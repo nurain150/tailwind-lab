@@ -1,8 +1,8 @@
 # Tailwind CSS Learning Labs
 
-A collection of interactive learning materials and practical labs designed to help me and learners understand and experiment with Tailwind CSS. All labs and classes are written by
+A collection of interactive learning materials and practical labs designed to help me and learners understand, and also experiment with Tailwind CSS. All labs and classes are written by
 
- various AI agent with human directions and arrangment. 
+various AI agent with human directions and arrangment. 
 
 
 
@@ -14,7 +14,8 @@ The goal is to understand how Tailwind classes work and how they can be applied 
 
 This is also a welcome back to coding after leaving the scene since about 2015 and with my last serious code being an android calculator app published on Amazon Store when Kindle was still alive. 
 
-Now a lot of things have changed the main Js has moved it standards and added new features elimineated olden days boilerplate codes, old emerging libs then have fully matured an example being React. The Scary CSS then has been made less scary within the styling lang itself. Then css got a beautiful lib called tailwind that allows utility first and responsive design out of the box with easy prefixes like md sm and so on. 
+Now a lot of things have changed the main Js has moved it standards and added new features elimineated olden days boilerplate codes, old emerging libs then have fully matured an example being React.
+The Scary CSS then has been made less scary within the styling lang itself. Then css got a beautiful lib called tailwind that allows utility first and responsive design out of the box with easy prefixes like md sm and so on. 
 
 I thank Allah(God) the almighty for making me witness these several ease and transformation since about 2016 or thereabout when i left web dev actively. 
 
