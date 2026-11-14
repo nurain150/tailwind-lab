@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tailwind UI Engineering & Design Systems Lab</title>
+<!-- Tailwind CDN with official Typography plugin bundled -->
+<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    safelist: [
+      'text-xs','text-sm','text-base','text-lg','text-xl','text-2xl','text-3xl','text-4xl','text-5xl','text-6xl',
+      'font-light','font-normal','font-medium','font-semibold','font-bold','font-black',
+      'leading-none','leading-tight','leading-snug','leading-normal','leading-relaxed','leading-loose',
+      'tracking-tighter','tracking-tight','tracking-normal','tracking-wide','tracking-widest',
+      'font-sans','font-serif','font-mono',
+      'text-slate-900','text-slate-800','text-slate-700','text-slate-600','text-slate-500','text-slate-400','text-blue-600','text-red-500','text-white',
+      'bg-white','bg-slate-50','bg-slate-100','bg-slate-200','bg-slate-800','bg-slate-900','bg-blue-50','bg-blue-600','bg-emerald-50','bg-emerald-600',
+      'border','border-2','border-slate-200','border-slate-300','border-blue-500','border-transparent',
+      'rounded-none','rounded-sm','rounded-md','rounded-lg','rounded-xl','rounded-2xl','rounded-full',
+      'shadow-sm','shadow','shadow-md','shadow-lg','shadow-xl','shadow-none',
+      'ring-0','ring-2','ring-4','ring-offset-2','ring-blue-500','ring-slate-300',
+      'divide-y','divide-slate-200','divide-blue-200','divide-none',
+      'from-blue-500','via-indigo-500','to-purple-600','from-slate-900','to-slate-800','from-emerald-500','to-teal-600',
+      'prose','prose-sm','prose-lg','prose-slate',
+      'max-w-md','max-w-sm','w-full','truncate','line-clamp-2','whitespace-normal'
+    ]
+  };
+</script>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:#f4f7fa; color:#0f172a; font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+  button, input, select, textarea { font:inherit; }
+  button { cursor:pointer; }
+  .app { max-width:1480px; margin:0 auto; padding:24px; }
+  
+  /* Topbar */
+  .topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:16px 24px; box-shadow:0 1px 3px rgba(0,0,0,0.02); }
+  .brand { display:flex; align-items:center; gap:14px; }
+  .brand-mark { width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg, #1e293b, #0f172a);color:#fff;display:grid;place-items:center;font-weight:900;font-size:15px;letter-spacing:-.05em; }
+  .eyebrow { font-size:10px; font-weight:800; letter-spacing:.15em; text-transform:uppercase; color:#64748b; }
+  .topbar h1 { margin:2px 0 0; font-size:20px; line-height:1.2; letter-spacing:-.03em; color:#0f172a; font-weight:800; }
+  .status { border:1px solid #e2e8f0; background:#f8fafc; border-radius:999px; padding:8px 14px; font-size:12px; font-weight:600; color:#475569; display:flex; align-items:center; gap:8px; }
+  
+  /* Layout */
+  .layout { display:grid; grid-template-columns:290px minmax(0,1fr); gap:20px; align-items:start; }
+  .sidebar,.panel { background:#fff;border:1px solid #e2e8f0;border-radius:20px;box-shadow:0 4px 20px rgba(15,23,42,0.03); }
+  .sidebar { padding:14px; position:sticky;top:20px; max-height:calc(100vh - 40px); overflow-y:auto; }
+  
+  /* Sidebar Modules & Lessons */
+  .module-group { margin-bottom:14px; }
+  .module-title { font-size:10px; font-weight:900; letter-spacing:.14em; color:#94a3b8; text-transform:uppercase; margin:10px 8px 6px; }
+  .lesson-nav { display:flex;flex-direction:column;gap:3px; }
+  .lesson-btn { display:flex;align-items:center;gap:10px;text-align:left;border:0;background:transparent;padding:9px 10px;border-radius:10px;color:#475569;font-size:13px;font-weight:600;width:100%;transition:all 0.15s; }
+  .lesson-btn:hover { background:#f1f5f9; color:#0f172a; }
+  .lesson-btn .num { display:grid;place-items:center;width:22px;height:22px;border:1px solid #e2e8f0;border-radius:6px;font-size:10px;font-weight:700;color:#64748b;background:#f8fafc;flex-shrink:0; }
+  .lesson-btn.active { background:#eff6ff;color:#1d4ed8;font-weight:700; }
+  .lesson-btn.active .num { background:#2563eb;color:white;border-color:#2563eb; }
+  
+  /* Main Content Area */
+  .main { min-width:0; display:flex; flex-direction:column; gap:16px; }
+  .lesson-head { padding:26px; }
+  .lesson-badge { display:inline-flex; align-items:center; gap:6px; color:#1d4ed8; background:#eff6ff; border:1px solid #dbeafe; border-radius:999px; padding:5px 12px; font-size:11px; font-weight:800; }
+  .lesson-head h2 { margin:8px 0 10px; font-size:24px; letter-spacing:-.035em; line-height:1.2; color:#0f172a; font-weight:800; }
+  
+  /* Theory & Pedagogical Sections */
+  .theory { margin-top:14px; padding-top:16px; border-top:1px solid #f1f5f9; color:#334155; font-size:14px; line-height:1.75; }
+  .theory p { margin:0 0 12px; }
+  .theory ul { margin:0 0 12px; padding-left:18px; }
+  .theory li { margin-bottom:6px; }
+  .theory code { background:#f1f5f9; padding:2px 6px; border-radius:5px; font-family:monospace; font-size:12px; color:#0f172a; border:1px solid #e2e8f0; }
+  
+  .callout { background:#f8fafc; padding:14px 16px; border-left:4px solid #3b82f6; margin:14px 0; border-radius:0 10px 10px 0; font-size:13px; color:#334158; border:1px solid #e2e8f0; border-left-width:4px; }
+  .callout.warning { border-left-color:#ef4444; background:#fef2f2; color:#991b1b; }
+  .callout.success { border-left-color:#10b981; background:#ecfdf5; color:#065f46; }
+  .callout.pro-tip { border-left-color:#8b5cf6; background:#f5f3ff; color:#5b21b6; }
+
+  /* Failure & Comparison Grid */
+  .compare-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:16px 0; }
+  .compare-card { border-radius:10px; padding:14px; border:1px solid #e2e8f0; }
+  .compare-card.bad { background:#fff5f5; border-color:#feb2b2; }
+  .compare-card.good { background:#f0fdf4; border-color:#bbf7d0; }
+  .compare-title { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; display:flex; align-items:center; gap:6px; }
+  .compare-card.bad .compare-title { color:#c53030; }
+  .compare-card.good .compare-title { color:#166534; }
+
+  /* Work Grid & Panels */
+  .work-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .panel { padding:18px; min-width:0; display:flex; flex-direction:column; }
+  .panel-head { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:12px; }
+  .panel h3 { margin:0; font-size:14px; font-weight:700; color:#0f172a; }
+  .sub { margin-top:3px; color:#64748b; font-size:12px; line-height:1.4; }
+  .tag { border-radius:6px; padding:3px 7px; background:#f1f5f9; color:#475569; font-size:10px; font-weight:800; white-space:nowrap; border:1px solid #e2e8f0; }
+  
+  /* Controls UI */
+  .controls { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .control { padding:10px 12px; border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc; }
+  .control.full { grid-column:1/-1; }
+  .control-top { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:6px; }
+  .control label { color:#475569; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+  select { width:100%; border:1px solid #cbd5e1; border-radius:8px; background:#fff; padding:7px 10px; color:#0f172a; font-size:12px; font-weight:600; outline:none; }
+  
+  /* Preview Stage */
+  .preview-stage { 
+    background-color: #f8fafc;
+    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+    background-size: 16px 16px;
+    border: 1px dashed #cbd5e1; 
+    border-radius: 12px; 
+    padding: 24px; 
+    min-height: 340px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+    margin-top: 12px;
+  }
+  
+  /* Visualizer Model Area */
+  .diagram-wrap { border:1px solid #e2e8f0; border-radius:12px; background:#f8fafc; padding:14px; height:100%; min-height:410px; display:flex; flex-direction:column; justify-content:center; }
+  .diagram { position:relative; display:flex; flex-direction: column; align-items:center; justify-content:center; overflow:auto; padding:12px; }
+  
+  /* Code Editor Section */
+  .code-panel { margin-top:2px; }
+  .code-toolbar { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; }
+  .code-toolbar button { border:1px solid #cbd5e1; background:#fff; color:#334155; border-radius:8px; padding:6px 10px; font-size:11px; font-weight:750; }
+  .code-editor { width:100%; min-height:200px; resize:vertical; border:1px solid #0f172a; border-radius:10px; background:#0f172a; color:#e2e8f0; padding:14px; font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace; outline:none; }
+  
+  /* Lesson Navigation Footer */
+  .lesson-bottom { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:2px; background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:14px 20px; }
+  .takeaway { flex:1; color:#065f46; font-size:13px; font-weight:600; line-height:1.5; display:flex; align-items:center; gap:8px; }
+  .takeaway::before { content:"💡"; font-size:15px; flex-shrink:0; }
+  .lesson-bottom button { border:0; border-radius:10px; background:#0f172a; color:#fff; padding:10px 18px; font-size:12px; font-weight:750; transition:background 0.15s; }
+  .lesson-bottom button:disabled { opacity:0.4; cursor:not-allowed; }
+
+  @media(max-width:1024px){.layout{grid-template-columns:1fr}.work-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">DS</div>
+      <div>
+        <div class="eyebrow">Design Systems & UI Engineering Lab</div>
+        <h1>Tailwind Architectural Mastery</h1>
+      </div>
+    </div>
+    <div class="status">
+      <span style="width:7px;height:7px;border-radius:50%;background:#10b981;display:inline-block;"></span>
+      14 Structured Modules
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebarNav"></aside>
+
+    <main class="main">
+      <section class="panel lesson-head">
+        <div class="lesson-badge" id="badge">MODULE 01 · LESSON 01</div>
+        <h2 id="lessonTitle">Lesson Title</h2>
+        <div id="lessonTheory" class="theory"></div>
+      </section>
+      
+      <div class="work-grid">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Interactive Controls</h3>
+              <div class="sub">Configure surface tokens and design properties in real time.</div>
+            </div>
+            <span class="tag">LIVE TOKENS</span>
+          </div>
+          <div class="controls" id="controls"></div>
+          <div class="preview-stage" id="previewStage"></div>
+        </section>
+        
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Architectural Visualizer</h3>
+              <div class="sub">Inspecting structural depth, stacking layers, and layout metrics.</div>
+            </div>
+            <span class="tag">SYSTEM MODEL</span>
+          </div>
+          <div class="diagram-wrap">
+            <div class="diagram" id="diagramArea"></div>
+          </div>
+        </section>
+      </div>
+      
+      <section class="panel code-panel">
+        <div class="code-toolbar">
+          <div>
+            <h3>Live DOM Markup Editor</h3>
+            <div class="sub">Edit markup directly. Safe DOM parsing automatically updates the state model.</div>
+          </div>
+          <button id="resetCode">Reset to Defaults</button>
+        </div>
+        <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+      </section>
+      
+      <div class="lesson-bottom">
+        <div class="takeaway" id="takeaway"></div>
+        <button id="nextLesson">Next Lesson →</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const curriculum = [
+  {
+    module: "Module 1: Surfaces & Backgrounds",
+    lessons: [
+      {
+        id: "surfaces-1",
+        title: "What Is A UI Surface?",
+        badge: "01 · SURFACES",
+        theory: `<p>Every digital interface is built from layered <strong>surfaces</strong>. Pages, cards, modals, banners, and buttons are not mere decorations—they represent physical planes in virtual z-space.</p>
+        <p>Tailwind's background utilities (<code>bg-white</code>, <code>bg-slate-50</code>, <code>bg-slate-100</code>) establish immediate visual grouping. Without contrasting surfaces, interfaces collapse into flat walls of text.</p>
+        <div class="callout pro-tip">
+          <strong>The Mental Model:</strong> Think of UI engineering as woodworking. You are layering sheets of material. Higher elevation cards sit on top of background canvases.
+        </div>`,
+        takeaway: "Surfaces create structural separation. Never place content directly on raw backgrounds without a dedicated surface container.",
+        controls: ["bgSurface", "containerWidth"],
+        component: "surfaceBasic"
+      },
+      {
+        id: "surfaces-2",
+        title: "Background Hierarchy",
+        badge: "02 · BACKGROUND SCALE",
+        theory: `<p>Tailwind provides neutral gray scales (<code>slate</code>, <code>gray</code>, <code>zinc</code>) structured in increments from <code>50</code> (lightest tint) to <code>900</code> (deepest shade).</p>
+        <p>Background hierarchy flows from <code>bg-slate-50</code> (page canvas) to <code>bg-white</code> (primary cards) and <code>bg-slate-100</code> (nested interactive wells).</p>
+        <div class="callout warning">
+          <strong>Common Pitfall:</strong> Randomly mixing cool blue-grays with warm neutral slates breaks chromatic harmony. Stick to a single neutral family per application.
+        </div>`,
+        takeaway: "Establish hierarchy by stepping through neutral surface tokens rather than picking random opacity values.",
+        controls: ["bgHierarchy", "containerWidth"],
+        component: "bgHierarchyComp"
+      },
+      {
+        id: "surfaces-3",
+        title: "Text Contrast & Readability",
+        badge: "03 · CONTRAST & LEGIBILITY",
+        theory: `<p>Junior developers frequently default to pure black (<code>text-black</code>) on pure white. In professional design systems, pure black is strictly avoided because it creates excessive optical vibration and eye strain.</p>
+        <p>Instead, production apps use rich charcoal tones like <code>text-slate-900</code> for headers and <code>text-slate-600</code> for supporting body copy.</p>`,
+        takeaway: "Never use pure black text. Use <code>text-slate-900</code> for high-emphasis titles and <code>text-slate-600</code> for body paragraphs.",
+        controls: ["textColor", "fontSize"],
+        component: "contrastComp"
+      }
+    ]
+  },
+  {
+    module: "Module 2: Structure & Boundaries",
+    lessons: [
+      {
+        id: "structure-4",
+        title: "Borders & Structural Edges",
+        badge: "04 · BORDERS",
+        theory: `<p>Borders exist to separate neighboring surfaces when contrast alone is insufficient. However, heavy dark borders (like <code>border-black</code>) create a dated, prison-cell aesthetic.</p>
+        <p>Modern apps use ultra-subtle borders such as <code>border-slate-200</code> or <code>border-slate-300</code> so the user's eye focuses on content rather than container edges.</p>`,
+        takeaway: "Keep structural borders subtle (<code>border-slate-200</code>). Let content drive attention, not container strokes.",
+        controls: ["borderWidth", "borderColor"],
+        component: "borderComp"
+      },
+      {
+        id: "structure-5",
+        title: "Dividers & Content Flow",
+        badge: "05 · DIVIDERS",
+        theory: `<p>While individual component borders wrap elements, <strong>dividers</strong> (<code>divide-y</code>, <code>divide-slate-200</code>) establish repeating rhythm across list items and table rows without cluttering markup with repetitive classes.</p>`,
+        takeaway: "Use container division utilities for lists to keep template code DRY and spacing uniform.",
+        controls: ["divideStyle"],
+        component: "divideComp"
+      },
+      {
+        id: "structure-6",
+        title: "Radius Psychology",
+        badge: "06 · BORDER RADIUS",
+        theory: `<p>Border radius is not just styling—it carries psychological weight. <strong>Sharp corners</strong> (<code>rounded-none</code>, <code>rounded-sm</code>) communicate precision and enterprise software. <strong>Rounded corners</strong> (<code>rounded-xl</code>, <code>rounded-2xl</code>) communicate friendliness and modern SaaS consumer apps.</p>`,
+        takeaway: "Match your border radius to your brand personality: sharp for enterprise tooling, rounded for consumer SaaS.",
+        controls: ["borderRadius"],
+        component: "radiusComp"
+      }
+    ]
+  },
+  {
+    module: "Module 3: Elevation & Depth",
+    lessons: [
+      {
+        id: "elevation-7",
+        title: "Shadow Theory & Elevation",
+        badge: "07 · SHADOWS",
+        theory: `<p>Shadows communicate elevation because our brains are hardwired to associate occlusion shadows with physical height. We are simulating distance between a surface and the underlying page canvas.</p>
+        <div class="compare-grid">
+          <div class="compare-card bad">
+            <div class="compare-title">❌ Shadow Abuse</div>
+            <p style="margin:0;font-size:11px;color:#7f1d1d;">Applying <code>shadow-2xl</code> to every flat list item destroys spatial hierarchy.</p>
+          </div>
+          <div class="compare-card good">
+            <div class="compare-title">✨ Strategic Elevation</div>
+            <p style="margin:0;font-size:11px;color:#14532d;">Use <code>shadow-sm</code> for static cards and reserve <code>shadow-xl</code> for floating popovers.</p>
+          </div>
+        </div>`,
+        takeaway: "Reserve heavy shadows for floating overlays (modals, dropdowns). Use <code>shadow-sm</code> for standard cards.",
+        controls: ["shadowSize"],
+        component: "shadowComp"
+      },
+      {
+        id: "elevation-8",
+        title: "Rings & Accessibility Focus",
+        badge: "08 · RINGS & FOCUS",
+        theory: `<p>Focus rings (<code>ring-2 ring-blue-500</code>) are vital accessibility requirements ensuring keyboard navigation users can track focus states. Never remove focus outlines without providing a custom accessible alternative.</p>`,
+        takeaway: "Always maintain high-contrast focus rings for keyboard accessibility compliance.",
+        controls: ["ringSize", "ringColor"],
+        component: "ringComp"
+      }
+    ]
+  },
+  {
+    module: "Module 4: Typography & Rhythm",
+    lessons: [
+      {
+        id: "typography-9",
+        title: "Scale, Hierarchy & Weight",
+        badge: "09 · TYPOGRAPHY HIERARCHY",
+        theory: `<p>Typography guides the eye through visual weight. If everything is bold and sized at <code>text-lg</code>, nothing stands out. Effective interfaces pair massive display titles (<code>text-3xl font-black tracking-tight</code>) with muted metadata.</p>`,
+        takeaway: "Establish clear typographic contrast between headings and body text to create scannable reading paths.",
+        controls: ["fontSize", "fontWeight"],
+        component: "typoScaleComp"
+      },
+      {
+        id: "typography-10",
+        title: "Leading & Tracking Mechanics",
+        badge: "10 · LEADING & TRACKING",
+        theory: `<p><strong>Leading</strong> (line height) controls vertical spacing. <code>leading-none</code> causes text collisions, whereas <code>leading-relaxed</code> ensures comfortable paragraph readability.</p>
+        <p><strong>Tracking</strong> (letter spacing) should be tightened on large headings (<code>tracking-tight</code>) and widened on tiny uppercase labels (<code>tracking-widest</code>).</p>`,
+        takeaway: "Use <code>leading-relaxed</code> for multi-line body paragraphs and <code>tracking-tight</code> for large display headers.",
+        controls: ["leadingSize", "trackingSize"],
+        component: "leadingComp"
+      },
+      {
+        id: "typography-11",
+        title: "Truncation & Boundary Safety",
+        badge: "11 · TRUNCATION",
+        theory: `<p>Dynamic strings from APIs can easily break rigid UI grids if they overflow containers. Tailwind provides robust clipping tools: <code>truncate</code> for single lines and <code>line-clamp-2</code> for multiline cards.</p>`,
+        takeaway: "Always apply truncation or line-clamping to user-generated or dynamic content strings.",
+        controls: ["truncateMode", "containerWidth"],
+        component: "truncateComp"
+      }
+    ]
+  },
+  {
+    module: "Module 5: Advanced Systems",
+    lessons: [
+      {
+        id: "advanced-12",
+        title: "Gradients & Visual Accents",
+        badge: "12 · GRADIENTS",
+        theory: `<p>Gradients (<code>bg-gradient-to-r from-blue-500 to-purple-600</code>) add modern polish to hero headers, brand cards, and premium badges. However, overusing gradients across functional UI elements creates visual noise.</p>`,
+        takeaway: "Use gradients sparingly for hero accents and badges; keep functional UI controls clean and solid.",
+        controls: ["gradientStyle"],
+        component: "gradientComp"
+      },
+      {
+        id: "advanced-13",
+        title: "Markdown & Prose Styling",
+        badge: "13 · PROSE PLUGIN",
+        theory: `<p>When rendering raw HTML or Markdown from CMS sources, manual styling of headings, lists, blockquotes, and links is tedious. The official Tailwind Typography plugin's <code>prose</code> class automatically injects professional typographic rhythm.</p>`,
+        takeaway: "Always wrap CMS markdown output in the <code>prose prose-slate</code> container class.",
+        controls: ["proseSize"],
+        component: "proseComp"
+      },
+      {
+        id: "advanced-14",
+        title: "Capstone: Production Analytics Card",
+        badge: "14 · CAPSTONE PROJECT",
+        theory: `<p>Let's synthesize everything we've learned: layered surfaces, subtle borders, precise typography, strategic shadows, and professional contrast into a production-grade analytics card.</p>`,
+        takeaway: "Great UI engineering combines surfaces, typography, elevation, and hierarchy into cohesive, accessible components.",
+        controls: ["capstoneTheme"],
+        component: "capstoneComp"
+      }
+    ]
+  }
+];
+
+const state = {
+  bgSurface: "bg-white",
+  bgHierarchy: "bg-slate-50",
+  containerWidth: "max-w-md",
+  textColor: "text-slate-900",
+  fontSize: "text-2xl",
+  fontWeight: "font-bold",
+  borderWidth: "border",
+  borderColor: "border-slate-200",
+  divideStyle: "divide-y divide-slate-200",
+  borderRadius: "rounded-xl",
+  shadowSize: "shadow-md",
+  ringSize: "ring-2",
+  ringColor: "ring-blue-500",
+  leadingSize: "leading-relaxed",
+  trackingSize: "tracking-tight",
+  truncateMode: "truncate",
+  gradientStyle: "from-blue-500 via-indigo-500 to-purple-600",
+  proseSize: "prose",
+  capstoneTheme: "default"
+};
+
+let currentModIndex = 0;
+let currentLessonIndex = 0;
+let typingTimer = null;
+const $ = id => document.getElementById(id);
+
+function renderComponentHTML() {
+  const lesson = curriculum[currentModIndex].lessons[currentLessonIndex];
+  
+  switch(lesson.component) {
+    case "surfaceBasic":
+      return `<div class="${state.bgSurface} border border-slate-200 shadow-sm p-8 ${state.containerWidth} w-full mx-auto rounded-2xl transition-all duration-200">
+  <div class="text-xs font-bold tracking-widest text-blue-600 uppercase mb-2">Workspace Canvas</div>
+  <h3 class="text-xl font-bold text-slate-900 mb-3">Project Overview</h3>
+  <p class="text-sm text-slate-600 leading-relaxed mb-6">This card represents an elevated surface resting on the application background canvas.</p>
+  <button class="bg-slate-900 text-white font-semibold px-4 py-2 rounded-xl text-sm shadow-sm hover:bg-slate-800 transition">Manage Workspace</button>
+</div>`;
+
+    case "bgHierarchyComp":
+      return `<div class="${state.bgHierarchy} p-6 border border-slate-200 rounded-2xl ${state.containerWidth} w-full mx-auto">
+  <div class="bg-white p-6 border border-slate-200 shadow-sm rounded-xl mb-4">
+    <h4 class="font-bold text-slate-900 mb-1">Primary Surface (bg-white)</h4>
+    <p class="text-xs text-slate-500">Elevated container element.</p>
+  </div>
+  <div class="bg-slate-100 p-4 border border-slate-200 rounded-xl">
+    <h4 class="font-bold text-slate-800 text-sm mb-1">Nested Well (bg-slate-100)</h4>
+    <p class="text-xs text-slate-600">Secondary recessed surface.</p>
+  </div>
+</div>`;
+
+    case "contrastComp":
+      return `<div class="bg-white p-8 border border-slate-200 shadow-sm rounded-2xl max-w-md w-full mx-auto text-center">
+  <p class="text-xs font-bold tracking-widest text-slate-400 uppercase mb-2">Readability Test</p>
+  <h2 class="${state.fontSize} ${state.fontWeight} ${state.textColor} mb-3">Enterprise Analytics</h2>
+  <p class="text-sm text-slate-600 leading-relaxed">Notice how charcoal text tokens prevent harsh optical glare compared to pure black.</p>
+</div>`;
+
+    case "borderComp":
+      return `<div class="bg-white ${state.borderWidth} ${state.borderColor} p-8 rounded-2xl max-w-md w-full mx-auto shadow-sm">
+  <h3 class="text-lg font-bold text-slate-900 mb-2">Structural Boundary</h3>
+  <p class="text-sm text-slate-600">Subtle border tokens establish clean separation without optical distraction.</p>
+</div>`;
+
+    case "divideComp":
+      return `<div class="bg-white border border-slate-200 rounded-2xl max-w-md w-full mx-auto shadow-sm overflow-hidden ${state.divideStyle}">
+  <div class="p-4 text-sm font-semibold text-slate-800">API Integration Status: Active</div>
+  <div class="p-4 text-sm font-medium text-slate-600">Database Latency: 14ms</div>
+  <div class="p-4 text-sm font-medium text-slate-600">SSL Certificate: Valid 365 Days</div>
+</div>`;
+
+    case "radiusComp":
+      return `<div class="bg-slate-900 text-white p-8 max-w-md w-full mx-auto ${state.borderRadius} shadow-xl text-center">
+  <h3 class="text-xl font-bold mb-2">Brand Personality</h3>
+  <p class="text-sm text-slate-300">This container uses <code>${state.borderRadius}</code>.</p>
+</div>`;
+
+    case "shadowComp":
+      return `<div class="bg-white border border-slate-200 p-8 max-w-md w-full mx-auto rounded-2xl ${state.shadowSize} transition-all duration-200 text-center">
+  <h3 class="text-lg font-bold text-slate-900 mb-2">Elevation Model</h3>
+  <p class="text-sm text-slate-600">Active shadow token: <code>${state.shadowSize}</code></p>
+</div>`;
+
+    case "ringComp":
+      return `<div class="max-w-md w-full mx-auto text-center p-8 bg-white border border-slate-200 rounded-2xl shadow-sm">
+  <button class="bg-blue-600 text-white font-bold px-6 py-3 rounded-xl text-sm ${state.ringSize} ${state.ringColor} ring-offset-2 transition">Interactive Focus Button</button>
+  <p class="text-xs text-slate-500 mt-4">Click or tab to inspect focus ring accessibility state.</p>
+</div>`;
+
+    case "typoScaleComp":
+      return `<div class="bg-white border border-slate-200 p-8 rounded-2xl max-w-md w-full mx-auto shadow-sm">
+  <p class="text-xs font-bold tracking-widest text-blue-600 uppercase mb-1">Typography System</p>
+  <h1 class="${state.fontSize} ${state.fontWeight} text-slate-900 mb-3 tracking-tight">Scalable Headlines</h1>
+  <p class="text-sm text-slate-600 leading-relaxed">Pairing proportional weights with responsive scale classes maintains visual hierarchy.</p>
+</div>`;
+
+    case "leadingComp":
+      return `<div class="bg-white border border-slate-200 p-8 rounded-2xl max-w-md w-full mx-auto shadow-sm">
+  <h3 class="text-base font-bold text-slate-900 mb-2 ${state.trackingSize}">Paragraph Rhythm</h3>
+  <p class="text-sm text-slate-700 ${state.leadingSize}">Typography readability relies heavily on vertical line spacing. Without adequate leading, multi-line blocks become difficult for the human eye to track across line breaks.</p>
+</div>`;
+
+    case "truncateComp":
+      return `<div class="bg-white border border-slate-200 p-6 rounded-2xl mx-auto shadow-sm ${state.containerWidth}">
+  <h4 class="text-sm font-bold text-slate-900 ${state.truncateMode} mb-2">Enterprise Infrastructure & Cloud Security Management Gateway</h4>
+  <p class="text-xs text-slate-500">Container width: <code>${state.containerWidth}</code> · Truncation: <code>${state.truncateMode}</code></p>
+</div>`;
+
+    case "gradientComp":
+      return `<div class="bg-gradient-to-r ${state.gradientStyle} p-8 rounded-2xl max-w-md w-full mx-auto shadow-lg text-white">
+  <div class="text-xs font-bold tracking-widest uppercase mb-1 opacity-80">Hero Banner</div>
+  <h3 class="text-2xl font-black mb-2">Modern Visual Polish</h3>
+  <p class="text-sm opacity-90">Gradients provide striking accents for hero sections and feature callouts.</p>
+</div>`;
+
+    case "proseComp":
+      return `<div class="bg-white border border-slate-200 p-8 rounded-2xl max-w-md w-full mx-auto shadow-sm">
+  <article class="${state.proseSize} prose-slate">
+    <h1>Typography Plugin</h1>
+    <p>The prose wrapper automatically styles raw HTML elements without manual class injection.</p>
+    <ul>
+      <li>Consistent margins</li>
+      <li>Automatic heading scales</li>
+      <li>Polished blockquotes</li>
+    </ul>
+  </article>
+</div>`;
+
+    case "capstoneComp":
+      return `<article class="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden max-w-md w-full mx-auto">
+  <div class="h-36 bg-gradient-to-r from-blue-600 to-indigo-600 p-6 flex flex-col justify-end text-white">
+    <span class="text-[10px] font-extrabold tracking-widest uppercase bg-white/20 px-2.5 py-1 rounded-full w-max mb-2">Q4 Enterprise</span>
+    <h3 class="text-xl font-black tracking-tight">Quarterly Growth Report</h3>
+  </div>
+  <div class="p-6">
+    <div class="flex justify-between items-center mb-4 pb-4 border-b border-slate-100">
+      <div>
+        <p class="text-xs text-slate-400 font-semibold uppercase">Total Revenue</p>
+        <p class="text-2xl font-black text-slate-900">$348,250</p>
+      </div>
+      <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">+14.2%</span>
+    </div>
+    <p class="text-xs text-slate-600 leading-relaxed mb-6">Cloud infrastructure usage scaled smoothly across all active regional server clusters.</p>
+    <button class="w-full bg-slate-900 text-white font-bold py-2.5 rounded-xl text-xs hover:bg-slate-800 transition">View Detailed Audit</button>
+  </div>
+</article>`;
+
+    default:
+      return `<div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm max-w-md w-full mx-auto">Default Preview</div>`;
+  }
+}
+
+function updateVisualizer() {
+  const lesson = curriculum[currentModIndex].lessons[currentLessonIndex];
+  let diag = "";
+
+  if (lesson.id.startsWith("surfaces")) {
+    diag = `<div class="w-full text-center">
+      <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Z-Space Surface Elevation</h4>
+      <div class="space-y-3 max-w-xs mx-auto">
+        <div class="bg-slate-200 p-3 rounded-xl border border-slate-300 text-xs font-bold text-slate-700">Canvas (bg-slate-50)</div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-xs font-bold text-slate-900">Primary Card (bg-white)</div>
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-600">Nested Well (bg-slate-100)</div>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-4 leading-normal">Surfaces step forward visually through background shade increments.</p>
+    </div>`;
+  } else if (lesson.id.startsWith("elevation")) {
+    diag = `<div class="w-full text-center">
+      <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Elevation & Occlusion Stack</h4>
+      <div class="space-y-4 max-w-xs mx-auto">
+        <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm text-xs font-bold text-slate-700">Level 1: <code>shadow-sm</code> (Cards)</div>
+        <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-xl text-xs font-bold text-blue-600">Level 3: <code>shadow-xl</code> (Modals)</div>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-4 leading-normal">Shadow spread simulates physical distance from the page canvas.</p>
+    </div>`;
+  } else if (lesson.id.startsWith("structure")) {
+    diag = `<div class="w-full text-center">
+      <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Structural Boundary Model</h4>
+      <div class="p-6 bg-white border-2 border-dashed border-blue-300 rounded-2xl max-w-xs mx-auto relative">
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">Border Token</div>
+        <p class="text-xs text-slate-700 font-medium">Borders establish crisp geometric edges without relying on heavy contrast.</p>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-4 leading-normal">Use subtle tokens like <code>border-slate-200</code> for professional polish.</p>
+    </div>`;
+  } else if (lesson.id.startsWith("typography")) {
+    diag = `<div class="w-full text-center">
+      <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Line Box & Leading Mechanics</h4>
+      <div class="bg-white border border-slate-200 rounded-xl p-4 max-w-xs mx-auto space-y-2 text-left">
+        <div class="bg-red-100 border border-red-300 px-2 py-1 text-[11px] font-mono text-red-800">line-height box (leading)</div>
+        <div class="bg-red-100 border border-red-300 px-2 py-1 text-[11px] font-mono text-red-800">line-height box (leading)</div>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-4 leading-normal">Adequate leading prevents descenders and ascenders from colliding.</p>
+    </div>`;
+  } else {
+    diag = `<div class="text-center text-slate-400 text-sm py-16">
+      <span class="text-4xl block mb-3">📐</span>
+      Inspecting architectural design tokens and structural layout properties.
+    </div>`;
+  }
+
+  $("diagramArea").innerHTML = diag;
+}
+
+function createSelect(id, label, opts) {
+  return `<div class="control"><div class="control-top"><label for="${id}">${label}</label></div><select id="${id}">${opts.map(o => `<option value="${o[0]}" ${o[0]===state[id]?'selected':''}>${o[1]}</option>`).join("")}</select></div>`;
+}
+
+function renderControls() {
+  const lesson = curriculum[currentModIndex].lessons[currentLessonIndex];
+  let html = "";
+
+  lesson.controls.forEach(ctrl => {
+    switch(ctrl) {
+      case "bgSurface":
+        html += createSelect("bgSurface", "Surface Background", [["bg-white","White (bg-white)"],["bg-slate-50","Slate 50"],["bg-blue-50","Blue Tint (bg-blue-50)"]]);
+        break;
+      case "bgHierarchy":
+        html += createSelect("bgHierarchy", "Canvas Hierarchy", [["bg-slate-50","Slate Canvas (bg-slate-50)"],["bg-slate-100","Slate 100 Canvas"],["bg-white","Pure White Canvas"]]);
+        break;
+      case "containerWidth":
+        html += createSelect("containerWidth", "Container Width", [["max-w-md","Max Width MD"],["max-w-sm","Max Width SM"],["w-full","Full Width (w-full)"]]);
+        break;
+      case "textColor":
+        html += createSelect("textColor", "Text Color Token", [["text-slate-900","Slate 900 (Optimal)"],["text-slate-700","Slate 700 (Soft)"],["text-slate-400","Slate 400 (Low Contrast)"]]);
+        break;
+      case "fontSize":
+        html += createSelect("fontSize", "Font Scale", [["text-lg","Large (text-lg)"],["text-2xl","2X Large (text-2xl)"],["text-4xl","4X Large (text-4xl)"]]);
+        break;
+      case "fontWeight":
+        html += createSelect("fontWeight", "Font Weight", [["font-normal","Normal (400)"],["font-semibold","Semibold (600)"],["font-black","Black (900)"]]);
+        break;
+      case "borderWidth":
+        html += createSelect("borderWidth", "Border Width", [["border","Thin Border (border)"],["border-2","Thick Border (border-2)"],["border-transparent","No Border"]]);
+        break;
+      case "borderColor":
+        html += createSelect("borderColor", "Border Token", [["border-slate-200","Subtle Slate 200"],["border-slate-300","Slate 300"],["border-blue-500","Primary Blue 500"]]);
+        break;
+      case "divideStyle":
+        html += createSelect("divideStyle", "List Dividers", [["divide-y divide-slate-200","Subtle Divider Y"],["divide-y divide-blue-200","Blue Divider Y"],["divide-none","No Dividers"]]);
+        break;
+      case "borderRadius":
+        html += createSelect("borderRadius", "Border Radius", [["rounded-none","Sharp (rounded-none)"],["rounded-lg","Rounded LG"],["rounded-2xl","Modern 2XL"],["rounded-full","Pill (rounded-full)"]]);
+        break;
+      case "shadowSize":
+        html += createSelect("shadowSize", "Elevation Shadow", [["shadow-sm","Subtle Shadow SM"],["shadow-md","Medium Shadow MD"],["shadow-xl","Floating XL"],["shadow-none","Flat (No Shadow)"]]);
+        break;
+      case "ringSize":
+        html += createSelect("ringSize", "Focus Ring Width", [["ring-0","No Ring"],["ring-2","Ring Width 2px"],["ring-4","Ring Width 4px"]]);
+        break;
+      case "ringColor":
+        html += createSelect("ringColor", "Focus Ring Color", [["ring-blue-500","Blue Ring 500"],["ring-slate-300","Slate Ring 300"]]);
+        break;
+      case "leadingSize":
+        html += createSelect("leadingSize", "Line Height (Leading)", [["leading-none","Tight Collision (none)"],["leading-normal","Normal (1.5)"],["leading-relaxed","Relaxed (1.625)"],["leading-loose","Loose (2.0)"]]);
+        break;
+      case "trackingSize":
+        html += createSelect("trackingSize", "Letter Spacing (Tracking)", [["tracking-tighter","Tighter"],["tracking-tight","Tight (Headlines)"],["tracking-normal","Normal"],["tracking-widest","Widest (Caps)"]]);
+        break;
+      case "truncateMode":
+        html += createSelect("truncateMode", "Truncation Rule", [["truncate","Single Line Truncate"],["line-clamp-2","Line Clamp 2"],["whitespace-normal","Normal Wrap"]]);
+        break;
+      case "gradientStyle":
+        html += createSelect("gradientStyle", "Gradient Stops", [["from-blue-500 via-indigo-500 to-purple-600","Blue to Purple"],["from-slate-900 to-slate-800","Dark Slate"],["from-emerald-500 to-teal-600","Emerald to Teal"]]);
+        break;
+      case "proseSize":
+        html += createSelect("proseSize", "Prose Scale", [["prose","Standard Prose"],["prose-sm","Small Prose"],["prose-lg","Large Prose"]]);
+        break;
+      case "capstoneTheme":
+        html += createSelect("capstoneTheme", "Card Theme", [["default","Enterprise Blue"],["dark","Slate Night"]]);
+        break;
+    }
+  });
+
+  $("controls").innerHTML = html;
+
+  $("controls").querySelectorAll("select").forEach(el => {
+    el.addEventListener("change", () => {
+      state[el.id] = el.value;
+      updateAll();
+    });
+  });
+}
+
+function updateAll(skipEditor = false) {
+  const html = renderComponentHTML();
+  if (!skipEditor) $("codeEditor").value = html;
+  $("previewStage").innerHTML = html;
+  updateVisualizer();
+}
+
+function parseEditorDOM() {
+  const rawHTML = $("codeEditor").value;
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(rawHTML, "text/html");
+  const firstEl = doc.body.firstElementChild;
+  if (!firstEl) return;
+
+  const classList = [...firstEl.classList];
+  classList.forEach(cls => {
+    if (cls.startsWith("bg-") && !cls.includes("gradient")) {
+      if (state.hasOwnProperty("bgSurface")) state.bgSurface = cls;
+      if (state.hasOwnProperty("bgHierarchy")) state.bgHierarchy = cls;
+    }
+    if (cls.startsWith("text-slate-") || cls.startsWith("text-blue-")) {
+      if (state.hasOwnProperty("textColor")) state.textColor = cls;
+    }
+    if (cls.startsWith("text-xs") || cls.startsWith("text-sm") || cls.startsWith("text-lg") || cls.startsWith("text-2xl") || cls.startsWith("text-4xl")) {
+      if (state.hasOwnProperty("fontSize")) state.fontSize = cls;
+    }
+    if (cls.startsWith("font-")) {
+      if (state.hasOwnProperty("fontWeight")) state.fontWeight = cls;
+    }
+    if (cls.startsWith("rounded-")) {
+      if (state.hasOwnProperty("borderRadius")) state.borderRadius = cls;
+    }
+    if (cls.startsWith("shadow-")) {
+      if (state.hasOwnProperty("shadowSize")) state.shadowSize = cls;
+    }
+    if (cls.startsWith("leading-")) {
+      if (state.hasOwnProperty("leadingSize")) state.leadingSize = cls;
+    }
+    if (cls.startsWith("tracking-")) {
+      if (state.hasOwnProperty("trackingSize")) state.trackingSize = cls;
+    }
+  });
+
+  renderControls();
+}
+
+function renderSidebar() {
+  let navHTML = "";
+  curriculum.forEach((mod, mIdx) => {
+    navHTML += `<div class="module-group">
+      <div class="module-title">${mod.module}</div>
+      <div class="lesson-nav">`;
+    mod.lessons.forEach((l, lIdx) => {
+      const isActive = (mIdx === currentModIndex && lIdx === currentLessonIndex);
+      navHTML += `<button class="lesson-btn ${isActive ? 'active' : ''}" data-m="${mIdx}" data-l="${lIdx}">
+        <span class="num">${String(lIdx + 1).padStart(2, "0")}</span>
+        <span>${l.title}</span>
+      </button>`;
+    });
+    navHTML += `</div></div>`;
+  });
+
+  $("sidebarNav").innerHTML = navHTML;
+
+  document.querySelectorAll(".lesson-btn").forEach(btn => {
+    btn.onclick = () => {
+      currentModIndex = +btn.dataset.m;
+      currentLessonIndex = +btn.dataset.l;
+      renderLesson();
+    };
+  });
+}
+
+function renderLesson() {
+  const mod = curriculum[currentModIndex];
+  const lesson = mod.lessons[currentLessonIndex];
+
+  $("badge").textContent = lesson.badge;
+  $("lessonTitle").textContent = lesson.title;
+  $("lessonTheory").innerHTML = lesson.theory;
+  $("takeaway").textContent = lesson.takeaway;
+
+  renderSidebar();
+  renderControls();
+  updateAll();
+
+  const isLast = (currentModIndex === curriculum.length - 1 && currentLessonIndex === mod.lessons.length - 1);
+  $("nextLesson").textContent = isLast ? "Complete Curriculum ✓" : "Next Lesson →";
+  $("nextLesson").disabled = isLast;
+}
+
+$("codeEditor").addEventListener("input", () => {
+  $("previewStage").innerHTML = $("codeEditor").value;
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(() => {
+    parseEditorDOM();
+    updateVisualizer();
+  }, 350);
+});
+
+$("resetCode").onclick = () => updateAll();
+
+$("nextLesson").onclick = () => {
+  const mod = curriculum[currentModIndex];
+  if (currentLessonIndex < mod.lessons.length - 1) {
+    currentLessonIndex++;
+  } else if (currentModIndex < curriculum.length - 1) {
+    currentModIndex++;
+    currentLessonIndex = 0;
+  }
+  renderLesson();
+};
+
+renderLesson();
+</script>
+</body>
+</html>

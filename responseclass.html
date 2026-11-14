@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Responsive & Alignment Lab</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--soft:#f8fafc;--acc:#2563eb;--accbg:#eff6ff;--ok:#047857;--okbg:#ecfdf5;--warn:#b45309;--warnbg:#fffbeb;color-scheme:light dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1120;--card:#111a2e;--ink:#e2e8f0;--mut:#94a3b8;--line:#243049;--soft:#0f1729;--acc:#60a5fa;--accbg:#172554;--ok:#6ee7b7;--okbg:#052e2b;--warn:#fbbf24;--warnbg:#2a1f05}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+button,textarea{font:inherit;color:inherit}button{cursor:pointer}
+code{font:12px ui-monospace,Menlo,monospace;background:var(--soft);border:1px solid var(--line);padding:1px 6px;border-radius:5px}
+.app{max-width:1280px;margin:0 auto;padding:16px}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.mark{width:38px;height:38px;border-radius:10px;background:var(--acc);color:#fff;display:grid;place-items:center;font-weight:900;font-size:13px}
+.top h1{margin:0;font-size:18px}.top p{margin:0;color:var(--mut);font-size:12px}
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:16px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.nav{position:sticky;top:12px;display:flex;flex-direction:column;gap:4px}
+.nav button{display:flex;gap:8px;align-items:center;text-align:left;border:0;background:transparent;padding:9px 10px;border-radius:8px;color:var(--mut);font-weight:650;font-size:13px}
+.nav button.on{background:var(--accbg);color:var(--acc)}
+.nav .n{width:22px;height:22px;border-radius:6px;border:1px solid var(--line);display:grid;place-items:center;font-size:10px;flex:none}
+.nav button.on .n{background:var(--acc);color:#fff;border-color:var(--acc)}
+.nav .done .n{background:var(--ok);color:#fff;border-color:var(--ok)}
+.badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--acc);background:var(--accbg);border-radius:99px;padding:3px 10px}
+h2{margin:8px 0;font-size:22px;letter-spacing:-.02em}h3{margin:0 0 4px;font-size:14px}
+.sub{color:var(--mut);font-size:12px}
+.idea{font-size:15px;max-width:70ch}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:14px 0}
+.tile{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px}
+.tile .box{border:1px dashed var(--mut);border-radius:6px;padding:4px;gap:4px;background:var(--card)}
+.tile i{background:var(--acc);border-radius:3px;display:block}
+.tile code{align-self:flex-start}.tile small{color:var(--mut);font-size:11px}
+.note{border-left:4px solid var(--warn);background:var(--warnbg);padding:10px 14px;border-radius:0 8px 8px 0;font-size:13px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.knobs{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin:10px 0}
+.knob{border:1px solid var(--line);background:var(--soft);border-radius:10px;padding:8px 10px}
+.knob label{display:block;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:6px}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:7px;padding:3px 8px;font:11px ui-monospace,Menlo,monospace}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.vp{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:12px 0 8px}
+.vp input{flex:1;min-width:160px;accent-color:var(--acc)}
+.bp{font-weight:800;color:var(--acc);min-width:150px}
+.stage{background:var(--soft);background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:16px 16px;border:1px dashed var(--mut);border-radius:10px;padding:12px;display:flex;justify-content:center;overflow:hidden}
+.wrap{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#f8fafc}
+iframe{border:0;transform-origin:0 0;display:block;background:#f8fafc}
+.live{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;align-items:center}
+.live span.t{font:11px ui-monospace,Menlo,monospace;padding:2px 8px;border-radius:6px;border:1px solid var(--line);color:var(--mut);opacity:.55}
+.live span.t.on{opacity:1;background:var(--okbg);color:var(--ok);border-color:var(--ok)}
+.rec{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:10px 0}
+.rec button{text-align:left;border:1px solid var(--line);background:var(--soft);border-radius:10px;padding:10px}
+.rec b{display:block;font-size:13px}.rec span{font-size:11px;color:var(--mut)}
+.rec button:hover{border-color:var(--acc)}
+textarea{width:100%;min-height:200px;resize:vertical;background:#0f172a;color:#e2e8f0;border:1px solid #0f172a;border-radius:8px;padding:12px;font:12px/1.6 ui-monospace,Menlo,monospace}
+.btn{border:0;border-radius:8px;background:var(--ink);color:var(--bg);padding:8px 14px;font-weight:700;font-size:12px}
+.btn.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.4}
+.res{font-weight:700;font-size:13px}.res.ok{color:var(--ok)}.res.no{color:var(--warn)}
+.take{background:var(--okbg);color:var(--ok);border-radius:8px;padding:10px 14px;font-weight:600;font-size:13px;margin-top:12px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.nav{position:static;flex-direction:row;overflow-x:auto}.nav button{white-space:nowrap}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><div class="mark">RWD</div><div><h1>Responsive & Alignment Lab</h1><p>Breakpoints · flex <code>items-*</code> · grid <code>place-items-*</code></p></div></div>
+  <div class="layout">
+    <nav class="nav" id="nav"></nav>
+    <main>
+      <section class="card">
+        <span class="badge" id="badge"></span>
+        <h2 id="title"></h2>
+        <p class="idea" id="idea"></p>
+        <h3 id="tilesTitle"></h3>
+        <div class="tiles" id="tiles"></div>
+        <div class="note" id="gotcha"></div>
+      </section>
+
+      <section class="card">
+        <h3>1 · Playground</h3>
+        <div class="sub">Pick classes, then drag the width. The preview is a real mini-browser, so <code>md:</code> truly switches on at 768px.</div>
+        <div class="knobs" id="knobs"></div>
+        <div class="vp">
+          <span class="bp" id="bp"></span>
+          <input type="range" id="w" min="320" max="1280" step="10" value="375">
+          <div class="row" id="presets"></div>
+        </div>
+        <div class="stage" id="stage"><div class="wrap" id="wrap"><iframe id="fr" title="Live preview"></iframe></div></div>
+        <div class="live" id="live"></div>
+        <textarea id="code" spellcheck="false" aria-label="Editable HTML"></textarea>
+        <div class="row" style="margin-top:8px"><button class="btn alt" id="reset">Reset from knobs</button><span class="sub">The editor is live. Type in it and the preview follows.</span></div>
+      </section>
+
+      <section class="card">
+        <h3>2 · Real-world recipes</h3>
+        <div class="sub">Patterns you will write again and again. Click one to load it, then resize.</div>
+        <div class="rec" id="rec"></div>
+      </section>
+
+      <section class="card">
+        <h3>3 · Your mission</h3>
+        <p id="mission" style="margin:6px 0 10px"></p>
+        <div class="row"><button class="btn" id="start">Start mission</button><button class="btn alt" id="check">Check my classes</button><span class="res" id="res"></span></div>
+        <div class="take" id="take"></div>
+        <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" id="next">Next module →</button></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const BP=[['base',0],['sm',640],['md',768],['lg',1024],['xl',1280]];
+const bpOf=w=>BP.filter(b=>w>=b[1]).pop()[0];
+const CARD='bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold shadow-sm';
+const cards=()=>[1,2,3,4,5,6].map(n=>`  <div class="${CARD}">Card ${n}</div>`).join('\n');
+const alignTiles=['start','center','end','stretch'].map(v=>({l:'items-'+v,code:'items-'+v,css:`display:flex;gap:6px;align-items:${v==='stretch'?'stretch':'flex-'+v.replace('center','center')};height:56px`.replace('flex-center','center'),kids:['width:20px;min-height:14px','width:20px;min-height:30px']}));
+const placeTiles=['start','center','end'].map(v=>({l:'place-items-'+v,code:'place-items-'+v,css:`display:grid;grid-template-columns:1fr 1fr;place-items:${v==='center'?'center':v};height:56px`,kids:['width:18px;height:18px','width:18px;height:18px']}));
+const colTiles=[[1,'base'],[2,'sm:'],[4,'lg:']].map(([n,p])=>({l:p==='base'?'phone, 0px+':p+' from '+(p==='sm:'?'640':'1024')+'px',code:p==='base'?'grid-cols-1':p+'grid-cols-'+n,css:`display:grid;grid-template-columns:repeat(${n},1fr)`,kids:Array(4).fill('height:12px')}));
+
+const L=[
+{title:'Mobile-first breakpoints',badge:'01 · BREAKPOINTS',
+ idea:'Unprefixed classes are your phone layout. A prefix such as <code>sm:</code> means “from this width and up, also do this”. You never target phones only; you start small and add on as the screen grows.',
+ tilesTitle:'Same grid, three widths',tiles:colTiles,
+ gotcha:'<b>Common trap:</b> <code>md:grid-cols-3</code> does not mean “only on tablets”. It means 768px <i>and wider</i>, until a larger prefix such as <code>lg:</code> overrides it.',
+ fixed:'grid gap-3 p-3',
+ knobs:[{n:'Base (phone)',o:['grid-cols-1','grid-cols-2']},{n:'sm: (640px+)',o:['','sm:grid-cols-2','sm:grid-cols-3']},{n:'lg: (1024px+)',o:['','lg:grid-cols-4','lg:grid-cols-3']}],
+ kids:()=>cards(),
+ recipes:[{n:'Card gallery',c:'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3',u:'Blog posts, products, team photos'},{n:'Stat tiles',c:'grid grid-cols-2 lg:grid-cols-4 gap-3 p-3',u:'Dashboards: two on phones is fine'},{n:'Sidebar layout',c:'grid grid-cols-1 md:grid-cols-3 gap-3 p-3',u:'Stacked on phone, 3 tracks from md:'}],
+ start:'grid gap-3 p-3',need:['grid-cols-1','sm:grid-cols-2','lg:grid-cols-4'],
+ mission:'Make the cards show <b>1 column</b> on phones, <b>2 columns</b> from sm:, and <b>4 columns</b> from lg:.',
+ take:'Write the phone layout first, then add sm: md: lg: only where the design needs to change.'},
+{title:'Flexbox: direction, items-*, justify-*',badge:'02 · FLEXBOX',
+ idea:'A flex container has two axes. <code>justify-*</code> positions children along the <b>main</b> axis (the direction of flow). <code>items-*</code> positions them across the <b>cross</b> axis. Change <code>flex-col</code> to <code>flex-row</code> and the axes swap.',
+ tilesTitle:'items-* across the cross axis (row direction)',tiles:alignTiles,
+ gotcha:'<b>Axes swap:</b> in <code>flex-col</code>, <code>items-center</code> centres horizontally, while in <code>flex-row</code> it centres vertically. That is why <code>items-start md:items-center</code> pairs so well with <code>flex-col md:flex-row</code>.',
+ fixed:'flex gap-3 p-4 bg-white border border-slate-200 rounded-xl',
+ knobs:[{n:'Direction',o:['flex-col md:flex-row','flex-col','flex-row']},{n:'Cross axis (items-*)',o:['items-start md:items-center','items-start','items-center','items-end','items-stretch']},{n:'Main axis (justify-*)',o:['justify-start','justify-between','justify-center','justify-end']}],
+ kids:()=>`  <div>\n    <h3 class="font-bold text-sm">Page title</h3>\n    <p class="text-xs text-slate-500">A taller block<br>with two lines</p>\n  </div>\n  <button class="bg-slate-900 text-white font-bold px-4 py-2 rounded-lg text-xs">Action</button>`,
+ recipes:[{n:'Navbar',c:'flex flex-col gap-3 md:flex-row md:items-center md:justify-between p-4 bg-white border border-slate-200 rounded-xl',u:'Logo left, actions right, centred on one line'},{n:'Footer bar',c:'flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between p-4 bg-white border border-slate-200 rounded-xl',u:'Baseline-ish bottom alignment on wide screens'},{n:'Media row',c:'flex flex-row items-start gap-3 p-4 bg-white border border-slate-200 rounded-xl',u:'Avatar plus text, pinned to the top'}],
+ start:'flex gap-3 p-4 bg-white border border-slate-200 rounded-xl',need:['flex-col','md:flex-row','md:items-center'],
+ mission:'Make the header <b>stack on phones</b>, switch to a <b>row from md:</b>, and <b>centre the children vertically from md:</b>.',
+ take:'flex-col md:flex-row plus items-start md:items-center is the base recipe for most responsive header rows.'},
+{title:'Grid: place-items-* and place-self-*',badge:'03 · GRID ALIGNMENT',
+ idea:'In a grid, every child sits in a cell. <code>place-items-*</code> is shorthand for <code>items-*</code> (vertical) plus <code>justify-items-*</code> (horizontal), applied to all children at once. <code>place-self-*</code> does the same for just one child.',
+ tilesTitle:'place-items-* inside each cell',tiles:placeTiles,
+ gotcha:'<b>Default is stretch:</b> children fill their cell until you set an alignment. Once you add <code>place-items-center</code>, children shrink to their own size, which is why centred cards can look smaller.',
+ fixed:'grid grid-cols-2 grid-rows-2 gap-3 min-h-[240px] p-3 bg-slate-100 border border-slate-200 rounded-xl',
+ knobs:[{n:'Container: place-items',o:['place-items-start','place-items-center','place-items-end','place-items-stretch']},{n:'Container: from md:',o:['','md:place-items-center','md:place-items-end']},{n:'Chip A only: place-self',o:['','place-self-end','place-self-center','place-self-stretch'],slot:'a'}],
+ kids:a=>['A','B','C','D'].map(x=>`  <div class="${CARD}${x==='A'&&a?' '+a:''}">Chip ${x}</div>`).join('\n'),
+ recipes:[{n:'Centred badges',c:'grid grid-cols-2 grid-rows-2 place-items-center gap-3 min-h-[240px] p-3 bg-slate-100 border border-slate-200 rounded-xl',u:'Icons or stats centred in each cell'},{n:'Pinned, then centred',c:'grid grid-cols-2 grid-rows-2 place-items-start md:place-items-center gap-3 min-h-[240px] p-3 bg-slate-100 border border-slate-200 rounded-xl',u:'Top-left on phones, centred on desktop'},{n:'Hero centre',c:'grid grid-cols-1 grid-rows-1 place-items-center min-h-[240px] p-3 bg-slate-100 border border-slate-200 rounded-xl',u:'One block perfectly centred'}],
+ start:'grid grid-cols-2 grid-rows-2 gap-3 min-h-[240px] p-3 bg-slate-100 border border-slate-200 rounded-xl',need:['place-items-center'],
+ mission:'Centre <b>every chip</b> inside its grid cell, <b>both horizontally and vertically</b>, with a single class on the container.',
+ take:'place-items-center on the grid wrapper is the fastest way to centre cells on both axes.'}
+];
+
+let cur=0,width=375,code='',ready=false;
+const sel=L.map(l=>l.knobs.map(()=>0)),done=new Set(),H=300;
+const fr=$('fr');
+
+function frameDoc(){return '<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><scr'+'ipt src="https://cdn.tailwindcss.com/3.4.17"></scr'+'ipt></head><body class="bg-slate-50 p-3"><div id="root"></div></body></html>';}
+fr.onload=()=>{ready=true;push();};
+fr.srcdoc=frameDoc();
+function push(){if(!ready)return;try{fr.contentDocument.getElementById('root').innerHTML=code;}catch(e){}}
+
+function build(){
+  const l=L[cur];let c=l.fixed,a='';
+  l.knobs.forEach((k,i)=>{const v=k.o[sel[cur][i]];if(k.slot==='a')a=v;else if(v)c+=' '+v;});
+  return `<div class="${c}">\n${l.kids(a)}\n</div>`;
+}
+function tokens(){const m=/class="([^"]*)"/.exec(code);return m?m[1].split(/\s+/).filter(Boolean):[];}
+function fit(){
+  const sc=Math.min(1,($('stage').clientWidth-26)/width);
+  fr.style.width=width+'px';fr.style.height=H+'px';fr.style.transform=`scale(${sc})`;
+  $('wrap').style.width=width*sc+'px';$('wrap').style.height=H*sc+'px';
+  $('bp').textContent=`${width}px · ${bpOf(width)==='base'?'base only':bpOf(width)+': active'}`;
+  live();
+}
+function live(){
+  $('live').innerHTML='<span class="sub">Live at this width:</span>'+tokens().map(t=>{
+    const m=/^(sm|md|lg|xl):/.exec(t);const on=!m||width>=BP.find(b=>b[0]===m[1])[1];
+    return `<span class="t ${on?'on':''}">${t}</span>`;}).join('');
+}
+function setCode(s){code=s;$('code').value=s;push();live();}
+
+function renderLesson(){
+  const l=L[cur];
+  $('badge').textContent=l.badge;$('title').textContent=l.title;$('idea').innerHTML=l.idea;
+  $('tilesTitle').textContent=l.tilesTitle;$('gotcha').innerHTML=l.gotcha;
+  $('tiles').innerHTML=l.tiles.map(t=>`<div class="tile"><div class="box" style="${t.css}">${t.kids.map(k=>`<i style="${k}"></i>`).join('')}</div><code>${t.code}</code><small>${t.l}</small></div>`).join('');
+  $('knobs').innerHTML=l.knobs.map((k,i)=>`<div class="knob"><label>${k.n}</label><div class="row">${k.o.map((o,j)=>`<button class="chip ${sel[cur][i]===j?'on':''}" data-k="${i}" data-o="${j}">${o||'none'}</button>`).join('')}</div></div>`).join('');
+  $('knobs').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{sel[cur][+b.dataset.k]=+b.dataset.o;renderLesson();});
+  $('rec').innerHTML=l.recipes.map((r,i)=>`<button data-r="${i}"><b>${r.n}</b><span>${r.u}</span></button>`).join('');
+  $('rec').querySelectorAll('button').forEach(b=>b.onclick=()=>{const r=l.recipes[+b.dataset.r];setCode(code.replace(/class="[^"]*"/,`class="${r.c}"`));$('stage').scrollIntoView({behavior:'smooth',block:'center'});});
+  $('mission').innerHTML=l.mission;$('take').textContent='Takeaway: '+l.take;$('res').textContent='';$('res').className='res';
+  $('nav').innerHTML=L.map((x,i)=>`<button class="${i===cur?'on':''} ${done.has(i)?'done':''}" data-i="${i}"><span class="n">${done.has(i)?'✓':i+1}</span>${x.title.split(':')[0]}</button>`).join('');
+  $('nav').querySelectorAll('button').forEach(b=>b.onclick=()=>{cur=+b.dataset.i;renderLesson();});
+  $('next').disabled=cur===L.length-1;
+  setCode(build());fit();
+}
+
+$('w').oninput=e=>{width=+e.target.value;fit();};
+$('presets').innerHTML=[['Phone',375],['Tablet',768],['Laptop',1024],['Desktop',1280]].map(p=>`<button class="chip" data-w="${p[1]}">${p[0]} ${p[1]}</button>`).join('');
+$('presets').querySelectorAll('button').forEach(b=>b.onclick=()=>{width=+b.dataset.w;$('w').value=width;fit();});
+$('code').oninput=e=>{code=e.target.value;push();live();};
+$('reset').onclick=()=>setCode(build());
+$('start').onclick=()=>{const l=L[cur];setCode(code.replace(/class="[^"]*"/,`class="${l.start}"`));$('res').textContent='Edit the class list in the editor, then check.';$('res').className='res';};
+$('check').onclick=()=>{
+  const l=L[cur],t=new Set(tokens()),miss=l.need.filter(x=>!t.has(x));
+  if(!miss.length){done.add(cur);$('res').textContent='✅ Nailed it. Drag the width to watch it work.';$('res').className='res ok';
+    $('nav').querySelectorAll('button')[cur].classList.add('done');$('nav').querySelectorAll('.n')[cur].textContent='✓';}
+  else{$('res').textContent='Not yet. Still missing: '+miss.join(', ');$('res').className='res no';}
+};
+$('next').onclick=()=>{if(cur<L.length-1){cur++;renderLesson();}};
+window.addEventListener('resize',fit);
+renderLesson();
+</script>
+</body>
+</html>

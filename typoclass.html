@@ -1,0 +1,528 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tailwind Typography Mastery Lab</title>
+<!-- Tailwind CDN with official Typography plugin bundled -->
+<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+<script>
+  tailwind.config = {
+    safelist: [
+      'text-xs','text-sm','text-base','text-lg','text-xl','text-2xl','text-3xl','text-4xl','text-5xl','text-6xl',
+      'font-light','font-normal','font-medium','font-semibold','font-bold','font-black',
+      'leading-none','leading-tight','leading-snug','leading-normal','leading-relaxed','leading-loose',
+      'tracking-tighter','tracking-tight','tracking-normal','tracking-wide','tracking-widest',
+      'font-sans','font-serif','font-mono',
+      'text-slate-900','text-slate-800','text-slate-700','text-slate-600','text-slate-500','text-slate-400','text-blue-600','text-red-500','text-white',
+      'text-left','text-center','text-right','text-justify',
+      'truncate','line-clamp-2','line-clamp-3','whitespace-normal',
+      'w-full','w-3/4','w-1/2','w-1/3','w-64','max-w-md','max-w-sm','max-w-lg',
+      'prose','prose-sm','prose-lg','prose-slate',
+      'bg-white','bg-slate-50','bg-slate-800','bg-slate-900','bg-blue-50','border','border-slate-200','border-slate-300',
+      'rounded-lg','rounded-xl','rounded-2xl','shadow-sm','p-6','p-8','mb-4','mb-3','mb-2','mt-4','mt-2','gap-4','grid','grid-cols-2',
+      'h-48','w-10','h-10','w-12','h-12'
+    ]
+  };
+</script>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:#f4f6f9; color:#0f172a; font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+  button, input, select, textarea { font:inherit; }
+  button { cursor:pointer; }
+  .app { max-width:1400px; margin:0 auto; padding:24px; }
+  .topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:16px 24px; }
+  .brand { display:flex; align-items:center; gap:12px; }
+  .brand-mark { width:42px;height:42px;border-radius:12px;background:#0f172a;color:#fff;display:grid;place-items:center;font-weight:900;letter-spacing:-.05em; }
+  .eyebrow { font-size:10px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; color:#64748b; }
+  .topbar h1 { margin:2px 0 0; font-size:20px; line-height:1.2; letter-spacing:-.03em; font-weight:800; }
+  .status { border:1px solid #e2e8f0; background:#f8fafc; border-radius:999px; padding:8px 14px; font-size:12px; color:#475569; font-weight:600; }
+  .layout { display:grid; grid-template-columns:250px minmax(0,1fr); gap:20px; align-items:start; }
+  .sidebar,.panel { background:#fff;border:1px solid #e2e8f0;border-radius:18px;box-shadow:0 4px 16px rgba(15,23,42,0.03); }
+  .sidebar { padding:14px; position:sticky;top:20px; max-height:calc(100vh - 40px); overflow-y:auto;}
+  .side-label { margin:7px 8px 10px; font-size:10px; font-weight:800; letter-spacing:.12em; color:#94a3b8; text-transform:uppercase; }
+  .lesson-nav { display:flex;flex-direction:column;gap:4px; }
+  .lesson-nav button { display:flex;align-items:center;gap:10px;text-align:left;border:0;background:transparent;padding:10px;border-radius:10px;color:#475569;font-size:13px;font-weight:650; width:100%; transition:all 0.15s; }
+  .lesson-nav button .num { display:grid;place-items:center;width:24px;height:24px;border:1px solid #e2e8f0;border-radius:7px;font-size:11px;color:#64748b;background:#f8fafc;flex-shrink:0; }
+  .lesson-nav button.active { background:#eff6ff;color:#1d4ed8; }
+  .lesson-nav button.active .num { background:#2563eb;color:white;border-color:#2563eb; }
+  
+  .main { min-width:0; display:flex; flex-direction:column; gap:16px; }
+  .lesson-head { padding:24px; }
+  .lesson-head h2 { margin:8px 0 8px;font-size:24px;letter-spacing:-.03em;line-height:1.2;font-weight:800; }
+  .lesson-badge { display:inline-flex; align-items:center; gap:6px; color:#1d4ed8; background:#eff6ff; border-radius:999px; padding:5px 10px; font-size:11px; font-weight:800; }
+  
+  .theory { margin-top:14px; padding-top:14px; border-top:1px solid #f1f5f9; color:#334155; font-size:14px; line-height:1.7; }
+  .theory p { margin:0 0 12px; }
+  .theory ul { margin:0 0 12px; padding-left:18px; }
+  .theory li { margin-bottom:6px; }
+  .theory code { background:#f1f5f9; padding:2px 6px; border-radius:4px; font-family:monospace; font-size:12px; color:#0f172a; border:1px solid #e2e8f0; }
+  .callout { background:#f8fafc; padding:14px; border-left:4px solid #3b82f6; margin:14px 0; border-radius:0 8px 8px 0; font-size:13px; border-top:1px solid #e2e8f0; border-right:1px solid #e2e8f0; border-bottom:1px solid #e2e8f0; }
+  .callout.warning { border-left-color:#ef4444; background:#fef2f2; color:#991b1b; }
+  .callout.success { border-left-color:#10b981; background:#ecfdf5; color:#065f46; }
+
+  .work-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
+  .panel { padding:18px;min-width:0; }
+  .panel-head { display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px; }
+  .panel h3 { margin:0;font-size:14px;font-weight:700;letter-spacing:-.01em; color:#0f172a; }
+  .sub { margin-top:3px;color:#64748b;font-size:12px;line-height:1.4; }
+  .tag { border-radius:6px;padding:3px 7px;background:#f1f5f9;color:#475569;font-size:10px;font-weight:800;white-space:nowrap;border:1px solid #e2e8f0; }
+  
+  .controls { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
+  .control { padding:10px 12px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc; }
+  .control.full { grid-column:1/-1; }
+  .control-top { display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px; }
+  .control label { color:#475569;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em; }
+  select { width:100%;border:1px solid #cbd5e1;border-radius:8px;background:#fff;padding:7px 10px;color:#0f172a;font-size:12px;font-weight:600;outline:none; }
+  .seg { display:flex;gap:4px;flex-wrap:wrap; }
+  .seg button { border:1px solid #cbd5e1;background:#fff;color:#475569;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700; flex:1; }
+  .seg button.selected { background:#eff6ff;border-color:#2563eb;color:#1d4ed8; }
+  
+  .preview-stage { 
+    background-color: #f8fafc;
+    background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+    background-size: 20px 20px;
+    border: 1px dashed #cbd5e1; 
+    border-radius: 12px; 
+    padding: 24px; 
+    min-height: 360px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto; 
+    margin-top: 14px;
+  }
+  
+  .diagram-wrap { border:1px solid #e2e8f0; border-radius:12px; background:#f8fafc; padding:14px; height:100%; min-height:420px; display:flex; flex-direction:column; justify-content:center; }
+  .diagram { position:relative; display:flex; flex-direction: column; align-items:center; justify-content:center; overflow:auto; padding:12px; }
+  
+  .code-panel { margin-top:4px; }
+  .code-toolbar { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; }
+  .code-toolbar button { border:1px solid #cbd5e1; background:#fff; color:#334155; border-radius:8px; padding:6px 10px; font-size:11px; font-weight:750; }
+  .code-editor { width:100%; min-height:200px; resize:vertical; border:1px solid #0f172a; border-radius:10px; background:#0f172a; color:#e2e8f0; padding:14px; font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace; outline:none; }
+  
+  .lesson-bottom { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:4px; background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:14px 20px; }
+  .takeaway { flex:1; color:#065f46; font-size:13px; font-weight:600; line-height:1.5; }
+  .lesson-bottom button { border:0; border-radius:10px; background:#0f172a; color:#fff; padding:10px 16px; font-size:12px; font-weight:750; transition:background 0.15s; }
+  .lesson-bottom button:disabled { opacity:0.4; cursor:not-allowed; }
+  
+  @media(max-width:950px){.layout{grid-template-columns:1fr}.work-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">TW</div>
+      <div>
+        <div class="eyebrow">Interactive Curriculum</div>
+        <h1>Typography Mastery Lab</h1>
+      </div>
+    </div>
+    <div class="status">Hierarchy · Rhythm · Readability</div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="side-label">Curriculum</div>
+      <nav class="lesson-nav" id="lessonNav"></nav>
+    </aside>
+    <main class="main">
+      <section class="panel lesson-head">
+        <div class="lesson-badge" id="badge">LESSON 01</div>
+        <h2 id="lessonTitle">Lesson Title</h2>
+        <div id="lessonTheory" class="theory"></div>
+      </section>
+      
+      <div class="work-grid">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Interactive Controls</h3>
+              <div class="sub">Adjust properties to output live Tailwind classes.</div>
+            </div>
+            <span class="tag">LIVE</span>
+          </div>
+          <div class="controls" id="controls"></div>
+          <div class="preview-stage" id="previewStage"></div>
+        </section>
+        
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Visualizer</h3>
+              <div class="sub">Inspecting structural CSS layout mechanics.</div>
+            </div>
+            <span class="tag">MODEL</span>
+          </div>
+          <div class="diagram-wrap">
+            <div class="diagram" id="diagramArea"></div>
+          </div>
+        </section>
+      </div>
+      
+      <section class="panel code-panel">
+        <div class="code-toolbar">
+          <div>
+            <h3>Live Markup Editor</h3>
+            <div class="sub">Edit markup directly; controls and preview sync automatically.</div>
+          </div>
+          <button id="resetCode">Reset to Defaults</button>
+        </div>
+        <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+      </section>
+      
+      <div class="lesson-bottom">
+        <div class="takeaway" id="takeaway"></div>
+        <button id="nextLesson">Next Lesson →</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const lessons = [
+ {
+  title:"Scale & Hierarchy",
+  badge:"01 · SIZES & WEIGHTS",
+  theory:`<p>Typography guides the human eye through visual weight. If everything is rendered at large sizes with bold weights, nothing stands out. Hierarchy is created by contrasting <strong>size (<code>text-*</code>)</strong> and <strong>weight (<code>font-*</code>)</strong>.</p>
+  <ul>
+    <li><strong>Size:</strong> Tailwind provides a scale from <code>text-xs</code> (12px) up to massive display scales.</li>
+    <li><strong>Weight:</strong> Ranging from <code>font-light</code> (300) to <code>font-black</code> (900). Use heavy weights for primary titles and normal weights for body copy.</li>
+  </ul>
+  <div class="callout success">
+    <strong>Design Principle:</strong> A blog card should feature a dominant header paired with subdued, smaller metadata so the reader's eye lands on the title first.
+  </div>`,
+  takeaway:"Use size and weight contrast to establish clear visual hierarchy. The most important text must always dominate optical weight.",
+  controls:["size","weight","fontFamily"], component:"blogHeader"
+ },
+ {
+  title:"Reading Rhythm",
+  badge:"02 · LEADING & TRACKING",
+  theory:`<p>When rendering multi-line paragraphs, spacing between lines and characters dictates reading comfort and cognitive load.</p>
+  <ul>
+    <li><strong>Leading (Line Height):</strong> Controls vertical distance. <code>leading-none</code> causes lines to collide, while <code>leading-relaxed</code> lets multi-line paragraphs breathe.</li>
+    <li><strong>Tracking (Letter Spacing):</strong> Controls horizontal distance. <code>tracking-tight</code> tightens large headlines, whereas <code>tracking-widest</code> suits small uppercase badges.</li>
+  </ul>
+  <div class="callout warning">
+    <strong>Line Collision Risk:</strong> Setting leading too tight (<code>leading-none</code>) causes letter descenders and ascenders to crash into each other.
+  </div>`,
+  takeaway:"Apply <code>leading-relaxed</code> for multi-line paragraphs to prevent visual fatigue. Use <code>tracking-tight</code> on large headers.",
+  controls:["leading","tracking","size"], component:"paragraph"
+ },
+ {
+  title:"Families & Contrast",
+  badge:"03 · TYPE & COLOR",
+  theory:`<p>Font family selection establishes emotional tone, while text color contrast ensures accessibility and legibility.</p>
+  <ul>
+    <li><code>font-sans</code>: Clean, geometric UI interfaces.</li>
+    <li><code>font-serif</code>: Editorial and long-form reading context.</li>
+    <li><code>font-mono</code>: Fixed-width data alignment and code snippets.</li>
+  </ul>
+  <div class="callout warning">
+    <strong>Contrast Warning:</strong> Pure black (<code>text-black</code>) on pure white creates excessive optical glare. Professional systems use rich charcoals like <code>text-slate-900</code> or <code>text-slate-600</code>.
+  </div>`,
+  takeaway:"Avoid pure black for body copy; use dark slates (<code>slate-900</code> / <code>slate-600</code>) to reduce eye strain.",
+  controls:["fontFamily","textColor","size"], component:"contrast"
+ },
+ {
+  title:"Overflow & Truncation",
+  badge:"04 · SAFETY BOUNDARIES",
+  theory:`<p>Dynamic user-generated or API text strings can easily break rigid UI grids if they exceed container widths.</p>
+  <ul>
+    <li><code>truncate</code>: Forces single-line clipping with an ellipsis (<code>...</code>).</li>
+    <li><code>line-clamp-2</code> / <code>line-clamp-3</code>: Restricts multi-line paragraphs to a fixed number of visible lines before clipping.</li>
+  </ul>
+  <div class="callout">
+    <strong>Try this:</strong> Reduce the container width slider while testing truncation classes to observe boundary containment in action.
+  </div>`,
+  takeaway:"Always wrap dynamic strings in truncation or line-clamp classes to safeguard your layout from unexpected overflow.",
+  controls:["truncate","containerWidth"], component:"product"
+ },
+ {
+  title:"The Prose Plugin",
+  badge:"05 · MARKDOWN STYLING",
+  theory:`<p>Rendering raw HTML from markdown or CMS databases requires styling nested elements (<code>&lt;h1&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;ul&gt;</code>, <code>&lt;blockquote&gt;</code>) manually.</p>
+  <p>Tailwind's official <strong>Typography Plugin</strong> provides the <code>prose</code> wrapper class, instantly injecting professional typographic rhythm across all child elements.</p>
+  <div class="callout success">
+    <strong>Plugin Integration:</strong> Notice how toggling prose on instantly transforms unstyled HTML into a polished article layout.
+  </div>`,
+  takeaway:"Use the <code>prose</code> class when displaying raw HTML or markdown content to inherit harmonious spacing and typography defaults.",
+  controls:["prose","size"], component:"prose"
+ },
+ {
+  title:"Capstone: Article Layout",
+  badge:"06 · FINAL PROJECT",
+  theory:`<p>Let's synthesize everything we've learned into a production-ready article card:</p>
+  <ul>
+    <li>Small uppercase category label with <code>tracking-widest</code>.</li>
+    <li>Bold display headline with <code>tracking-tight</code>.</li>
+    <li>Muted metadata and body text utilizing balanced leading.</li>
+  </ul>`,
+  takeaway:"Mastering typography means combining scale, weight, tracking, leading, and color into a cohesive, readable system.",
+  controls:["size","weight","leading","textColor"], component:"capstone"
+ }
+];
+
+const state = {
+  size:"text-3xl", weight:"font-bold", fontFamily:"font-sans", textColor:"text-slate-900",
+  leading:"leading-relaxed", tracking:"tracking-normal",
+  truncate:"truncate", containerWidth:"w-full", prose:false
+};
+
+let current = 0;
+let typingTimer = null;
+const $ = id => document.getElementById(id);
+
+function getClasses() {
+  let cls = [state.size, state.weight, state.fontFamily, state.textColor];
+  if (current !== 2) cls.push(state.leading, state.tracking);
+  return cls.filter(Boolean).join(" ");
+}
+
+/* ---------- HTML Component Generation ---------- */
+function generateHTML() {
+  const l = lessons[current];
+  const baseCls = getClasses();
+
+  if (l.component === "blogHeader") {
+    return `<article class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 max-w-md w-full mx-auto">
+  <div class="text-xs font-bold tracking-widest text-blue-600 uppercase mb-2">Engineering</div>
+  <h1 class="${baseCls} mb-3">Mastering Typography in Tailwind</h1>
+  <p class="text-sm text-slate-500 font-medium">By Jane Doe · Oct 2026</p>
+</article>`;
+  }
+
+  if (l.component === "paragraph") {
+    return `<article class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 max-w-md w-full mx-auto">
+  <h2 class="text-xl font-bold mb-4 text-slate-800">The Art of Readability</h2>
+  <p class="${baseCls}">Typography is the art and technique of arranging type to make written language legible, readable, and appealing when displayed across digital interfaces and screen viewports.</p>
+</article>`;
+  }
+
+  if (l.component === "contrast") {
+    return `<div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 max-w-md w-full mx-auto text-center">
+  <div class="mb-6">
+    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Quarterly Revenue</h3>
+    <p class="${state.fontFamily} text-4xl font-bold ${state.textColor}">$124,500.00</p>
+  </div>
+  <p class="${state.fontFamily} text-sm ${state.textColor} opacity-80">Total processed volume across active enterprise networks.</p>
+</div>`;
+  }
+
+  if (l.component === "product") {
+    const clampCls = state.truncate === "whitespace-normal" ? "" : state.truncate;
+    return `<div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mx-auto transition-all ${state.containerWidth}">
+  <div class="w-12 h-12 bg-slate-100 rounded-lg mb-4 border border-slate-200"></div>
+  <h3 class="text-lg font-bold text-slate-800 ${clampCls} mb-2">Premium Ergonomic Office Chair with Lumbar Support</h3>
+  <p class="text-sm text-slate-500 line-clamp-3 mb-4">Experience ultimate comfort featuring breathable mesh engineering and 4D adjustable armrests.</p>
+  <button class="w-full bg-slate-900 text-white font-bold py-2 rounded-lg text-sm">Add to Cart</button>
+</div>`;
+  }
+
+  if (l.component === "prose") {
+    const proseCls = state.prose ? `prose ${state.size === "text-sm" ? "prose-sm" : state.size === "text-lg" ? "prose-lg" : ""} prose-slate` : "";
+    return `<div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 max-w-md w-full mx-auto">
+  <div class="${proseCls}">
+    <h1>Why Reading Matters</h1>
+    <p>Reading is a complex cognitive process of decoding symbols in order to construct or derive meaning.</p>
+    <ul>
+      <li>Improves vocabulary retention</li>
+      <li>Reduces cognitive stress</li>
+      <li>Expands core knowledge</li>
+    </ul>
+    <blockquote>"A reader lives a thousand lives before he dies."</blockquote>
+  </div>
+</div>`;
+  }
+
+  if (l.component === "capstone") {
+    return `<article class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden max-w-md w-full mx-auto">
+  <div class="h-40 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
+  <div class="p-8">
+    <div class="text-xs font-bold tracking-widest text-blue-600 uppercase mb-2">Design Systems</div>
+    <h1 class="${getClasses()} mb-4">Building a Scalable System</h1>
+    <p class="text-slate-500 text-sm mb-6 leading-relaxed">Learn how to architect component typography rules that scale across engineering teams without sacrificing consistency.</p>
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-slate-200 rounded-full"></div>
+      <div>
+        <p class="text-sm font-bold text-slate-800">Alex Rivera</p>
+        <p class="text-xs text-slate-400">Design Systems Lead</p>
+      </div>
+    </div>
+  </div>
+</article>`;
+  }
+  return "";
+}
+
+/* ---------- Visualizer Model ---------- */
+function updateVisualizer() {
+  let diagram = "";
+  const l = lessons[current];
+
+  if (l.component === "paragraph" || l.component === "capstone") {
+    const lhMap = { "leading-none": "1.0", "leading-tight": "1.25", "leading-snug": "1.375", "leading-normal": "1.5", "leading-relaxed": "1.625", "leading-loose": "2.0" };
+    let lh = lhMap[state.leading] || "1.5";
+    
+    diagram = `<div class="w-full text-center">
+      <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Line Box & Leading Mechanics</h4>
+      <div class="bg-white border border-slate-200 rounded-xl p-4 max-w-xs mx-auto space-y-2 text-left shadow-sm">
+        <div class="bg-red-50 border border-red-200 px-3 py-1.5 text-xs font-mono text-red-700 font-semibold">Line Box 1 (${state.leading})</div>
+        <div class="bg-red-50 border border-red-200 px-3 py-1.5 text-xs font-mono text-red-700 font-semibold">Line Box 2 (${state.leading})</div>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-4 leading-normal">Red bounds represent calculated vertical line-height boxes. Relaxed leading prevents line collisions.</p>
+    </div>`;
+  } else if (l.component === "product") {
+    diagram = `<div class="w-full text-center">
+      <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Overflow & Container Boundaries</h4>
+      <div class="bg-blue-50 border-2 border-dashed border-blue-300 p-4 rounded-xl max-w-xs mx-auto text-left relative">
+         <div class="absolute -top-3 -left-2 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">Constraint Box</div>
+         <p class="text-xs text-blue-900 ${state.truncate}">Long text strings automatically wrap or truncate based on your selected boundary rules.</p>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-4">Truncation protects UI layouts when dynamic string lengths exceed expected grid boundaries.</p>
+    </div>`;
+  } else {
+    diagram = `<div class="text-center text-slate-400 text-sm py-16">
+      <span class="text-4xl block mb-3 font-serif">Aa</span>
+      Adjust control options to inspect structural typography mechanics.
+    </div>`;
+  }
+
+  $("diagramArea").innerHTML = diagram;
+}
+
+/* ---------- Controls Builder ---------- */
+function select(id, label, opts) {
+  return `<div class="control"><div class="control-top"><label for="${id}">${label}</label></div><select id="${id}">${opts.map(o=>`<option value="${o[0]}" ${o[0]===state[id]?'selected':''}>${o[1]}</option>`).join("")}</select></div>`;
+}
+function toggle(id, label, val) {
+  return `<div class="control full"><div class="control-top"><label>${label}</label></div><div class="seg" data-seg="${id}"><button data-toggle="${id}" data-v="true" class="${val?'selected':''}">ON</button><button data-toggle="${id}" data-v="false" class="${!val?'selected':''}">OFF</button></div></div>`;
+}
+
+function renderControls() {
+  const l = lessons[current];
+  let c = "";
+  
+  if (l.controls.includes("size")) c += select("size","Font Size",[["text-xs","text-xs"],["text-sm","text-sm"],["text-base","text-base"],["text-xl","text-xl"],["text-2xl","text-2xl"],["text-3xl","text-3xl"],["text-4xl","text-4xl"],["text-6xl","text-6xl"]]);
+  if (l.controls.includes("weight")) c += select("weight","Font Weight",[["font-light","Light (300)"],["font-normal","Normal (400)"],["font-semibold","Semibold (600)"],["font-bold","Bold (700)"],["font-black","Black (900)"]]);
+  if (l.controls.includes("fontFamily")) c += select("fontFamily","Font Family",[["font-sans","Sans (Default)"],["font-serif","Serif (Editorial)"],["font-mono","Mono (Code)"]]);
+  
+  if (l.controls.includes("leading")) c += select("leading","Line Height",[["leading-none","leading-none (1.0)"],["leading-tight","leading-tight (1.25)"],["leading-normal","leading-normal (1.5)"],["leading-relaxed","leading-relaxed (1.625)"],["leading-loose","leading-loose (2.0)"]]);
+  if (l.controls.includes("tracking")) c += select("tracking","Letter Spacing",[["tracking-tighter","tracking-tighter"],["tracking-tight","tracking-tight"],["tracking-normal","tracking-normal"],["tracking-wide","tracking-wide"],["tracking-widest","tracking-widest"]]);
+  
+  if (l.controls.includes("textColor")) c += select("textColor","Text Color",[["text-slate-900","Slate 900 (Dark)"],["text-slate-600","Slate 600 (Muted Body)"],["text-blue-600","Blue 600 (Primary)"],["text-red-500","Red 500 (Error)"]]);
+  
+  if (l.controls.includes("truncate")) c += select("truncate","Truncation Method",[["truncate","truncate (1 Line)"],["line-clamp-2","line-clamp-2"],["line-clamp-3","line-clamp-3"],["whitespace-normal","None (Wrap)"]]);
+  if (l.controls.includes("containerWidth")) c += select("containerWidth","Container Width",[["w-full","w-full (100%)"],["w-3/4","w-3/4 (75%)"],["w-1/2","w-1/2 (50%)"],["w-64","w-64 (256px)"]]);
+  
+  if (l.controls.includes("prose")) c += toggle("prose","Enable Prose Plugin",state.prose);
+
+  $("controls").innerHTML = c;
+
+  $("controls").querySelectorAll("select").forEach(el => {
+    el.addEventListener("change", () => {
+      state[el.id] = el.value;
+      updateAll();
+    });
+  });
+
+  $("controls").querySelectorAll("[data-toggle]").forEach(btn => {
+    btn.onclick = () => {
+      state[btn.dataset.toggle] = btn.dataset.v === "true";
+      const seg = btn.parentElement;
+      seg.querySelectorAll("button").forEach(x => x.classList.toggle("selected", x.dataset.v === String(state[btn.dataset.toggle])));
+      updateAll();
+    };
+  });
+}
+
+/* ---------- State & DOM Synchronization ---------- */
+function updateAll(skipEditor = false) {
+  const html = generateHTML();
+  if (!skipEditor) $("codeEditor").value = html;
+  $("previewStage").innerHTML = html;
+  updateVisualizer();
+}
+
+function parseEditorDOM() {
+  const rawHTML = $("codeEditor").value;
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(rawHTML, "text/html");
+  
+  // Find primary target elements to read active classes
+  const el = doc.querySelector("h1, h2, p, div");
+  if (!el) return;
+
+  [...el.classList].forEach(cls => {
+    if (cls.startsWith("text-xs") || cls.startsWith("text-sm") || cls.startsWith("text-base") || cls.startsWith("text-xl") || cls.startsWith("text-2xl") || cls.startsWith("text-3xl") || cls.startsWith("text-4xl") || cls.startsWith("text-6xl")) {
+      state.size = cls;
+    }
+    if (cls.startsWith("font-") && !["font-sans","font-serif","font-mono"].includes(cls)) {
+      state.weight = cls;
+    }
+    if (["font-sans","font-serif","font-mono"].includes(cls)) {
+      state.fontFamily = cls;
+    }
+    if (cls.startsWith("leading-")) state.leading = cls;
+    if (cls.startsWith("tracking-")) state.tracking = cls;
+    if (cls.startsWith("text-slate-") || cls.startsWith("text-blue-") || cls.startsWith("text-red-")) {
+      state.textColor = cls;
+    }
+    if (cls === "truncate" || cls.startsWith("line-clamp-") || cls === "whitespace-normal") {
+      state.truncate = cls;
+    }
+    if (cls.startsWith("w-") || cls.startsWith("max-w-")) {
+      state.containerWidth = cls;
+    }
+    if (cls === "prose") state.prose = true;
+  });
+
+  renderControls();
+}
+
+/* ---------- Navigation & Init ---------- */
+function renderNav() {
+  $("lessonNav").innerHTML = lessons.map((l, i) =>
+    `<button class="${i === current ? 'active' : ''}" data-i="${i}">
+      <span class="num">${String(i + 1).padStart(2, "0")}</span>
+      <span>${l.title}</span>
+    </button>`
+  ).join("");
+  document.querySelectorAll("[data-i]").forEach(b => b.onclick = () => { current = +b.dataset.i; renderLesson(); });
+}
+
+function renderLesson() {
+  const l = lessons[current];
+  $("badge").textContent = l.badge;
+  $("lessonTitle").textContent = l.title;
+  $("lessonTheory").innerHTML = l.theory;
+  $("takeaway").textContent = l.takeaway;
+  
+  renderNav();
+  renderControls();
+  updateAll();
+  
+  $("nextLesson").textContent = current === lessons.length - 1 ? "Complete Module ✓" : "Next Lesson →";
+  $("nextLesson").disabled = current === lessons.length - 1;
+}
+
+$("codeEditor").addEventListener("input", () => {
+  $("previewStage").innerHTML = $("codeEditor").value;
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(() => {
+    parseEditorDOM();
+    updateVisualizer();
+  }, 300);
+});
+
+$("resetCode").onclick = () => updateAll();
+$("nextLesson").onclick = () => { if (current < lessons.length - 1) { current++; renderLesson(); } };
+
+renderLesson();
+</script>
+</body>
+</html>
+
+

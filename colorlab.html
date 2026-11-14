@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visual Surfaces & UI Components Studio</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    safelist: [
+      'bg-white', 'bg-slate-50', 'bg-slate-100', 'bg-slate-800', 'bg-slate-900',
+      'bg-blue-50', 'bg-blue-600', 'bg-red-50', 'bg-red-600', 'bg-green-50', 'bg-green-600',
+      'text-white', 'text-slate-900', 'text-slate-800', 'text-slate-600', 'text-slate-500', 'text-blue-800', 'text-red-800',
+      'border', 'border-2', 'border-slate-200', 'border-slate-300', 'border-blue-500',
+      'divide-y', 'divide-slate-200',
+      'rounded-xl', 'rounded-2xl', 'rounded-3xl', 'rounded-full',
+      'shadow-sm', 'shadow-md', 'shadow-xl', 'shadow-2xl',
+      'ring-2', 'ring-blue-500', 'ring-offset-2', 'ring-offset-white'
+    ]
+  };
+</script>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:#f4f6fb; color:#0f172a; font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+  button, input, select, textarea { font:inherit; }
+  button { cursor:pointer; }
+  .app { max-width:1400px; margin:0 auto; padding:20px; }
+  .topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:18px; background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:14px 20px; }
+  .brand { display:flex; align-items:center; gap:10px; }
+  .brand-mark { width:38px;height:38px;border-radius:10px;background:#2563eb;color:#fff;display:grid;place-items:center;font-weight:900;font-size:14px; }
+  .eyebrow { font-size:10px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#64748b; }
+  .topbar h1 { margin:2px 0 0; font-size:18px; line-height:1.2; font-weight:800; }
+  .status { border:1px solid #e2e8f0; background:#f8fafc; border-radius:999px; padding:6px 12px; font-size:11px; font-weight:700; color:#475569; }
+  .layout { display:grid; grid-template-columns:240px minmax(0,1fr); gap:18px; align-items:start; }
+  .sidebar,.panel { background:#fff;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 4px 14px rgba(15,23,42,0.02); }
+  .sidebar { padding:12px; position:sticky;top:16px; max-height:calc(100vh - 32px); overflow-y:auto; }
+  .side-label { margin:6px 8px 8px; font-size:10px; font-weight:800; letter-spacing:.12em; color:#94a3b8; text-transform:uppercase; }
+  .lesson-nav { display:flex;flex-direction:column;gap:3px; }
+  .lesson-btn { display:flex;align-items:center;gap:8px;text-align:left;border:0;background:transparent;padding:8px 10px;border-radius:8px;color:#475569;font-size:12px;font-weight:650; width:100%; transition:all 0.15s; }
+  .lesson-btn:hover { background:#f1f5f9; color:#0f172a; }
+  .lesson-btn .num { display:grid;place-items:center;width:22px;height:22px;border:1px solid #e2e8f0;border-radius:6px;font-size:10px;color:#64748b;background:#f8fafc;flex-shrink:0; }
+  .lesson-btn.active { background:#eff6ff;color:#1d4ed8;font-weight:700; }
+  .lesson-btn.active .num { background:#2563eb;color:white;border-color:#2563eb; }
+  
+  .main { min-width:0; display:flex; flex-direction:column; gap:16px; }
+  .lesson-head { padding:20px; }
+  .lesson-badge { display:inline-flex; align-items:center; gap:6px; color:#1d4ed8; background:#eff6ff; border-radius:999px; padding:4px 10px; font-size:10px; font-weight:800; }
+  .lesson-head h2 { margin:6px 0 6px; font-size:22px; letter-spacing:-.02em; font-weight:800; }
+  
+  .theory { margin-top:12px; padding-top:12px; border-top:1px solid #f1f5f9; color:#334155; font-size:13px; line-height:1.65; }
+  .theory p { margin:0 0 10px; }
+  .theory ul { margin:0 0 10px; padding-left:16px; }
+  .theory li { margin-bottom:4px; }
+  .theory code { background:#f1f5f9; padding:2px 5px; border-radius:4px; font-family:monospace; font-size:11px; color:#0f172a; border:1px solid #e2e8f0; }
+  .callout { background:#f8fafc; padding:12px; border-left:4px solid #2563eb; margin:12px 0; border-radius:0 8px 8px 0; font-size:12px; border:1px solid #e2e8f0; border-left-width:4px; }
+
+  .work-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .panel { padding:16px; min-width:0; }
+  .panel-head { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:12px; }
+  .panel h3 { margin:0; font-size:13px; font-weight:700; color:#0f172a; }
+  .sub { margin-top:2px; color:#64748b; font-size:11px; }
+  .tag { border-radius:5px; padding:2px 6px; background:#f1f5f9; color:#475569; font-size:9px; font-weight:800; border:1px solid #e2e8f0; }
+  
+  .controls { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .control { padding:9px 10px; border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc; }
+  .control.full { grid-column:1/-1; }
+  .control-top { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:5px; }
+  .control label { color:#475569; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+  select { width:100%; border:1px solid #cbd5e1; border-radius:6px; background:#fff; padding:6px 8px; color:#0f172a; font-size:12px; font-weight:600; outline:none; }
+  
+  .preview-stage { 
+    background-color: #f8fafc;
+    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+    background-size: 16px 16px;
+    border: 1px dashed #cbd5e1; 
+    border-radius: 10px; 
+    padding: 20px; 
+    min-height: 320px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto; 
+    margin-top: 10px;
+  }
+  
+  .diagram-wrap { border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc; padding:12px; height:100%; min-height:360px; display:flex; flex-direction:column; justify-content:center; }
+  .diagram { position:relative; display:flex; flex-direction: column; align-items:center; justify-content:center; overflow:auto; padding:10px; }
+  
+  .code-panel { margin-top:2px; }
+  .code-toolbar { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px; }
+  .code-toolbar button { border:1px solid #cbd5e1; background:#fff; color:#334155; border-radius:6px; padding:5px 9px; font-size:11px; font-weight:750; }
+  .code-editor { width:100%; min-height:180px; resize:vertical; border:1px solid #0f172a; border-radius:8px; background:#0f172a; color:#e2e8f0; padding:12px; font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace; outline:none; }
+  
+  .lesson-bottom { display:flex; justify-content:space-between; align-items:center; gap:12px; background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:12px 16px; }
+  .takeaway { flex:1; color:#065f46; font-size:12px; font-weight:600; line-height:1.4; }
+  .lesson-bottom button { border:0; border-radius:8px; background:#0f172a; color:#fff; padding:9px 15px; font-size:11px; font-weight:750; }
+  .lesson-bottom button:disabled { opacity:0.4; cursor:not-allowed; }
+
+  @media(max-width:950px){.layout{grid-template-columns:1fr}.work-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">UI</div>
+      <div>
+        <div class="eyebrow">Real-World Design Systems Lab</div>
+        <h1>Visual Surfaces & UI Components Studio</h1>
+      </div>
+    </div>
+    <div class="status">Architectural Reasoning · Component Design</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="side-label">Design System Modules</div>
+      <nav class="lesson-nav" id="lessonNav"></nav>
+    </aside>
+
+    <main class="main">
+      <section class="panel lesson-head">
+        <div class="lesson-badge" id="badge">MODULE 01</div>
+        <h2 id="lessonTitle">Lesson Title</h2>
+        <div id="lessonTheory" class="theory"></div>
+      </section>
+      
+      <div class="work-grid">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Real-World UI Preview</h3>
+              <div class="sub">Assembled production component using design tokens.</div>
+            </div>
+            <span class="tag">UI STUDIO</span>
+          </div>
+          <div class="controls" id="controls"></div>
+          <div class="preview-stage" id="previewStage"></div>
+        </section>
+        
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Design Reasoning Model</h3>
+              <div class="sub">Z-space elevation and surface hierarchy breakdown.</div>
+            </div>
+            <span class="tag">ARCHITECTURE</span>
+          </div>
+          <div class="diagram-wrap">
+            <div class="diagram" id="diagramArea"></div>
+          </div>
+        </section>
+      </div>
+      
+      <section class="panel code-panel">
+        <div class="code-toolbar">
+          <div>
+            <h3>Component Markup</h3>
+            <div class="sub">Inspect the fully composed structural code.</div>
+          </div>
+          <button id="resetCode">Reset Component</button>
+        </div>
+        <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+      </section>
+      
+      <div class="lesson-bottom">
+        <div class="takeaway" id="takeaway"></div>
+        <button id="nextLesson">Next Module →</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const modules = [
+  {
+    title: "Surface Hierarchy & Z-Space",
+    badge: "01 · SURFACES",
+    theory: `<p>Interfaces are built from physical planes in virtual z-space. Placing a card (<code>bg-white</code>) onto a page canvas (<code>bg-slate-50</code>) creates immediate visual grouping.</p>
+    <ul>
+      <li><strong>The Canvas:</strong> The deepest background layer.</li>
+      <li><strong>The Surface:</strong> Elevated container cards holding user content.</li>
+    </ul>
+    <div class="callout">
+      <strong>Engineering Rule:</strong> Never place cards directly on raw white backgrounds if the outer page shares that exact shade. Step your background tokens.
+    </div>`,
+    takeaway: "Always layer elevated white cards on top of tinted background canvases to establish clear z-space separation.",
+    controls: ["canvasBg", "cardBg"],
+    component: "surfaceModel"
+  },
+  {
+    title: "The Contrast Principle",
+    badge: "02 · CONTRAST",
+    theory: `<p>Professional design systems avoid pure black text (<code>text-black</code>) because it produces optical glare and high eye strain against white screens.</p>
+    <ul>
+      <li>Use <code>text-slate-900</code> for prominent headings.</li>
+      <li>Use <code>text-slate-600</code> or <code>text-slate-500</code> for body descriptions.</li>
+    </ul>`,
+    takeaway: "Use charcoal slates instead of pure black text to ensure comfortable, sustained readability.",
+    controls: ["textColorMode"],
+    component: "contrastModel"
+  },
+  {
+    title: "Structural Boundary Borders",
+    badge: "03 · BORDERS",
+    theory: `<p>Heavy dark borders create a dated, cramped look. Modern software (Stripe, Linear) uses ultra-subtle tokens like <code>border-slate-200</code>.</p>
+    <ul>
+      <li>Borders should define boundaries without drawing primary attention away from the content.</li>
+    </ul>`,
+    takeaway: "Keep structural borders subtle (border-slate-200) to maintain a clean, uncluttered interface aesthetic.",
+    controls: ["borderMode"],
+    component: "borderModel"
+  },
+  {
+    title: "Corner Radius Psychology",
+    badge: "04 · RADIUS",
+    theory: `<p>Corner roundness carries distinct brand tone:</p>
+    <ul>
+      <li><strong>Sharp (rounded-none / sm):</strong> Enterprise software, data density, precision.</li>
+      <li><strong>Rounded (rounded-2xl / 3xl):</strong> Modern consumer SaaS, friendly applications.</li>
+    </ul>`,
+    takeaway: "Match your border-radius tokens intentionally to your product's brand identity.",
+    controls: ["radiusMode"],
+    component: "radiusModel"
+  },
+  {
+    title: "Strategic Elevation Shadows",
+    badge: "05 · ELEVATION",
+    theory: `<p>Shadows simulate physical elevation. Applying heavy shadows everywhere flattens the UI hierarchy.</p>
+    <ul>
+      <li><code>shadow-sm</code>: Flat resting cards.</li>
+      <li><code>shadow-xl</code> / <code>2xl</code>: Floating dialogs, modals, and dropdown menus.</li>
+    </ul>`,
+    takeaway: "Reserve high-elevation shadows exclusively for elements that physically break out or float above the canvas.",
+    controls: ["shadowMode"],
+    component: "shadowModel"
+  },
+  {
+    title: "Production Pricing Card",
+    badge: "06 · CAPSTONE",
+    theory: `<p>Let's synthesize everything: background canvases, subtle borders, slate text contrast, rounded containers, and elevation shadows into a production-grade pricing card.</p>`,
+    takeaway: "Great UI engineering merges color tokens, borders, and shadows into a cohesive design system language.",
+    controls: ["planTier"],
+    component: "capstoneModel"
+  }
+];
+
+const state = {
+  canvasBg: "bg-slate-50",
+  cardBg: "bg-white",
+  textColorMode: "optimal",
+  borderMode: "subtle",
+  radiusMode: "rounded-2xl",
+  shadowMode: "shadow-md",
+  planTier: "pro"
+};
+
+let current = 0;
+let typingTimer = null;
+const $ = id => document.getElementById(id);
+
+function generateHTML() {
+  const m = modules[current];
+
+  if (m.component === "surfaceModel") {
+    return `<div class="${state.canvasBg} p-8 rounded-2xl border border-slate-200 w-full max-w-md mx-auto transition-all">
+  <div class="${state.cardBg} p-6 rounded-xl border border-slate-200 shadow-sm">
+    <span class="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest">Elevated Surface</span>
+    <h3 class="font-bold text-slate-900 text-base mt-1 mb-2">Workspace Card</h3>
+    <p class="text-xs text-slate-600">Resting on a distinct canvas background token.</p>
+  </div>
+</div>`;
+  }
+
+  if (m.component === "contrastModel") {
+    const titleColor = state.textColorMode === "pure" ? "text-black" : "text-slate-900";
+    const bodyColor = state.textColorMode === "pure" ? "text-black" : "text-slate-600";
+    return `<div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm w-full max-w-md mx-auto text-center">
+  <h3 class="text-xl font-black ${titleColor} mb-2">Readability & Optical Contrast</h3>
+  <p class="text-sm ${bodyColor} leading-relaxed">Comparing pure black text against professional charcoal slate tokens.</p>
+</div>`;
+  }
+
+  if (m.component === "borderModel") {
+    const borderClass = state.borderMode === "heavy" ? "border-2 border-slate-800" : "border border-slate-200";
+    return `<div class="bg-white p-8 rounded-2xl ${borderClass} shadow-sm w-full max-w-md mx-auto">
+  <h3 class="font-bold text-slate-900 text-sm mb-1">Structural Edge Treatment</h3>
+  <p class="text-xs text-slate-500">Border token configuration: <code>${state.borderMode}</code></p>
+</div>`;
+  }
+
+  if (m.component === "radiusModel") {
+    return `<div class="bg-slate-900 text-white p-8 w-full max-w-md mx-auto ${state.radiusMode} shadow-lg text-center">
+  <h3 class="font-bold text-base mb-1">Brand Personality Curve</h3>
+  <p class="text-xs text-slate-400">Applied Radius: <code>${state.radiusMode}</code></p>
+</div>`;
+  }
+
+  if (m.component === "shadowModel") {
+    return `<div class="bg-white p-8 border border-slate-200 rounded-2xl ${state.shadowMode} w-full max-w-md mx-auto text-center">
+  <h3 class="font-bold text-slate-900 text-base mb-1">Elevation Depth Simulation</h3>
+  <p class="text-xs text-slate-500">Active Shadow Class: <code>${state.shadowMode}</code></p>
+</div>`;
+  }
+
+  if (m.component === "capstoneModel") {
+    const isPro = state.planTier === "pro";
+    return `<div class="bg-white w-full max-w-sm mx-auto rounded-3xl border border-slate-200 shadow-xl p-6">
+  <div class="flex justify-between items-center mb-4">
+    <h3 class="font-bold text-slate-900 text-base">${isPro ? 'Pro Workspace' : 'Starter Tier'}</h3>
+    <span class="text-[10px] font-extrabold px-2.5 py-1 rounded-full ${isPro ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-600'}">${isPro ? 'POPULAR' : 'BASIC'}</span>
+  </div>
+  <div class="mb-5">
+    <span class="text-3xl font-black text-slate-900">${isPro ? '$29' : '$0'}</span>
+    <span class="text-xs text-slate-500"> / month</span>
+  </div>
+  <ul class="space-y-2 mb-6 text-xs text-slate-600">
+    <li class="flex items-center">✓ Full Surface Tokens</li>
+    <li class="flex items-center">✓ Responsive Layout Grids</li>
+  </ul>
+  <button class="w-full bg-slate-900 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm hover:bg-slate-800 transition">Get Started</button>
+</div>`;
+  }
+
+  return "";
+}
+
+function updateVisualizer() {
+  const m = modules[current];
+  let diag = "";
+
+  if (m.component === "surfaceModel") {
+    diag = `<div class="w-full text-center">
+      <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Z-Space Stacking Order</h4>
+      <div class="space-y-2 max-w-xs mx-auto">
+        <div class="p-2 bg-slate-200 text-[11px] font-bold text-slate-700 rounded">Canvas Layer (bg-slate-50)</div>
+        <div class="p-3 bg-white text-[11px] font-bold text-slate-900 rounded shadow-sm">Surface Container (bg-white)</div>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-4">Elevating surfaces creates visual hierarchy.</p>
+    </div>`;
+  } else {
+    diag = `<div class="text-center text-slate-400 text-sm py-12">
+      <span class="text-3xl block mb-2">🏛️</span>
+      Design Systems Architectural Model.
+    </div>`;
+  }
+
+  $("diagramArea").innerHTML = diag;
+}
+
+function renderControls() {
+  const m = modules[current];
+  let c = "";
+
+  m.controls.forEach(ctrl => {
+    if (ctrl === "canvasBg") {
+      c += `<div class="control"><div class="control-top"><label>Canvas Background</label></div><select id="canvasBg"><option value="bg-slate-50" ${state.canvasBg==='bg-slate-50'?'selected':''}>Slate Canvas</option><option value="bg-white" ${state.canvasBg==='bg-white'?'selected':''}>White Canvas</option></select></div>`;
+      c += `<div class="control"><div class="control-top"><label>Card Surface</label></div><select id="cardBg"><option value="bg-white" ${state.cardBg==='bg-white'?'selected':''}>White Card</option><option value="bg-slate-100" ${state.cardBg==='bg-slate-100'?'selected':''}>Slate 100 Card</option></select></div>`;
+    }
+    if (ctrl === "textColorMode") {
+      c += `<div class="control full"><div class="control-top"><label>Text Contrast Mode</label></div><select id="textColorMode"><option value="optimal" ${state.textColorMode==='optimal'?'selected':''}>Charcoal Slate (Optimal)</option><option value="pure" ${state.textColorMode==='pure'?'selected':''}>Pure Black (Harsh Glare)</option></select></div>`;
+    }
+    if (ctrl === "borderMode") {
+      c += `<div class="control full"><div class="control-top"><label>Border Treatment</label></div><select id="borderMode"><option value="subtle" ${state.borderMode==='subtle'?'selected':''}>Subtle Token (border-slate-200)</option><option value="heavy" ${state.borderMode==='heavy'?'selected':''}>Heavy Dark (border-slate-800)</option></select></div>`;
+    }
+    if (ctrl === "radiusMode") {
+      c += `<div class="control full"><div class="control-top"><label>Corner Radius</label></div><select id="radiusMode"><option value="rounded-none" ${state.radiusMode==='rounded-none'?'selected':''}>Sharp Enterprise (rounded-none)</option><option value="rounded-2xl" ${state.radiusMode==='rounded-2xl'?'selected':''}>Friendly Consumer (rounded-2xl)</option></select></div>`;
+    }
+    if (ctrl === "shadowMode") {
+      c += `<div class="control full"><div class="control-top"><label>Elevation Depth</label></div><select id="shadowMode"><option value="shadow-sm" ${state.shadowSize==='shadow-sm'?'selected':''}>Subtle Card (shadow-sm)</option><option value="shadow-2xl" ${state.shadowSize==='shadow-2xl'?'selected':''}>Heavy Modal (shadow-2xl)</option></select></div>`;
+    }
+    if (ctrl === "planTier") {
+      c += `<div class="control full"><div class="control-top"><label>Pricing Tier</label></div><select id="planTier"><option value="pro" ${state.planTier==='pro'?'selected':''}>Pro Plan</option><option value="free" ${state.planTier==='free'?'selected':''}>Free Tier</option></select></div>`;
+    }
+  });
+
+  $("controls").innerHTML = c;
+  $("controls").querySelectorAll("select").forEach(el => {
+    el.addEventListener("change", (e) => {
+      state[el.id] = e.target.value;
+      updateAll();
+    });
+  });
+}
+
+function updateAll(skipEditor = false) {
+  const html = generateHTML();
+  if (!skipEditor) $("codeEditor").value = html;
+  $("previewStage").innerHTML = html;
+  updateVisualizer();
+}
+
+function renderNav() {
+  $("lessonNav").innerHTML = modules.map((m, i) =>
+    `<button class="lesson-btn ${i === current ? 'active' : ''}" data-i="${i}">
+      <span class="num">${String(i + 1).padStart(2, "0")}</span>
+      <span>${m.title}</span>
+    </button>`
+  ).join("");
+  document.querySelectorAll("[data-i]").forEach(b => b.onclick = () => { current = +b.dataset.i; renderModule(); });
+}
+
+function renderModule() {
+  const m = modules[current];
+  $("badge").textContent = m.badge;
+  $("lessonTitle").textContent = m.title;
+  $("lessonTheory").innerHTML = m.theory;
+  $("takeaway").textContent = m.takeaway;
+  
+  renderNav();
+  renderControls();
+  updateAll();
+  
+  $("nextLesson").textContent = current === modules.length - 1 ? "Complete Studio ✓" : "Next Module →";
+  $("nextLesson").disabled = current === modules.length - 1;
+}
+
+$("resetCode").onclick = () => updateAll();
+$("nextLesson").onclick = () => { if (current < modules.length - 1) { current++; renderModule(); } };
+
+renderModule();
+</script>
+</body>
+</html>

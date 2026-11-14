@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en" class="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Positioning & Layering Mastery Lab</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: { extend: {} }
+  }
+</script>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; transition: background-color 0.3s, color 0.3s; }
+  
+  /* Studio UI Layout */
+  .app { max-width:1500px; margin:0 auto; padding:24px; display:flex; flex-direction:column; gap:24px; min-height:100vh; }
+  
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding-bottom:16px; border-bottom:1px solid #e2e8f0; }
+  .dark .topbar { border-color:#334155; }
+  
+  .brand { display:flex; align-items:center; gap:12px; font-weight:900; font-size:22px; letter-spacing:-0.5px; }
+  
+  .layout { display:grid; grid-template-columns: 300px minmax(0,1fr); gap:24px; align-items:start; }
+  
+  /* Sidebar */
+  .sidebar { display:flex; flex-direction:column; gap:10px; position:sticky; top:24px; }
+  .module-btn { text-align:left; padding:14px 18px; border-radius:10px; border:1px solid #e2e8f0; background:#fff; color:#475569; font-weight:600; font-size:14px; transition:all 0.2s; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.02); }
+  .dark .module-btn { background:#1e293b; border-color:#334155; color:#cbd5e1; }
+  .module-btn:hover { background:#f8fafc; transform:translateY(-1px); }
+  .dark .module-btn:hover { background:#0f172a; }
+  .module-btn.active { background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8; box-shadow:0 2px 4px rgba(59,130,246,0.1); }
+  .dark .module-btn.active { background:#1e3a8a; border-color:#3b82f6; color:#eff6ff; }
+  
+  /* Main Area */
+  .main { display:flex; flex-direction:column; gap:24px; min-width: 0; }
+  
+  .panel { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:28px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05); }
+  .dark .panel { background:#1e293b; border-color:#334155; box-shadow:0 4px 6px -1px rgba(0,0,0,0.3); }
+  
+  /* Bulky Theory */
+  .theory-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid #f1f5f9; }
+  .dark .theory-header { border-color:#334155; }
+  .theory h2 { margin:0; font-size:26px; font-weight:900; color:#0f172a; letter-spacing:-0.5px; }
+  .dark .theory h2 { color:#f8fafc; }
+  .badge { background:#eff6ff; color:#1d4ed8; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; border:1px solid #bfdbfe; }
+  .dark .badge { background:#1e3a8a; color:#bfdbfe; border-color:#3b82f6; }
+  
+  .theory-content { font-size:15px; line-height:1.8; color:#334155; }
+  .dark .theory-content { color:#94a3b8; }
+  .theory-content p { margin:0 0 16px 0; }
+  .theory-content h3 { font-size:16px; font-weight:800; color:#0f172a; margin:24px 0 12px 0; }
+  .dark .theory-content h3 { color:#e2e8f0; }
+  .theory-content code { background:#f1f5f9; padding:2px 6px; border-radius:4px; font-family:ui-monospace, monospace; font-size:14px; color:#0f172a; font-weight:600; border:1px solid #e2e8f0; }
+  .dark .theory-content code { background:#0f172a; color:#e2e8f0; border-color:#334155; }
+  
+  .callout { background:#f8fafc; border-left:4px solid #3b82f6; padding:16px 20px; border-radius:0 8px 8px 0; margin:20px 0; font-size:14px; color:#334155; }
+  .dark .callout { background:#0f172a; color:#cbd5e1; }
+  .callout strong { color:#0f172a; }
+  .dark .callout strong { color:#f8fafc; }
+  
+  /* Visual Diagrams (Claude Style) */
+  .viz-container { display: flex; gap: 24px; margin: 24px 0; flex-wrap: wrap; background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px dashed #cbd5e1; }
+  .dark .viz-container { background: #0f172a; border-color: #334155; }
+  .viz-box { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 8px; }
+  .viz-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; }
+  .viz-label.bad { color: #ef4444; }
+  .viz-label.good { color: #10b981; }
+  .viz-canvas { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; height: 100px; position: relative; overflow: hidden; }
+  .dark .viz-canvas { background: #1e293b; border-color: #475569; }
+  
+  /* Lab Area */
+  .lab-grid { display:grid; grid-template-columns: 1fr 1fr; gap:24px; }
+  
+  /* Code Editor */
+  .code-container { display:flex; flex-direction:column; border-radius:12px; overflow:hidden; border:1px solid #e2e8f0; }
+  .dark .code-container { border-color:#334155; }
+  .code-header { background:#f8fafc; padding:12px 16px; font-size:12px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; }
+  .dark .code-header { background:#0f172a; border-color:#334155; color:#94a3b8; }
+  textarea.code-editor { flex:1; min-height:600px; width:100%; padding:20px; border:0; outline:none; background:#0f172a; color:#e2e8f0; font:14px/1.6 ui-monospace, monospace; resize:vertical; }
+  
+  /* Preview Area */
+  .preview-container { display:flex; flex-direction:column; border-radius:12px; overflow:hidden; border:1px solid #e2e8f0; background:#f8fafc; }
+  .dark .preview-container { border-color:#334155; background:#0f172a; }
+  .preview-header { background:#f8fafc; padding:12px 16px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; }
+  .dark .preview-header { background:#0f172a; border-color:#334155; }
+  
+  .controls-bar { display:flex; gap:8px; align-items:center; font-size:12px; }
+  .btn-toggle { border:1px solid #cbd5e1; background:transparent; padding:6px 12px; border-radius:4px; font-size:12px; font-weight:700; color:#64748b; cursor:pointer; }
+  .dark .btn-toggle { border-color:#475569; color:#94a3b8; }
+  .btn-toggle:hover { background:#f1f5f9; }
+  .dark .btn-toggle:hover { background:#1e293b; }
+  
+  /* The Visible Canvas */
+  .iframe-wrapper { 
+    flex:1; 
+    padding:24px; 
+    display:flex; 
+    justify-content:center; 
+    align-items:flex-start; 
+    overflow:hidden; 
+    background-color: #e2e8f0;
+    background-image: linear-gradient(#cbd5e1 1px, transparent 1px), linear-gradient(90deg, #cbd5e1 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  .dark .iframe-wrapper {
+    background-color: #0f172a;
+    background-image: linear-gradient(#1e293b 1px, transparent 1px), linear-gradient(90deg, #1e293b 1px, transparent 1px);
+  }
+  iframe { background:#fff; border-radius:12px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); transition: width 0.2s ease; border:1px solid #cbd5e1; display:block; width: 100%; height: 600px; }
+  .dark iframe { border-color:#475569; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); }
+  
+  /* Viewport Info Bar */
+  .viewport-info { display:flex; justify-content:space-between; align-items:center; padding:10px 16px; background:#f8fafc; border-top:1px solid #e2e8f0; font-size:12px; font-weight:700; color:#64748b; }
+  .dark .viewport-info { background:#0f172a; border-color:#334155; color:#94a3b8; }
+</style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <span style="color:#3b82f6">⬛</span> Positioning & Layering Studio
+    </div>
+    <button id="studioThemeToggle" class="border border-slate-300 dark:border-slate-600 rounded-md px-4 py-2 text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+      Toggle UI Theme
+    </button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main">
+      <section class="panel theory">
+        <div class="theory-header">
+          <h2 id="moduleTitle"></h2>
+          <span class="badge" id="moduleBadge"></span>
+        </div>
+        <div id="moduleTheory" class="theory-content"></div>
+      </section>
+
+      <section class="lab-grid">
+        <!-- Code Side -->
+        <div class="code-container">
+          <div class="code-header">
+            <span>HTML Source</span>
+            <span style="color:#10b981">● Live Sync</span>
+          </div>
+          <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+        </div>
+
+        <!-- Preview Side -->
+        <div class="preview-container">
+          <div class="preview-header">
+            <div class="controls-bar">
+              <button class="btn-toggle" id="btnReset" style="border-color:#ef4444; color:#ef4444;">Reset to Naive</button>
+            </div>
+            <div class="controls-bar">
+              <button class="btn-toggle" id="previewDarkToggle">Dark Mode</button>
+            </div>
+          </div>
+          
+          <div class="iframe-wrapper">
+            <iframe id="previewIframe"></iframe>
+          </div>
+
+          <div class="viewport-info">
+            <span>Live Application Preview</span>
+            <span id="statusLabel" class="text-blue-500">Ready</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+// Module Data - Bulky Theory & Visuals
+const modules = [
+  {
+    id: "relative",
+    title: "1. Coordinate Space (Relative & Absolute)",
+    badge: "Positioning Context",
+    theory: `
+      <p><strong>The Problem:</strong> You want to place a small red notification dot on the top-right corner of an avatar. You apply <code>absolute top-0 right-0</code> to the dot, but it flies away to the top-right corner of the entire page.</p>
+      <p><strong>The Rule:</strong> An <code>absolute</code> element breaks out of the normal document flow. It will anchor itself to the nearest ancestor that has <code>position: relative</code> (or absolute/fixed). If no ancestor has it, it anchors to the browser window.</p>
+      
+      <div class="viz-container">
+        <div class="viz-box">
+          <div class="viz-label bad">❌ Static Parent</div>
+          <div class="viz-canvas" style="display:flex; align-items:center; justify-content:center;">
+            <div class="bg-slate-200 rounded-full w-10 h-10"></div>
+            <div class="bg-red-500 rounded-full w-3 h-3 absolute top-2 right-2"></div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Badge escapes to the canvas corner</div>
+        </div>
+        
+        <div class="viz-box">
+          <div class="viz-label good">✅ Relative Parent</div>
+          <div class="viz-canvas" style="display:flex; align-items:center; justify-content:center; position:relative;">
+            <div class="relative">
+              <div class="bg-slate-200 rounded-full w-10 h-10"></div>
+              <div class="bg-green-500 rounded-full w-3 h-3 absolute top-0 right-0 border-2 border-white"></div>
+            </div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Badge anchors perfectly to the avatar</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Your Mission:</strong><br>
+        Look at the Live Editor. The avatar's parent container is missing its relative context. Add <code>relative</code> to the parent div to lock the notification dot in place.
+      </div>
+    `,
+    naive: `<!-- 1. Relative Mission -->
+<div class="p-8 flex items-center gap-4 bg-white rounded-xl shadow-sm border border-slate-200">
+  <!-- Add 'relative' here -->
+  <div class="inline-block">
+    <div class="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center font-bold text-slate-500 text-xl">AV</div>
+    <div class="absolute top-0 right-0 w-4 h-4 bg-red-500 border-2 border-white rounded-full"></div>
+  </div>
+  <div>
+    <h2 class="font-bold text-lg text-slate-800">Jane Doe</h2>
+    <p class="text-sm text-slate-500">Status: Offline</p>
+  </div>
+</div>`
+  },
+  {
+    id: "sticky",
+    title: "2. Viewport Anchoring (Sticky & Fixed)",
+    badge: "Scroll Behavior",
+    theory: `
+      <p><strong>The Problem:</strong> You have a long table or sidebar. When the user scrolls down, the header disappears, and they lose context of what the columns mean.</p>
+      <p><strong>The Rule:</strong> <code>sticky</code> acts like a normal element until it hits a specific threshold (like <code>top-0</code>), at which point it pins to the screen. <code>fixed</code> is always pinned to the screen from the start.</p>
+      
+      <div class="viz-container">
+        <div class="viz-box">
+          <div class="viz-label bad">❌ Static</div>
+          <div class="viz-canvas" style="overflow-y:scroll;">
+            <div class="bg-slate-800 text-white p-2 text-[10px]">Header</div>
+            <div class="h-20 bg-slate-100">Content...</div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Header scrolls out of view</div>
+        </div>
+        
+        <div class="viz-box">
+          <div class="viz-label good">✅ Sticky top-0</div>
+          <div class="viz-canvas" style="overflow-y:scroll;">
+            <div class="sticky top-0 bg-blue-600 text-white p-2 text-[10px] z-10">Header</div>
+            <div class="h-20 bg-slate-100">Content...</div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Header pins to the top edge</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Your Mission:</strong><br>
+        The table header is currently static. Add <code>sticky top-0</code> to the header element. Then, scroll inside the preview window to test it!
+      </div>
+    `,
+    naive: `<!-- 2. Sticky Mission -->
+<div class="h-[800px] bg-slate-50">
+  <!-- Add 'sticky top-0' here -->
+  <div class="bg-slate-800 text-white p-4 font-bold flex justify-between shadow-md z-10">
+    <span>Transaction History</span>
+    <span>Scroll Down ↓</span>
+  </div>
+  <div class="p-4 space-y-4">
+    <div class="p-4 bg-white rounded shadow-sm border border-slate-200">Payment to Stripe - $49.00</div>
+    <div class="p-4 bg-white rounded shadow-sm border border-slate-200">Payment to AWS - $120.00</div>
+    <div class="p-4 bg-white rounded shadow-sm border border-slate-200">Payment to Vercel - $20.00</div>
+    <div class="p-4 bg-white rounded shadow-sm border border-slate-200">Payment to GitHub - $4.00</div>
+    <div class="p-4 bg-white rounded shadow-sm border border-slate-200">Payment to Figma - $15.00</div>
+    <div class="p-4 bg-white rounded shadow-sm border border-slate-200">Payment to Google - $5.00</div>
+    <div class="p-4 bg-white rounded shadow-sm border border-slate-200">Payment to Stripe - $49.00</div>
+    <div class="p-4 bg-white rounded shadow-sm border border-slate-200">Payment to AWS - $120.00</div>
+  </div>
+</div>`
+  },
+  {
+    id: "inset",
+    title: "3. Full Bleed Offsets (inset-0)",
+    badge: "Inset Shorthands",
+    theory: `
+      <p><strong>The Problem:</strong> You are building a modal or a background overlay. You need it to cover the entire parent container perfectly, edge-to-edge.</p>
+      <p><strong>The Rule:</strong> You could write <code>top-0 right-0 bottom-0 left-0</code>, but Tailwind gives you <code>inset-0</code>. It acts as a shorthand to stretch an absolute element to all four edges of its relative parent.</p>
+      
+      <div class="viz-container">
+        <div class="viz-box">
+          <div class="viz-label bad">❌ No inset</div>
+          <div class="viz-canvas" style="display:flex; align-items:center; justify-content:center;">
+             <div class="bg-slate-100 p-4 rounded text-xs">Card</div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">No overlay, raw content exposed</div>
+        </div>
+        
+        <div class="viz-box">
+          <div class="viz-label good">✅ inset-0</div>
+          <div class="viz-canvas" style="display:flex; align-items:center; justify-content:center; position:relative;">
+             <div class="bg-slate-100 p-4 rounded text-xs">Card</div>
+             <div class="absolute inset-0 bg-black/50 flex items-center justify-center text-white text-xs font-bold rounded">Overlay</div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Overlay stretches edge-to-edge</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Your Mission:</strong><br>
+        Add <code>absolute inset-0</code> to the overlay div. Watch it instantly stretch to cover the entire background image card.
+      </div>
+    `,
+    naive: `<!-- 3. Inset Mission -->
+<div class="relative w-full max-w-sm mx-auto h-64 rounded-xl overflow-hidden shadow-lg">
+  <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop" class="w-full h-full object-cover">
+  
+  <!-- Add 'absolute inset-0' to this div -->
+  <div class="bg-black/60 flex items-center justify-center">
+    <div class="text-center">
+      <h2 class="text-white text-xl font-bold">Explore Space</h2>
+      <p class="text-white/80 text-sm">Scroll to discover</p>
+    </div>
+  </div>
+</div>`
+  },
+  {
+    id: "zindex",
+    title: "4. Stacking Contexts (z-index)",
+    badge: "Layering",
+    theory: `
+      <p><strong>The Problem:</strong> You build a dropdown menu. You give it <code>z-50</code>. But it still renders *behind* the card below it.</p>
+      <p><strong>The Rule:</strong> Z-index only works within the same <strong>Stacking Context</strong>. Elements that create a new context (e.g., using <code>transform</code>, <code>opacity</code> < 1, or <code>position: relative</code> with a z-index) trap their children. A <code>z-50</code> inside a trapped container can never exceed a <code>z-10</code> outside the container.</p>
+      
+      <div class="viz-container">
+        <div class="viz-box">
+          <div class="viz-label bad">❌ Trapped Context</div>
+          <div class="viz-canvas" style="position:relative;">
+             <div class="absolute top-0 left-0 w-2/3 h-16 bg-slate-200 z-10 flex items-center justify-center text-xs">Card Below (z-10)</div>
+             <div class="relative z-0 w-full h-full flex items-center justify-center">
+               <div class="absolute top-4 left-8 w-2/3 h-16 bg-blue-500 z-50 flex items-center justify-center text-white text-xs">Dropdown (z-50)</div>
+             </div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Dropdown hides behind the card</div>
+        </div>
+        
+        <div class="viz-box">
+          <div class="viz-label good">✅ Fixed Context</div>
+          <div class="viz-canvas" style="position:relative;">
+             <div class="absolute top-0 left-0 w-2/3 h-16 bg-slate-200 z-10 flex items-center justify-center text-xs">Card Below (z-10)</div>
+             <div class="absolute top-4 left-8 w-2/3 h-16 bg-blue-500 z-50 flex items-center justify-center text-white text-xs">Dropdown (z-50)</div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Dropdown correctly renders on top</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Your Mission:</strong><br>
+        The dropdown wrapper is currently trapping its child. Add <code>z-50</code> to the outermost wrapper of the dropdown (the one with the blue background) to force it above the card below.
+      </div>
+    `,
+    naive: `<!-- 4. Z-Index Mission -->
+<div class="relative p-8 bg-slate-100 h-64">
+  
+  <!-- Card Below -->
+  <div class="absolute top-4 left-4 w-64 h-32 bg-white rounded-xl shadow-md border border-slate-200 z-10 p-4">
+    <h3 class="font-bold">Standard Card</h3>
+    <p class="text-xs text-slate-500">This card sits at z-10.</p>
+  </div>
+
+  <!-- Dropdown (Currently trapped in a z-0 wrapper) -->
+  <div class="absolute top-12 left-16 z-0">
+    <!-- Add 'z-50' to this element -->
+    <div class="w-64 bg-blue-600 text-white rounded-xl shadow-xl p-4">
+      <h3 class="font-bold">Dropdown Menu</h3>
+      <ul class="text-sm mt-2 space-y-1">
+        <li>Profile Settings</li>
+        <li>Account Billing</li>
+        <li>Sign Out</li>
+      </ul>
+    </div>
+  </div>
+
+</div>`
+  }
+];
+
+let currentModule = 0;
+const iframe = document.getElementById('previewIframe');
+const codeEditor = document.getElementById('codeEditor');
+let isDarkPreview = false;
+
+// --- Studio Dark Mode Toggle ---
+document.getElementById('studioThemeToggle').addEventListener('click', () => {
+  document.documentElement.classList.toggle('dark');
+  document.body.classList.toggle('bg-slate-50');
+  document.body.classList.toggle('bg-slate-900');
+  document.body.classList.toggle('text-slate-900');
+  document.body.classList.toggle('text-slate-100');
+});
+
+// --- Render Modules ---
+function renderSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.innerHTML = modules.map((m, i) => `
+    <button class="module-btn ${i === currentModule ? 'active' : ''}" onclick="loadModule(${i})">
+      ${m.title}
+    </button>
+  `).join('');
+}
+
+function loadModule(index) {
+  currentModule = index;
+  const mod = modules[index];
+  
+  renderSidebar();
+  document.getElementById('moduleTitle').textContent = mod.title;
+  document.getElementById('moduleBadge').textContent = mod.badge;
+  document.getElementById('moduleTheory').innerHTML = mod.theory;
+  
+  codeEditor.value = mod.naive;
+  updateIframe();
+}
+
+// --- Real-World App Shell for Iframe ---
+function updateIframe() {
+  const darkClass = isDarkPreview ? 'dark' : '';
+  
+  iframe.srcdoc = `
+    <!DOCTYPE html>
+    <html class="${darkClass}">
+    <head>
+      <meta charset="utf-8">
+      <script src="https://cdn.tailwindcss.com"></scr` + `ipt>
+      <script>
+        tailwind = { config: { darkMode: 'class' } }
+      </scr` + `ipt>
+      <style>
+        body { font-family: ui-sans-serif, system-ui, sans-serif; background-color: #f8fafc; margin: 0; padding: 0; }
+        .dark body { background-color: #0f172a; }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+      </style>
+    </head>
+    <body class="text-slate-900 dark:text-slate-100 h-full">
+      
+      <!-- REAL WORLD APP SHELL: TOP NAVIGATION -->
+      <nav class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-4 flex justify-between items-center z-50 relative">
+        <div class="font-black text-lg tracking-tight text-blue-600 dark:text-blue-400">MyApp.</div>
+        <div class="flex gap-6 text-sm font-semibold text-slate-500 dark:text-slate-400">
+          <span class="text-slate-900 dark:text-white">Dashboard</span>
+          <span class="hover:text-blue-500 cursor-pointer transition">Settings</span>
+        </div>
+      </nav>
+      
+      <!-- MAIN CONTENT AREA (WHERE YOUR CODE RENDERS) -->
+      <main class="p-4 md:p-8 h-full">
+        ${codeEditor.value}
+      </main>
+      
+    </body>
+    </html>
+  `;
+  
+  document.getElementById('statusLabel').textContent = "Syncing...";
+  setTimeout(() => { document.getElementById('statusLabel').textContent = "Ready"; }, 300);
+}
+
+// Live Sync
+codeEditor.addEventListener('input', updateIframe);
+
+// Preview Dark Mode Toggle
+document.getElementById('previewDarkToggle').addEventListener('click', () => {
+  isDarkPreview = !isDarkPreview;
+  updateIframe();
+  document.getElementById('previewDarkToggle').classList.toggle('active');
+});
+
+// Reset Button
+document.getElementById('btnReset').addEventListener('click', () => {
+  codeEditor.value = modules[currentModule].naive;
+  updateIframe();
+});
+
+// Init
+renderSidebar();
+loadModule(0);
+</script>
+</body>
+</html>

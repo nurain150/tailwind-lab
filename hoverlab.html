@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Module 08 · States & Interaction UI Studio</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    safelist: [
+      // Group states
+      'group', 'group-hover:translate-x-1', 'group-hover:text-blue-600', 'group-hover:shadow-xl', 'group-hover:-translate-y-1',
+      // Peer states
+      'peer', 'peer-checked:bg-blue-600', 'peer-checked:border-transparent', 'peer-checked:after:translate-x-full', 'peer-focus:outline-none',
+      // Pseudo-classes
+      'hover:bg-blue-700', 'focus:ring-2', 'focus:ring-blue-500', 'focus:outline-none', 'focus-visible:ring-2', 'focus-visible:ring-offset-2',
+      'active:scale-95', 'disabled:opacity-50', 'disabled:cursor-not-allowed',
+      // Transitions & Transforms
+      'transition-all', 'transition-colors', 'transition-transform', 'duration-300', 'ease-in-out', 'hover:-translate-y-1', 'hover:shadow-xl',
+      // Base styles
+      'bg-blue-600', 'bg-slate-900', 'text-white', 'border', 'border-slate-200', 'border-slate-300', 'bg-slate-100', 'bg-slate-200',
+      'rounded-2xl', 'rounded-xl', 'rounded-full', 'rounded-lg',
+      'p-6', 'p-4', 'py-3', 'px-4', 'flex', 'items-center', 'justify-between', 'cursor-pointer',
+      'w-full', 'max-w-sm', 'mx-auto', 'space-y-4', 'relative', 'inline-flex', 'sr-only',
+      // After pseudo for toggle
+      "after:content-['']", 'after:absolute', 'after:top-[2px]', 'after:left-[2px]', 'after:bg-white', 'after:border-slate-300', 'after:border', 'after:rounded-full', 'after:h-5', 'after:w-5', 'after:transition-all'
+    ]
+  };
+</script>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:#f4f7fa; color:#0f172a; font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+  button, input, select, textarea { font:inherit; cursor:pointer; }
+  .app { max-width:1440px; margin:0 auto; padding:24px; }
+  .topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:16px 24px; box-shadow:0 1px 3px rgba(0,0,0,0.02); }
+  .brand { display:flex; align-items:center; gap:14px; }
+  .brand-mark { width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg, #1e293b, #0f172a);color:#fff;display:grid;place-items:center;font-weight:900;font-size:15px; }
+  .eyebrow { font-size:10px; font-weight:800; letter-spacing:.15em; text-transform:uppercase; color:#64748b; }
+  .topbar h1 { margin:2px 0 0; font-size:20px; line-height:1.2; color:#0f172a; font-weight:800; }
+  .status { border:1px solid #e2e8f0; background:#f8fafc; border-radius:999px; padding:8px 14px; font-size:12px; font-weight:600; color:#475569; display:flex; align-items:center; gap:8px; }
+  .layout { display:grid; grid-template-columns:280px minmax(0,1fr); gap:20px; align-items:start; }
+  .sidebar,.panel { background:#fff;border:1px solid #e2e8f0;border-radius:20px;box-shadow:0 4px 20px rgba(15,23,42,0.03); }
+  .sidebar { padding:14px; position:sticky;top:20px; max-height:calc(100vh - 40px); overflow-y:auto; }
+  .side-label { margin:6px 8px 8px; font-size:10px; font-weight:800; letter-spacing:.14em; color:#94a3b8; text-transform:uppercase; }
+  .pattern-nav { display:flex;flex-direction:column;gap:3px; }
+  .pattern-btn { display:flex;align-items:center;gap:10px;text-align:left;border:0;background:transparent;padding:10px;border-radius:10px;color:#475569;font-size:13px;font-weight:650; width:100%; transition:all 0.15s; }
+  .pattern-btn:hover { background:#f1f5f9; color:#0f172a; }
+  .pattern-btn .num { display:grid;place-items:center;width:22px;height:22px;border:1px solid #e2e8f0;border-radius:6px;font-size:10px;color:#64748b;background:#f8fafc;flex-shrink:0; }
+  .pattern-btn.active { background:#eff6ff;color:#1d4ed8;font-weight:700; }
+  .pattern-btn.active .num { background:#2563eb;color:white;border-color:#2563eb; }
+
+  .main { min-width:0; display:flex; flex-direction:column; gap:16px; }
+  .lesson-head { padding:26px; }
+  .lesson-badge { display:inline-flex; align-items:center; gap:6px; color:#1d4ed8; background:#eff6ff; border:1px solid #dbeafe; border-radius:999px; padding:5px 12px; font-size:11px; font-weight:800; }
+  .lesson-head h2 { margin:8px 0 10px; font-size:24px; color:#0f172a; font-weight:800; }
+  .theory { margin-top:14px; padding-top:16px; border-top:1px solid #f1f5f9; color:#334155; font-size:14px; line-height:1.75; }
+  .theory p { margin:0 0 12px; }
+  .theory code { background:#f1f5f9; padding:2px 6px; border-radius:4px; font-family:monospace; font-size:13px; color:#0f172a; border:1px solid #e2e8f0; }
+  .callout { background:#f8fafc; border-left:4px solid #3b82f6; padding:16px; border-radius:0 8px 8px 0; margin:16px 0; font-size:13px; }
+  .mission-step { display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start; }
+  .step-num { background: #3b82f6; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px; flex-shrink: 0; margin-top: 2px; }
+
+  .work-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .panel { padding:18px; min-width:0; }
+  .panel-head { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:12px; }
+  .panel h3 { margin:0; font-size:13px; font-weight:700; color:#0f172a; }
+  .sub { margin-top:2px; color:#64748b; font-size:11px; }
+  .tag { border-radius:5px; padding:2px 6px; background:#f1f5f9; color:#475569; font-size:9px; font-weight:800; border:1px solid #e2e8f0; }
+
+  .controls { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .control { padding:10px 12px; border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc; }
+  .control.full { grid-column:1/-1; }
+  .control label { color:#475569; font-size:11px; font-weight:700; text-transform:uppercase; display:block; margin-bottom:4px; }
+  select { width:100%; border:1px solid #cbd5e1; border-radius:8px; background:#fff; padding:7px 10px; color:#0f172a; font-size:12px; font-weight:600; outline:none; }
+
+  .preview-stage { background-color:#f8fafc; background-image:linear-gradient(#e2e8f0 1px,transparent 1px),linear-gradient(90deg,#e2e8f0 1px,transparent 1px); background-size:16px 16px; border:1px dashed #cbd5e1; border-radius:12px; padding:24px; min-height:360px; display:flex; align-items:center; justify-content:center; margin-top:12px; position:relative; overflow:auto; }
+  
+  .diagram-wrap { border:1px solid #e2e8f0; border-radius:12px; background:#f8fafc; padding:14px; min-height:420px; display:flex; flex-direction:column; justify-content:center; }
+  .diagram-node { background:#fff; border:1px solid #cbd5e1; padding:8px 12px; border-radius:6px; font-family:monospace; font-size:12px; text-align:center; }
+  .diagram-arrow { text-align:center; color:#94a3b8; font-size:18px; font-weight:bold; margin:4px 0; line-height:1; }
+  
+  .code-editor { width:100%; min-height:250px; border:1px solid #0f172a; border-radius:10px; background:#0f172a; color:#e2e8f0; padding:14px; font:13px/1.6 monospace; outline:none; resize:vertical; }
+  .lesson-bottom { display:flex; justify-content:space-between; align-items:center; gap:12px; background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:14px 20px; }
+  .takeaway { flex:1; color:#065f46; font-size:13px; font-weight:600; }
+  .lesson-bottom button { border:0; border-radius:10px; background:#0f172a; color:#fff; padding:10px 18px; font-size:12px; font-weight:750; }
+  
+  @media(max-width:950px) { .layout, .work-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">MOD 8</div>
+      <div>
+        <div class="eyebrow">Class Explorer</div>
+        <h1>States & Interaction Architecture</h1>
+      </div>
+    </div>
+    <div class="status">group · peer · focus · active</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="side-label">Curriculum Lessons</div>
+      <nav class="pattern-nav" id="patternNav"></nav>
+    </aside>
+
+    <main class="main">
+      <section class="panel lesson-head">
+        <div class="lesson-badge" id="badge">LESSON 01</div>
+        <h2 id="patternTitle">Pattern Title</h2>
+        <div id="patternTheory" class="theory"></div>
+      </section>
+      
+      <div class="work-grid">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Live Component Preview</h3>
+              <div class="sub">Interact with the component to observe state mechanics.</div>
+            </div>
+            <span class="tag">LIVE</span>
+          </div>
+          <div class="controls" id="controls"></div>
+          <div class="preview-stage" id="previewStage"></div>
+        </section>
+        
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>CSS Model</h3>
+              <div class="sub">Visualizing the selector relationship.</div>
+            </div>
+            <span class="tag">DIAGRAM</span>
+          </div>
+          <div class="diagram-wrap" id="diagramArea"></div>
+        </section>
+      </div>
+      
+      <section class="panel code-panel">
+        <div class="code-toolbar" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div>
+            <h3>Live Editor</h3>
+            <div class="sub">Edit the code to fix the component live.</div>
+          </div>
+          <button id="resetCode" style="border:1px solid #cbd5e1;background:#fff;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:750;">Reset to Naive</button>
+        </div>
+        <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+      </section>
+      
+      <div class="lesson-bottom">
+        <div class="takeaway" id="takeaway"></div>
+        <button id="nextPattern">Next Lesson →</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const patterns = [
+  {
+    id: "group-card",
+    badge: "01 · PARENT-CHILD COORDINATION",
+    title: "Interactive Action Card with Group Hover",
+    theory: `<p>Modern interfaces use cards that elevate on hover while simultaneously driving visual changes inside their child elements (like arrow translation or title color shifts).</p>
+    <p>Instead of writing JavaScript event listeners, Tailwind solves this with the <code>group</code> class.</p>
+    <ul style="padding-left:20px; margin-bottom:16px;">
+      <li>Add <code>group</code> to the parent wrapper element.</li>
+      <li>Add <code>group-hover:*</code> utilities to the children.</li>
+    </ul>
+    <div class="callout">
+      <strong>Multi-Step Mission:</strong><br>
+      The card below is broken. The arrow doesn't move and the text doesn't change color. Fix it:<br><br>
+      <div class="mission-step"><div class="step-num">1</div><div>Add the <code>group</code> class to the outer card wrapper.</div></div>
+      <div class="mission-step"><div class="step-num">2</div><div>Add <code>group-hover:text-blue-600</code> to the <code>&lt;h3&gt;</code> title.</div></div>
+      <div class="mission-step"><div class="step-num">3</div><div>Add <code>group-hover:translate-x-1</code> to the arrow icon.</div></div>
+    </div>`,
+    takeaway: "Use group containers to coordinate complex multi-element micro-interactions on hover without writing JavaScript event handlers.",
+    controls: ["cardHover"],
+    component: "groupCardPattern",
+    naive: `<!-- 1. Group Hover Mission -->
+<div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 w-full max-w-sm mx-auto">
+  
+  <div class="flex justify-between items-center mb-3">
+    <span class="text-[10px] font-extrabold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full uppercase tracking-wider">Module 08</span>
+    
+    <!-- STEP 3: Add 'group-hover:translate-x-1' to this span -->
+    <span class="text-xs text-slate-400 transition-transform">→</span>
+  </div>
+  
+  <!-- STEP 2: Add 'group-hover:text-blue-600' to this h3 -->
+  <h3 class="font-bold text-slate-900 text-base transition-colors mb-1">State Coordination</h3>
+  
+  <p class="text-xs text-slate-500">Hover over this card to observe hardware-accelerated lifts and group-hover text translation.</p>
+</div>`
+  },
+  {
+    id: "accessible-button",
+    badge: "02 · ACCESSIBLE FOCUS & ACTIVE",
+    title: "Accessible Button with Ring & Depression",
+    theory: `<p>Production buttons require accessible keyboard focus rings and tactile click feedback.</p>
+    <ul style="padding-left:20px; margin-bottom:16px;">
+      <li><code>focus:outline-none</code> removes the ugly native browser outline.</li>
+      <li><code>focus:ring-2 focus:ring-blue-500</code> adds an accessible, high-contrast focus ring.</li>
+      <li><code>active:scale-95</code> simulates the button physically depressing when clicked.</li>
+    </ul>
+    <div class="callout">
+      <strong>Multi-Step Mission:</strong><br>
+      The button below is broken. It has no focus ring and doesn't depress. Fix it:<br><br>
+      <div class="mission-step"><div class="step-num">1</div><div>Add <code>focus:outline-none focus:ring-2 focus:ring-blue-500</code> to the button.</div></div>
+      <div class="mission-step"><div class="step-num">2</div><div>Add <code>active:scale-95 transition-all</code> to the button.</div></div>
+    </div>`,
+    takeaway: "Always combine focus-visible rings with active scaling states to give users immediate tactile confirmation during interaction.",
+    controls: ["btnFocus"],
+    component: "buttonPattern",
+    naive: `<!-- 2. Accessible Button Mission -->
+<div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm text-center w-full max-w-sm mx-auto">
+  
+  <!-- STEP 1 & 2: Add focus:ring-2 focus:ring-blue-500 active:scale-95 transition-all -->
+  <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs shadow-sm cursor-pointer">
+    Publish Architecture Changes
+  </button>
+  
+  <p class="text-[11px] text-slate-400 mt-4">Click or tab to inspect focus rings and active scale depression.</p>
+</div>`
+  },
+  {
+    id: "peer-toggle",
+    badge: "03 · SIBLING STATE REACTIVITY",
+    title: "Peer-Checked Interactive Toggle Switch",
+    theory: `<p>Complex form controls like custom toggles often hide the native input element while styling a sibling element visually.</p>
+    <p>Tailwind's <code>peer</code> class allows you to style a sibling based on the state of a hidden input.</p>
+    <ul style="padding-left:20px; margin-bottom:16px;">
+      <li>Add <code>peer</code> to the hidden input.</li>
+      <li>Use <code>peer-checked:*</code> on the sibling to style it when checked.</li>
+    </ul>
+    <div class="callout">
+      <strong>Multi-Step Mission:</strong><br>
+      The toggle below is broken. Clicking it doesn't change the color or slide the dot. Fix it:<br><br>
+      <div class="mission-step"><div class="step-num">1</div><div>Add the <code>peer</code> class to the hidden checkbox input.</div></div>
+      <div class="mission-step"><div class="step-num">2</div><div>Add <code>peer-checked:bg-blue-600</code> to the toggle track (the gray pill).</div></div>
+      <div class="mission-step"><div class="step-num">3</div><div>Add <code>peer-checked:translate-x-5</code> to the toggle dot.</div></div>
+    </div>`,
+    takeaway: "Leverage peer selectors to style adjacent component states cleanly based on hidden checkbox or radio input values.",
+    controls: ["peerState"],
+    component: "togglePattern",
+    naive: `<!-- 3. Peer Toggle Mission -->
+<div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex items-center justify-between w-full max-w-sm mx-auto">
+  <div>
+    <h4 class="font-bold text-xs text-slate-900">Email Notifications</h4>
+    <p class="text-[11px] text-slate-500">Receive weekly architectural digests</p>
+  </div>
+  <label class="relative inline-flex items-center cursor-pointer">
+    
+    <!-- STEP 1: Add 'peer' to this input -->
+    <input type="checkbox" class="sr-only" checked>
+    
+    <!-- STEP 2: Add 'peer-checked:bg-blue-600' to this div -->
+    <div class="w-11 h-6 bg-slate-200 rounded-full transition-colors">
+      
+      <!-- STEP 3: Add 'peer-checked:translate-x-5' to this div -->
+      <div class="w-5 h-5 bg-white rounded-full shadow-sm mt-[2px] ml-[2px] transition-transform"></div>
+      
+    </div>
+  </label>
+</div>`
+  }
+];
+
+let currentPattern = 0;
+const state = {
+  cardHover: "active",
+  btnFocus: "active",
+  peerState: "checked"
+};
+
+const $ = id => document.getElementById(id);
+
+function generateHTML() {
+  const p = patterns[currentPattern];
+  return p.naive;
+}
+
+function updateVisualizer() {
+  const p = patterns[currentPattern];
+  let diag = "";
+
+  if (p.id === "group-card") {
+    diag = `<div class="w-full text-center">
+      <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Parent-Child Event Propagation</h4>
+      <div class="max-w-xs mx-auto">
+        <div class="diagram-node text-blue-900 border-blue-300 bg-blue-50">Parent Container (group)</div>
+        <div class="diagram-arrow">↓ hover</div>
+        <div class="diagram-node text-slate-700">Child Element (group-hover:*)</div>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-6 px-4">Hover states bubble down child selectors automatically.</p>
+    </div>`;
+  } else if (p.id === "accessible-button") {
+    diag = `<div class="w-full text-center">
+      <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Focus & Active State Stack</h4>
+      <div class="max-w-xs mx-auto space-y-3">
+        <div class="diagram-node text-slate-900 bg-slate-100">active:scale-95 (Click)</div>
+        <div class="diagram-node text-blue-900 bg-blue-50 border-blue-300">focus:ring-2 (Keyboard)</div>
+        <div class="diagram-node text-slate-700">Base Button Styling</div>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-6 px-4">Ensures WCAG compliance and high-end tactile feedback.</p>
+    </div>`;
+  } else {
+    diag = `<div class="w-full text-center">
+      <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Sibling Peer Selector Model</h4>
+      <div class="max-w-xs mx-auto space-y-3">
+        <div class="diagram-node text-amber-900 bg-amber-50 border-amber-300">Input (peer)</div>
+        <div class="diagram-arrow">↓ peer-checked</div>
+        <div class="diagram-node text-blue-900 bg-blue-50 border-blue-300">Sibling UI (peer-checked:*)</div>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-6 px-4">Styles adjacent elements based on input pseudo-classes.</p>
+    </div>`;
+  }
+
+  $("diagramArea").innerHTML = diag;
+}
+
+function renderControls() {
+  const p = patterns[currentPattern];
+  let html = "";
+
+  if (p.id === "group-card") {
+    html += `<div class="control full"><label>Mission Control</label><select id="cardHover"><option value="active">Fix the broken card in the editor</option></select></div>`;
+  } else if (p.id === "accessible-button") {
+    html += `<div class="control full"><label>Mission Control</label><select id="btnFocus"><option value="active">Fix the broken button in the editor</option></select></div>`;
+  } else {
+    html += `<div class="control full"><label>Mission Control</label><select id="peerState"><option value="checked">Fix the broken toggle in the editor</option></select></div>`;
+  }
+
+  $("controls").innerHTML = html;
+}
+
+function updateAll() {
+  const html = generateHTML();
+  $("codeEditor").value = html;
+  $("previewStage").innerHTML = html;
+  updateVisualizer();
+}
+
+function renderNav() {
+  $("patternNav").innerHTML = patterns.map((pt, i) =>
+    `<button class="pattern-btn ${i === currentPattern ? 'active' : ''}" data-i="${i}">
+      <span class="num">${String(i + 1).padStart(2, "0")}</span>
+      <span>${pt.title}</span>
+    </button>`
+  ).join("");
+  document.querySelectorAll("[data-i]").forEach(b => b.onclick = () => { currentPattern = +b.dataset.i; renderPattern(); });
+}
+
+function renderPattern() {
+  const p = patterns[currentPattern];
+  $("badge").textContent = p.badge;
+  $("patternTitle").textContent = p.title;
+  $("patternTheory").innerHTML = p.theory;
+  $("takeaway").textContent = p.takeaway;
+  renderNav();
+  renderControls();
+  updateAll();
+  $("nextPattern").textContent = currentPattern === patterns.length - 1 ? "Complete Module ✓" : "Next Lesson →";
+  $("nextPattern").disabled = currentPattern === patterns.length - 1;
+}
+
+// Live Editor
+$("codeEditor").addEventListener("input", (e) => {
+  $("previewStage").innerHTML = e.target.value;
+});
+
+$("resetCode").onclick = () => updateAll();
+$("nextPattern").onclick = () => { if (currentPattern < patterns.length - 1) { currentPattern++; renderPattern(); } };
+
+renderPattern();
+</script>
+</body>
+</html>

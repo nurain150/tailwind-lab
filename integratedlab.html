@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en" class="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dark Mode & Blog Integration Studio</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: { extend: {} }
+  }
+</script>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; transition: background-color 0.3s, color 0.3s; }
+  
+  /* Studio UI Layout */
+  .app { max-width:1500px; margin:0 auto; padding:24px; display:flex; flex-direction:column; gap:24px; min-height:100vh; }
+  
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding-bottom:16px; border-bottom:1px solid #e2e8f0; }
+  .dark .topbar { border-color:#334155; }
+  
+  .brand { display:flex; align-items:center; gap:12px; font-weight:900; font-size:22px; letter-spacing:-0.5px; }
+  
+  .layout { display:grid; grid-template-columns: 320px minmax(0,1fr); gap:24px; align-items:start; }
+  
+  /* Sidebar */
+  .sidebar { display:flex; flex-direction:column; gap:10px; position:sticky; top:24px; }
+  .module-btn { text-align:left; padding:14px 18px; border-radius:10px; border:1px solid #e2e8f0; background:#fff; color:#475569; font-weight:600; font-size:14px; transition:all 0.2s; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.02); }
+  .dark .module-btn { background:#1e293b; border-color:#334155; color:#cbd5e1; }
+  .module-btn:hover { background:#f8fafc; transform:translateY(-1px); }
+  .dark .module-btn:hover { background:#0f172a; }
+  .module-btn.active { background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8; box-shadow:0 2px 4px rgba(59,130,246,0.1); }
+  .dark .module-btn.active { background:#1e3a8a; border-color:#3b82f6; color:#eff6ff; }
+  
+  /* Main Area */
+  .main { display:flex; flex-direction:column; gap:24px; min-width: 0; }
+  
+  .panel { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:28px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05); }
+  .dark .panel { background:#1e293b; border-color:#334155; box-shadow:0 4px 6px -1px rgba(0,0,0,0.3); }
+  
+  /* Bulky Theory */
+  .theory-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid #f1f5f9; }
+  .dark .theory-header { border-color:#334155; }
+  .theory h2 { margin:0; font-size:26px; font-weight:900; color:#0f172a; letter-spacing:-0.5px; }
+  .dark .theory h2 { color:#f8fafc; }
+  .badge { background:#eff6ff; color:#1d4ed8; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; border:1px solid #bfdbfe; }
+  .dark .badge { background:#1e3a8a; color:#bfdbfe; border-color:#3b82f6; }
+  
+  .theory-content { font-size:15px; line-height:1.8; color:#334155; }
+  .dark .theory-content { color:#94a3b8; }
+  .theory-content p { margin:0 0 16px 0; }
+  .theory-content h3 { font-size:16px; font-weight:800; color:#0f172a; margin:24px 0 12px 0; }
+  .dark .theory-content h3 { color:#e2e8f0; }
+  .theory-content code { background:#f1f5f9; padding:2px 6px; border-radius:4px; font-family:ui-monospace, monospace; font-size:14px; color:#0f172a; font-weight:600; border:1px solid #e2e8f0; }
+  .dark .theory-content code { background:#0f172a; color:#e2e8f0; border-color:#334155; }
+  
+  .callout { background:#f8fafc; border-left:4px solid #3b82f6; padding:16px 20px; border-radius:0 8px 8px 0; margin:20px 0; font-size:14px; color:#334155; }
+  .dark .callout { background:#0f172a; color:#cbd5e1; }
+  .callout strong { color:#0f172a; }
+  .dark .callout strong { color:#f8fafc; }
+  
+  .mission-step { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+  .step-num { background: #3b82f6; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; flex-shrink: 0; margin-top: 2px; }
+  
+  /* Visual Diagrams */
+  .viz-container { display: flex; gap: 24px; margin: 24px 0; flex-wrap: wrap; background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px dashed #cbd5e1; }
+  .dark .viz-container { background: #0f172a; border-color: #334155; }
+  .viz-box { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 8px; }
+  .viz-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; }
+  .viz-label.bad { color: #ef4444; }
+  .viz-label.good { color: #10b981; }
+  .viz-canvas { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; height: 120px; position: relative; overflow: hidden; }
+  .dark .viz-canvas { background: #1e293b; border-color: #475569; }
+  
+  /* Lab Area */
+  .lab-grid { display:grid; grid-template-columns: 1fr 1fr; gap:24px; }
+  
+  /* Code Editor */
+  .code-container { display:flex; flex-direction:column; border-radius:12px; overflow:hidden; border:1px solid #e2e8f0; }
+  .dark .code-container { border-color:#334155; }
+  .code-header { background:#f8fafc; padding:12px 16px; font-size:12px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; }
+  .dark .code-header { background:#0f172a; border-color:#334155; color:#94a3b8; }
+  textarea.code-editor { flex:1; min-height:600px; width:100%; padding:20px; border:0; outline:none; background:#0f172a; color:#e2e8f0; font:14px/1.6 ui-monospace, monospace; resize:vertical; }
+  
+  /* Preview Area */
+  .preview-container { display:flex; flex-direction:column; border-radius:12px; overflow:hidden; border:1px solid #e2e8f0; background:#f8fafc; }
+  .dark .preview-container { border-color:#334155; background:#0f172a; }
+  .preview-header { background:#f8fafc; padding:12px 16px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; }
+  .dark .preview-header { background:#0f172a; border-color:#334155; }
+  
+  .controls-bar { display:flex; gap:8px; align-items:center; font-size:12px; }
+  .btn-toggle { border:1px solid #cbd5e1; background:transparent; padding:6px 12px; border-radius:4px; font-size:12px; font-weight:700; color:#64748b; cursor:pointer; }
+  .dark .btn-toggle { border-color:#475569; color:#94a3b8; }
+  .btn-toggle:hover { background:#f1f5f9; }
+  .dark .btn-toggle:hover { background:#1e293b; }
+  
+  /* The Visible Canvas */
+  .iframe-wrapper { 
+    flex:1; 
+    padding:24px; 
+    display:flex; 
+    justify-content:center; 
+    align-items:flex-start; 
+    overflow:hidden; 
+    background-color: #e2e8f0;
+    background-image: linear-gradient(#cbd5e1 1px, transparent 1px), linear-gradient(90deg, #cbd5e1 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  .dark .iframe-wrapper {
+    background-color: #0f172a;
+    background-image: linear-gradient(#1e293b 1px, transparent 1px), linear-gradient(90deg, #1e293b 1px, transparent 1px);
+  }
+  iframe { background:#fff; border-radius:12px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); transition: width 0.2s ease; border:1px solid #cbd5e1; display:block; width: 100%; height: 600px; }
+  .dark iframe { border-color:#475569; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); }
+</style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <span style="color:#3b82f6">⬛</span> Dark Mode & Integration Studio
+    </div>
+    <button id="studioThemeToggle" class="border border-slate-300 dark:border-slate-600 rounded-md px-4 py-2 text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+      Toggle UI Theme
+    </button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main">
+      <section class="panel theory">
+        <div class="theory-header">
+          <h2 id="moduleTitle"></h2>
+          <span class="badge" id="moduleBadge"></span>
+        </div>
+        <div id="moduleTheory" class="theory-content"></div>
+      </section>
+
+      <section class="lab-grid">
+        <!-- Code Side -->
+        <div class="code-container">
+          <div class="code-header">
+            <span>HTML Source</span>
+            <span style="color:#10b981">● Live Sync</span>
+          </div>
+          <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+        </div>
+
+        <!-- Preview Side -->
+        <div class="preview-container">
+          <div class="preview-header">
+            <div class="controls-bar" id="controlsArea"></div>
+            <div class="controls-bar">
+              <button class="btn-toggle" id="btnReset" style="border-color:#ef4444; color:#ef4444;">Reset Code</button>
+              <button class="btn-toggle" id="previewDarkToggle">Toggle Dark Mode</button>
+            </div>
+          </div>
+          
+          <div class="iframe-wrapper">
+            <iframe id="previewIframe"></iframe>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+// Module Data - Deep Theory & Multi-Step Missions
+const modules = [
+  {
+    id: "darkmode",
+    title: "1. Dark Mode Token Architecture",
+    badge: "Semantic Colors",
+    theory: `
+      <p><strong>The Problem:</strong> Hardcoding colors (like <code>bg-white</code> and <code>text-black</code>) makes your UI brittle. When you switch to dark mode, you are forced to manually overwrite every single surface, text, and border color. Miss one, and you have a blinding white card floating in a dark void.</p>
+      <p><strong>The Rule:</strong> In production systems, colors are treated as "Semantic Tokens." A surface isn't just "white"; it is a "Primary Surface." In Tailwind, this means always pairing your base class with a <code>dark:</code> variant.</p>
+      
+      <h3>Why not pure black?</h3>
+      <p>In dark mode, never use pure black (<code>#000000</code>) for backgrounds. The contrast against white text is too harsh and causes "halation" (eye strain). Tailwind's <code>slate-900</code> or <code>slate-950</code> are slightly tinted grays that are much easier on the eyes.</p>
+
+      <div class="viz-container">
+        <div class="viz-box">
+          <div class="viz-label bad">❌ Missing Dark Tokens</div>
+          <div class="viz-canvas" style="background: #0f172a; justify-content:center; align-items:center;">
+             <div class="bg-white p-4 rounded text-black w-full text-center shadow">White Card</div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Card stays blindingly white</div>
+        </div>
+        
+        <div class="viz-box">
+          <div class="viz-label good">✅ Paired Tokens</div>
+          <div class="viz-canvas" style="background: #0f172a; justify-content:center; align-items:center;">
+             <div class="bg-white dark:bg-slate-800 p-4 rounded text-slate-900 dark:text-white w-full text-center border dark:border-slate-700 shadow">Adaptive Card</div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Card adapts to the dark context</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Multi-Step Mission:</strong><br>
+        Toggle the Dark Mode button in the preview. The card is blinding white. Complete these steps in the Live Editor:<br><br>
+        <div class="mission-step"><div class="step-num">1</div><div>Give the main card a dark background: <code>dark:bg-slate-800</code>.</div></div>
+        <div class="mission-step"><div class="step-num">2</div><div>Fix the card border: <code>dark:border-slate-700</code>.</div></div>
+        <div class="mission-step"><div class="step-num">3</div><div>Fix the heading text color: <code>dark:text-white</code>.</div></div>
+        <div class="mission-step"><div class="step-num">4</div><div>Fix the paragraph text color: <code>dark:text-slate-400</code>.</div></div>
+      </div>
+    `,
+    naive: `<!-- 1. Dark Mode Mission -->
+<div class="p-8 flex items-center justify-center h-full bg-slate-50 dark:bg-slate-950">
+  
+  <!-- STEP 1 & 2: Add dark:bg-slate-800 dark:border-slate-700 to this div -->
+  <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-xl max-w-sm w-full text-center">
+    
+    <!-- STEP 3: Add dark:text-white here -->
+    <h3 class="text-xl font-black text-slate-900 mb-2">Premium Feature</h3>
+    
+    <!-- STEP 4: Add dark:text-slate-400 here -->
+    <p class="text-sm text-slate-500 mb-6">Unlock advanced analytics and custom domain support.</p>
+    
+    <button class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl text-sm transition hover:bg-blue-700">Upgrade Now</button>
+  </div>
+
+</div>`
+  },
+  {
+    id: "layout",
+    title: "2. Responsive Grid Layouts",
+    badge: "Mobile-First",
+    theory: `
+      <p><strong>The Problem:</strong> You build a beautiful 3-column layout on your desktop, but when a user opens it on their phone, the columns squish together until the text is unreadable. </p>
+      <p><strong>The Rule:</strong> Tailwind is mobile-first. You define the base layout for phones (usually <code>grid-cols-1</code>). Then, you use breakpoint prefixes (like <code>md:</code> or <code>lg:</code>) to expand the grid on larger screens.</p>
+      
+      <h3>The Asymmetric Blog Layout</h3>
+      <p>A standard blog article shouldn't be 50/50 with the sidebar. The article needs more room to breathe. We use a 4-column grid on desktop: the article spans 3 columns (<code>lg:col-span-3</code>) and the sidebar spans 1 column (<code>lg:col-span-1</code>).</p>
+
+      <div class="viz-container">
+        <div class="viz-box">
+          <div class="viz-label bad">❌ Unstructured Layout</div>
+          <div class="viz-canvas" style="background: #f8fafc; flex-direction: row; gap: 8px; padding: 8px;">
+             <div class="flex-1 bg-white border border-slate-200 flex items-center justify-center text-xs text-slate-400">Article squished</div>
+             <div class="w-16 bg-slate-200 flex items-center justify-center text-[8px] text-slate-500">Side</div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Sidebar overpowers the article</div>
+        </div>
+        
+        <div class="viz-box">
+          <div class="viz-label good">✅ Asymmetric Grid</div>
+          <div class="viz-canvas" style="background: #f8fafc; flex-direction: row; gap: 8px; padding: 8px;">
+             <div class="w-3/4 bg-white border border-slate-200 flex items-center justify-center text-xs text-slate-800 font-bold">Article (col-span-3)</div>
+             <div class="w-1/4 bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] text-slate-600">Side (col-span-1)</div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Article is the main focus</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Multi-Step Mission:</strong><br>
+        The layout is currently a flat stack. Complete these steps to build the grid:<br><br>
+        <div class="mission-step"><div class="step-num">1</div><div>Turn the parent container into a responsive grid: <code>grid grid-cols-1 lg:grid-cols-4 gap-8</code>.</div></div>
+        <div class="mission-step"><div class="step-num">2</div><div>Make the main article take up 3 columns on desktop: <code>lg:col-span-3</code>.</div></div>
+        <div class="mission-step"><div class="step-num">3</div><div>Make the sidebar take up 1 column on desktop: <code>lg:col-span-1</code>.</div></div>
+      </div>
+    `,
+    naive: `<!-- 2. Layout Mission -->
+<div class="bg-slate-50 dark:bg-slate-950 min-h-screen p-8 text-slate-900 dark:text-white">
+  
+  <!-- STEP 1: Add 'grid grid-cols-1 lg:grid-cols-4 gap-8' to this div -->
+  <div class="max-w-6xl mx-auto">
+    
+    <!-- STEP 2: Add 'lg:col-span-3' to this main tag -->
+    <main class="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 mb-8">
+      <h1 class="text-3xl font-black mb-4">Mastering UI Architecture</h1>
+      <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">This article should take up 75% of the screen. Currently, it takes up 100% because the grid is missing.</p>
+      <div class="h-64 bg-slate-100 dark:bg-slate-800 rounded-xl"></div>
+    </main>
+
+    <!-- STEP 3: Add 'lg:col-span-1' to this aside tag -->
+    <aside class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
+      <h3 class="font-bold mb-4">Related</h3>
+      <ul class="space-y-2 text-sm text-slate-500 dark:text-slate-400">
+        <li>Layout</li>
+        <li>Themes</li>
+      </ul>
+    </aside>
+
+  </div>
+</div>`
+  },
+  {
+    id: "sticky",
+    title: "3. Sticky Navigation & Z-Index",
+    badge: "Viewport Anchoring",
+    theory: `
+      <p><strong>The Problem:</strong> As the user scrolls down a long article, the navigation bar disappears. They have to scroll all the way back to the top to click a link.</p>
+      <p><strong>The Rule:</strong> <code>sticky top-0</code> pins the navigation to the top of the viewport once the user scrolls past it. However, a sticky element will slide <em>underneath</em> other elements unless you give it a high z-index.</p>
+      
+      <h3>The Stacking Context Trap</h3>
+      <p>If you apply <code>z-50</code> to the nav, but the nav is inside a parent div that has <code>z-0</code>, the nav is trapped. It can never rise above the content outside that parent. The sticky nav must be placed at the root level of the layout.</p>
+
+      <div class="viz-container">
+        <div class="viz-box">
+          <div class="viz-label bad">❌ Static Nav</div>
+          <div class="viz-canvas" style="background: #f8fafc; padding: 0; flex-direction: column;">
+             <div class="bg-slate-800 text-white p-2 text-[10px]">Nav (scrolls away)</div>
+             <div class="p-2 space-y-2"><div class="h-4 bg-slate-200 rounded"></div><div class="h-4 bg-slate-200 rounded"></div></div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Nav disappears on scroll</div>
+        </div>
+        
+        <div class="viz-box">
+          <div class="viz-label good">✅ Sticky Nav</div>
+          <div class="viz-canvas" style="background: #f8fafc; padding: 0; flex-direction: column; position: relative; overflow-y: scroll;">
+             <div class="sticky top-0 bg-slate-900 text-white p-2 text-[10px] z-50 shadow-md">Nav (pinned)</div>
+             <div class="p-2 space-y-2"><div class="h-4 bg-slate-200 rounded"></div><div class="h-4 bg-slate-200 rounded"></div><div class="h-4 bg-slate-200 rounded"></div></div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Nav pins to the top edge</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Multi-Step Mission:</strong><br>
+        Scroll inside the preview. The nav disappears. Let's fix it:<br><br>
+        <div class="mission-step"><div class="step-num">1</div><div>Add <code>sticky top-0</code> to the nav element.</div></div>
+        <div class="mission-step"><div class="step-num">2</div><div>Add <code>z-50</code> to ensure it stays above the content.</div></div>
+        <div class="mission-step"><div class="step-num">3</div><div>Scroll the preview again to verify the nav stays pinned.</div></div>
+      </div>
+    `,
+    naive: `<!-- 3. Sticky Nav Mission -->
+<div class="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-900 dark:text-white">
+  
+  <!-- STEP 1 & 2: Add 'sticky top-0 z-50' to this nav -->
+  <nav class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 flex justify-between items-center shadow-sm">
+    <div class="font-black text-xl">MyBlog.</div>
+    <div class="text-sm font-bold text-blue-600">Home</div>
+  </nav>
+
+  <div class="p-8 max-w-2xl mx-auto space-y-6">
+    <h1 class="text-3xl font-black">Scroll down to test the nav</h1>
+    <div class="h-64 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800"></div>
+    <div class="h-64 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800"></div>
+    <div class="h-64 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800"></div>
+    <div class="h-64 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800"></div>
+  </div>
+</div>`
+  },
+  {
+    id: "capstone",
+    title: "4. Final Capstone Integration",
+    badge: "Putting it all together",
+    theory: `
+      <p><strong>The Final Test:</strong> You now have all the pieces: Dark Mode tokens, Responsive Grids, and Sticky Navigation. </p>
+      <p>In this final capstone, you must combine them all into a single, cohesive blog page. You also need to add <strong>micro-interactions</strong> to make it feel premium. The article cards should lift slightly on hover, and the titles should change color.</p>
+      
+      <div class="callout">
+        <strong>Final Multi-Step Mission:</strong><br>
+        The code editor contains a broken blog layout. Fix it completely:<br><br>
+        <div class="mission-step"><div class="step-num">1</div><div>Add Dark Mode tokens to the Nav, Article, and Sidebar (<code>dark:bg-slate-900 dark:border-slate-800 dark:text-white</code>).</div></div>
+        <div class="mission-step"><div class="step-num">2</div><div>Make the layout a responsive grid: <code>grid grid-cols-1 lg:grid-cols-4 gap-8</code>.</div></div>
+        <div class="mission-step"><div class="step-num">3</div><div>Make the Nav sticky: <code>sticky top-0 z-50</code>.</div></div>
+        <div class="mission-step"><div class="step-num">4</div><div>Add a hover lift to the related article links: <code>hover:-translate-y-1 hover:shadow-lg transition-all</code>.</div></div>
+      </div>
+    `,
+    naive: `<!-- 4. Capstone Mission -->
+<div class="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-900 dark:text-white">
+  
+  <!-- STEP 3: Make this sticky top-0 z-50 -->
+  <nav class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 flex justify-between items-center shadow-sm">
+    <div class="font-black text-xl">MyBlog.</div>
+    <div class="text-sm font-bold text-blue-600">Home</div>
+  </nav>
+
+  <!-- STEP 2: Add 'grid grid-cols-1 lg:grid-cols-4 gap-8' -->
+  <div class="p-8 max-w-6xl mx-auto">
+    
+    <main class="bg-white p-8 rounded-2xl border border-slate-200 mb-8 lg:col-span-3">
+      <h1 class="text-3xl font-black mb-4">Building Robust UI</h1>
+      <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">This is the final test. Fix the dark mode, grid, and sticky nav.</p>
+      <div class="h-64 bg-slate-100 dark:bg-slate-800 rounded-xl"></div>
+    </main>
+
+    <aside class="bg-white p-6 rounded-2xl border border-slate-200 lg:col-span-1">
+      <h3 class="font-bold mb-4">Related Articles</h3>
+      <div class="space-y-4">
+        <!-- STEP 4: Add 'hover:-translate-y-1 hover:shadow-lg transition-all' to these cards -->
+        <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer">
+          <h4 class="font-bold text-sm">Mastering Flexbox</h4>
+        </div>
+        <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer">
+          <h4 class="font-bold text-sm">CSS Grid Systems</h4>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>`
+  }
+];
+
+let currentModule = 0;
+const iframe = document.getElementById('previewIframe');
+const codeEditor = document.getElementById('codeEditor');
+let isDarkPreview = false;
+
+// --- Studio Dark Mode Toggle ---
+document.getElementById('studioThemeToggle').addEventListener('click', () => {
+  document.documentElement.classList.toggle('dark');
+  document.body.classList.toggle('bg-slate-50');
+  document.body.classList.toggle('bg-slate-900');
+  document.body.classList.toggle('text-slate-900');
+  document.body.classList.toggle('text-slate-100');
+});
+
+// --- Render Modules ---
+function renderSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.innerHTML = modules.map((m, i) => `
+    <button class="module-btn ${i === currentModule ? 'active' : ''}" onclick="loadModule(${i})">
+      ${m.title}
+    </button>
+  `).join('');
+}
+
+function loadModule(index) {
+  currentModule = index;
+  const mod = modules[index];
+  
+  renderSidebar();
+  document.getElementById('moduleTitle').textContent = mod.title;
+  document.getElementById('moduleBadge').textContent = mod.badge;
+  document.getElementById('moduleTheory').innerHTML = mod.theory;
+  
+  codeEditor.value = mod.naive;
+  updateIframe();
+}
+
+// --- Real-World App Shell for Iframe ---
+function updateIframe() {
+  const darkClass = isDarkPreview ? 'dark' : '';
+  
+  iframe.srcdoc = `
+    <!DOCTYPE html>
+    <html class="${darkClass}">
+    <head>
+      <meta charset="utf-8">
+      <script src="https://cdn.tailwindcss.com"></scr` + `ipt>
+      <script>
+        tailwind = { config: { darkMode: 'class' } }
+      </scr` + `ipt>
+      <style>
+        body { font-family: ui-sans-serif, system-ui, sans-serif; margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+      </style>
+    </head>
+    <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+      
+      <!-- MAIN CONTENT AREA (WHERE YOUR CODE RENDERS) -->
+      <main class="flex-1 overflow-auto">
+        ${codeEditor.value}
+      </main>
+      
+    </body>
+    </html>
+  `;
+}
+
+// Live Sync
+codeEditor.addEventListener('input', updateIframe);
+
+// Preview Dark Mode Toggle
+document.getElementById('previewDarkToggle').addEventListener('click', () => {
+  isDarkPreview = !isDarkPreview;
+  updateIframe();
+  document.getElementById('previewDarkToggle').classList.toggle('active');
+});
+
+// Reset Button
+document.getElementById('btnReset').addEventListener('click', () => {
+  codeEditor.value = modules[currentModule].naive;
+  updateIframe();
+});
+
+// Init
+renderSidebar();
+loadModule(0);
+</script>
+</body>
+</html>

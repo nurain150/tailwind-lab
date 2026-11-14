@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en" class="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Responsive Architecture Studio</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: { extend: {} }
+  }
+</script>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; transition: background-color 0.3s, color 0.3s; }
+  
+  /* Studio UI Layout */
+  .app { max-width:1500px; margin:0 auto; padding:24px; display:flex; flex-direction:column; gap:24px; min-height:100vh; }
+  
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding-bottom:16px; border-bottom:1px solid #e2e8f0; }
+  .dark .topbar { border-color:#334155; }
+  
+  .brand { display:flex; align-items:center; gap:12px; font-weight:900; font-size:22px; letter-spacing:-0.5px; }
+  
+  .layout { display:grid; grid-template-columns: 300px minmax(0,1fr); gap:24px; align-items:start; }
+  
+  /* Sidebar */
+  .sidebar { display:flex; flex-direction:column; gap:10px; position:sticky; top:24px; }
+  .module-btn { text-align:left; padding:14px 18px; border-radius:10px; border:1px solid #e2e8f0; background:#fff; color:#475569; font-weight:600; font-size:14px; transition:all 0.2s; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.02); }
+  .dark .module-btn { background:#1e293b; border-color:#334155; color:#cbd5e1; }
+  .module-btn:hover { background:#f8fafc; transform:translateY(-1px); }
+  .dark .module-btn:hover { background:#0f172a; }
+  .module-btn.active { background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8; box-shadow:0 2px 4px rgba(59,130,246,0.1); }
+  .dark .module-btn.active { background:#1e3a8a; border-color:#3b82f6; color:#eff6ff; }
+  
+  /* Main Area */
+  .main { display:flex; flex-direction:column; gap:24px; min-width: 0; }
+  
+  .panel { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:28px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05); }
+  .dark .panel { background:#1e293b; border-color:#334155; box-shadow:0 4px 6px -1px rgba(0,0,0,0.3); }
+  
+  /* Bulky Theory */
+  .theory-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid #f1f5f9; }
+  .dark .theory-header { border-color:#334155; }
+  .theory h2 { margin:0; font-size:26px; font-weight:900; color:#0f172a; letter-spacing:-0.5px; }
+  .dark .theory h2 { color:#f8fafc; }
+  .badge { background:#eff6ff; color:#1d4ed8; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; border:1px solid #bfdbfe; }
+  .dark .badge { background:#1e3a8a; color:#bfdbfe; border-color:#3b82f6; }
+  
+  .theory-content { font-size:15px; line-height:1.8; color:#334155; }
+  .dark .theory-content { color:#94a3b8; }
+  .theory-content p { margin:0 0 16px 0; }
+  .theory-content h3 { font-size:16px; font-weight:800; color:#0f172a; margin:24px 0 12px 0; }
+  .dark .theory-content h3 { color:#e2e8f0; }
+  .theory-content code { background:#f1f5f9; padding:2px 6px; border-radius:4px; font-family:ui-monospace, monospace; font-size:14px; color:#0f172a; font-weight:600; border:1px solid #e2e8f0; }
+  .dark .theory-content code { background:#0f172a; color:#e2e8f0; border-color:#334155; }
+  
+  .callout { background:#f8fafc; border-left:4px solid #3b82f6; padding:16px 20px; border-radius:0 8px 8px 0; margin:20px 0; font-size:14px; color:#334155; }
+  .dark .callout { background:#0f172a; color:#cbd5e1; }
+  .callout strong { color:#0f172a; }
+  .dark .callout strong { color:#f8fafc; }
+  
+  /* Visual Diagrams (Claude Style) */
+  .viz-container { display: flex; gap: 24px; margin: 24px 0; flex-wrap: wrap; background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px dashed #cbd5e1; }
+  .dark .viz-container { background: #0f172a; border-color: #334155; }
+  .viz-box { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 8px; }
+  .viz-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; }
+  .viz-label.bad { color: #ef4444; }
+  .viz-label.good { color: #10b981; }
+  .viz-canvas { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; height: 100px; position: relative; }
+  .dark .viz-canvas { background: #1e293b; border-color: #475569; }
+  
+  /* Lab Area */
+  .lab-grid { display:grid; grid-template-columns: 1fr 1fr; gap:24px; }
+  
+  /* Code Editor */
+  .code-container { display:flex; flex-direction:column; border-radius:12px; overflow:hidden; border:1px solid #e2e8f0; }
+  .dark .code-container { border-color:#334155; }
+  .code-header { background:#f8fafc; padding:12px 16px; font-size:12px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; }
+  .dark .code-header { background:#0f172a; border-color:#334155; color:#94a3b8; }
+  textarea.code-editor { flex:1; min-height:600px; width:100%; padding:20px; border:0; outline:none; background:#0f172a; color:#e2e8f0; font:14px/1.6 ui-monospace, monospace; resize:vertical; }
+  
+  /* Preview Area */
+  .preview-container { display:flex; flex-direction:column; border-radius:12px; overflow:hidden; border:1px solid #e2e8f0; background:#f8fafc; }
+  .dark .preview-container { border-color:#334155; background:#0f172a; }
+  .preview-header { background:#f8fafc; padding:12px 16px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; }
+  .dark .preview-header { background:#0f172a; border-color:#334155; }
+  
+  .controls-bar { display:flex; gap:8px; align-items:center; font-size:12px; }
+  .btn-group { display:flex; background:#e2e8f0; border-radius:6px; padding:2px; }
+  .dark .btn-group { background:#334155; }
+  .btn-toggle { border:0; background:transparent; padding:6px 12px; border-radius:4px; font-size:12px; font-weight:700; color:#64748b; cursor:pointer; }
+  .dark .btn-toggle { color:#94a3b8; }
+  .btn-toggle.active { background:#fff; color:#0f172a; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+  .dark .btn-toggle.active { background:#0f172a; color:#f8fafc; }
+  
+  /* The Visible Canvas */
+  .iframe-wrapper { 
+    flex:1; 
+    padding:32px; 
+    display:flex; 
+    justify-content:center; 
+    align-items:flex-start; 
+    overflow:auto; 
+    background-color: #e2e8f0;
+    background-image: linear-gradient(#cbd5e1 1px, transparent 1px), linear-gradient(90deg, #cbd5e1 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  .dark .iframe-wrapper {
+    background-color: #0f172a;
+    background-image: linear-gradient(#1e293b 1px, transparent 1px), linear-gradient(90deg, #1e293b 1px, transparent 1px);
+  }
+  iframe { background:#fff; border-radius:12px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); transition: width 0.2s ease; border:1px solid #cbd5e1; display:block; }
+  .dark iframe { border-color:#475569; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); }
+  
+  /* Viewport Info Bar */
+  .viewport-info { display:flex; justify-content:space-between; align-items:center; padding:10px 16px; background:#f8fafc; border-top:1px solid #e2e8f0; font-size:12px; font-weight:700; color:#64748b; }
+  .dark .viewport-info { background:#0f172a; border-color:#334155; color:#94a3b8; }
+  .bp-tag { background:#3b82f6; color:white; padding:2px 8px; border-radius:4px; font-size:10px; text-transform:uppercase; letter-spacing:0.5px; }
+  .bp-tag.base { background:#10b981; }
+  .bp-tag.md { background:#8b5cf6; }
+  .bp-tag.lg { background:#f59e0b; }
+  
+  /* Slider */
+  .slider-box { display:flex; align-items:center; gap:12px; padding:12px 16px; font-size:12px; font-weight:700; color:#64748b; border-top:1px solid #e2e8f0; }
+  .dark .slider-box { color:#94a3b8; border-color:#334155; }
+  input[type=range] { flex:1; accent-color:#3b82f6; }
+</style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <span style="color:#3b82f6">⬛</span> Responsive Architecture Studio
+    </div>
+    <button id="studioThemeToggle" class="border border-slate-300 dark:border-slate-600 rounded-md px-4 py-2 text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+      Toggle UI Theme
+    </button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main">
+      <section class="panel theory">
+        <div class="theory-header">
+          <h2 id="moduleTitle"></h2>
+          <span class="badge" id="moduleBadge"></span>
+        </div>
+        <div id="moduleTheory" class="theory-content"></div>
+      </section>
+
+      <section class="lab-grid">
+        <!-- Code Side -->
+        <div class="code-container">
+          <div class="code-header">
+            <span>HTML Source</span>
+            <span style="color:#10b981">● Live</span>
+          </div>
+          <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+        </div>
+
+        <!-- Preview Side -->
+        <div class="preview-container">
+          <div class="preview-header">
+            <div class="controls-bar">
+              <div class="btn-group">
+                <button class="btn-toggle" onclick="setPreviewWidth(375, this)">Mobile</button>
+                <button class="btn-toggle" onclick="setPreviewWidth(768, this)">Tablet</button>
+                <button class="btn-toggle active" onclick="setPreviewWidth(1024, this)">Desktop</button>
+              </div>
+            </div>
+            <div class="controls-bar">
+              <button class="btn-toggle" id="previewDarkToggle" style="border:1px solid #cbd5e1; padding:4px 8px;">Dark Mode</button>
+              <button class="btn-toggle" id="btnReset" style="border:1px solid #ef4444; color:#ef4444; padding:4px 8px;">Reset</button>
+            </div>
+          </div>
+          
+          <div class="iframe-wrapper">
+            <iframe id="previewIframe" style="width: 1024px; height: 600px;"></iframe>
+          </div>
+
+          <div class="viewport-info">
+            <span>Viewport: <span id="widthLabel">1024</span>px</span>
+            <span id="bpLabel" class="bp-tag lg">lg (Desktop)</span>
+          </div>
+          
+          <div class="slider-box">
+            <span>Resize:</span>
+            <input type="range" id="widthSlider" min="320" max="1200" value="1024">
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+// Module Data - Now with visual diagrams!
+const modules = [
+  {
+    id: "stacking",
+    title: "1. Mobile-First Stacking",
+    badge: "Grid Rules",
+    theory: `
+      <p><strong>The Problem:</strong> If you build a 3-column layout first, and try to shrink it down to a phone, the content will overflow the screen and break the layout.</p>
+      <p><strong>The Rule:</strong> Content must never squish. On mobile, everything stacks vertically in a single column. On desktop, it expands into an asymmetric grid.</p>
+      
+      <!-- VISUAL DIAGRAM -->
+      <div class="viz-container">
+        <div class="viz-box">
+          <div class="viz-label bad">❌ Squeezed on mobile</div>
+          <div class="viz-canvas" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; align-items: stretch;">
+            <div class="bg-blue-500 rounded w-full h-full"></div>
+            <div class="bg-blue-500 rounded w-full h-full"></div>
+            <div class="bg-blue-500 rounded w-full h-full"></div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">grid-cols-3 on everything</div>
+        </div>
+        
+        <div class="viz-box">
+          <div class="viz-label good">✅ Smart desktop split</div>
+          <div class="viz-canvas" style="display:grid; grid-template-columns: 2fr 1fr; gap: 4px; align-items: stretch;">
+            <div class="bg-blue-500 rounded w-full h-full"></div>
+            <div class="bg-blue-300 rounded w-full h-full"></div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">md:grid-cols-3 & md:col-span-2</div>
+        </div>
+      </div>
+
+      <h3>How Tailwind Solves It</h3>
+      <p>Tailwind is a <strong>mobile-first</strong> framework. This means base utility classes (like <code>grid-cols-1</code>) apply to all screens, starting from the smallest phone. When you want the layout to change on larger screens, you use a breakpoint prefix like <code>md:</code> or <code>lg:</code>.</p>
+      
+      <div class="callout">
+        <strong>Your Mission:</strong><br>
+        1. Add <code>md:grid-cols-3</code> to the container div.<br>
+        2. Add <code>md:col-span-2</code> to the main article.<br>
+        Resize the preview to Tablet or Desktop to see the magic happen.
+      </div>
+    `,
+    naive: `<!-- 1. Stacking Mission -->
+<article class="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 p-6 md:p-8 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl">
+  <div class="grid grid-cols-1 gap-8">
+    
+    <!-- MAIN CONTENT -->
+    <main class="md:col-span-2">
+      <div class="border-b border-slate-200 dark:border-slate-700 pb-4 mb-4">
+        <span class="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded">Engineering</span>
+        <h1 class="text-2xl font-black mt-2">Scaling Design Systems</h1>
+        <span class="text-sm text-slate-500 dark:text-slate-400">Nov 2026</span>
+      </div>
+      <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-6 max-w-prose">
+        By combining mobile-first grid structures with precise cross-axis child alignment utilities, engineering teams build bulletproof component interfaces.
+      </p>
+      <button class="bg-slate-900 dark:bg-slate-700 text-white px-4 py-2 rounded-lg font-bold text-sm">Read More</button>
+    </main>
+    
+    <!-- SIDEBAR -->
+    <aside class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+      <h3 class="font-bold text-sm uppercase tracking-wider mb-3">Related</h3>
+      <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+        <li>Flexbox Mechanics</li>
+        <li>Surface Tokens</li>
+        <li>Focus Rings</li>
+      </ul>
+    </aside>
+    
+  </div>
+</article>`
+  },
+  {
+    id: "header",
+    title: "2. Adaptive Flex Alignment",
+    badge: "Flexbox Rules",
+    theory: `
+      <p><strong>The Problem:</strong> Stacking flex items vertically often creates ragged edges if you use the wrong alignment. On mobile, text should be left-aligned. On desktop, the title and date should sit on the same horizontal line, vertically centered.</p>
+      
+      <!-- VISUAL DIAGRAM -->
+      <div class="viz-container">
+        <div class="viz-box">
+          <div class="viz-label bad">❌ items-center while stacked</div>
+          <div class="viz-canvas" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <div class="bg-blue-500 rounded w-3/4 h-3 mb-2"></div>
+            <div class="bg-blue-300 rounded w-1/2 h-3"></div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Ragged edges, text floats in middle</div>
+        </div>
+        
+        <div class="viz-box">
+          <div class="viz-label good">✅ md:flex-row items-center</div>
+          <div class="viz-canvas" style="display:flex; flex-direction:row; align-items:center; justify-content:space-between;">
+            <div class="bg-blue-500 rounded w-3/5 h-3"></div>
+            <div class="bg-blue-300 rounded w-1/4 h-3"></div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Clean baseline, right aligned date</div>
+        </div>
+      </div>
+
+      <p><strong>The Rule:</strong> A flex container has a <strong>Main Axis</strong> (direction) and a <strong>Cross Axis</strong> (perpendicular). <code>justify-*</code> aligns along the Main Axis, and <code>items-*</code> aligns along the Cross Axis.</p>
+      
+      <div class="callout">
+        <strong>Your Mission:</strong><br>
+        Change the header div to: <code>flex flex-col md:flex-row items-start md:items-center justify-between</code>.
+      </div>
+    `,
+    naive: `<!-- 2. Header Alignment Mission -->
+<article class="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 p-6 md:p-8 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl">
+  <div class="border-b border-slate-200 dark:border-slate-700 pb-4 mb-4">
+    
+    <!-- HEADER ROW -->
+    <div class="flex flex-col justify-between">
+      <div>
+        <span class="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded">Engineering</span>
+        <h1 class="text-2xl font-black mt-2">Scaling Design Systems</h1>
+      </div>
+      <span class="text-sm text-slate-500 dark:text-slate-400 mt-2">Nov 2026</span>
+    </div>
+    
+  </div>
+  <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-6 max-w-prose">
+    By combining mobile-first grid structures with precise cross-axis child alignment utilities, engineering teams build bulletproof component interfaces.
+  </p>
+  <button class="bg-slate-900 dark:bg-slate-700 text-white px-4 py-2 rounded-lg font-bold text-sm">Read More</button>
+</article>`
+  },
+  {
+    id: "measure",
+    title: "3. The Reading Measure",
+    badge: "Typography Rules",
+    theory: `
+      <p><strong>The Problem:</strong> If you let a paragraph of text stretch across a wide desktop monitor (like 1440px), the human eye struggles to track from the far left to the far right. It causes reading fatigue.</p>
+      
+      <!-- VISUAL DIAGRAM -->
+      <div class="viz-container">
+        <div class="viz-box">
+          <div class="viz-label bad">❌ Stretches full width</div>
+          <div class="viz-canvas" style="justify-content:center;">
+             <div class="bg-red-100 border border-red-300 rounded p-2 text-[8px] leading-tight text-red-900 h-full w-full">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Hard to track lines</div>
+        </div>
+        
+        <div class="viz-box">
+          <div class="viz-label good">✅ max-w-prose</div>
+          <div class="viz-canvas" style="justify-content:center; align-items:flex-start; padding-left: 16px;">
+             <div class="bg-green-100 border border-green-300 rounded p-2 text-[8px] leading-tight text-green-900 w-2/3 h-full">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Easy to read measure</div>
+        </div>
+      </div>
+
+      <h3>The ch Unit</h3>
+      <p>CSS has a unit called <code>ch</code> which is the width of the "0" character in the current font. Tailwind's <code>max-w-prose</code> utility sets the max-width to roughly <code>65ch</code>. This allows the column to expand on smaller screens, but caps it on larger screens.</p>
+
+      <div class="callout">
+        <strong>Your Mission:</strong><br>
+        Add <code>max-w-prose</code> to the paragraph tag. Resize the preview to Desktop and notice how the text stops stretching, making it much more readable.
+      </div>
+    `,
+    naive: `<!-- 3. Reading Measure Mission -->
+<article class="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 p-6 md:p-8 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl">
+  <div class="border-b border-slate-200 dark:border-slate-700 pb-4 mb-4">
+    <h1 class="text-2xl font-black">Scaling Design Systems</h1>
+  </div>
+  
+  <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+    By combining mobile-first grid structures with precise cross-axis child alignment utilities, engineering teams build bulletproof component interfaces that scale seamlessly from handheld devices to ultra-wide desktop monitors. Notice how this paragraph stretches all the way across the screen. It is very difficult to read because your eyes have to track from the far left to the far right. A good reading experience needs a constrained measure.
+  </p>
+  
+  <button class="bg-slate-900 dark:bg-slate-700 text-white px-4 py-2 rounded-lg font-bold text-sm">Read More</button>
+</article>`
+  },
+  {
+    id: "sticky",
+    title: "4. The Sticky Sidebar",
+    badge: "Advanced Grid",
+    theory: `
+      <p><strong>The Problem:</strong> You have a two-column grid. You want the sidebar to follow the user as they scroll down the long article. You add <code>sticky top-0</code>, but it doesn't work. It just scrolls away.</p>
+      
+      <!-- VISUAL DIAGRAM -->
+      <div class="viz-container">
+        <div class="viz-box">
+          <div class="viz-label bad">❌ Stretches full height</div>
+          <div class="viz-canvas" style="display:flex; flex-direction:row; padding:0; overflow:hidden;">
+             <div class="bg-slate-100 w-2/3 h-full border-r border-slate-200"></div>
+             <div class="bg-blue-500 w-1/3 h-full"></div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Sidebar matches article height, can't stick</div>
+        </div>
+        
+        <div class="viz-box">
+          <div class="viz-label good">✅ md:self-start</div>
+          <div class="viz-canvas" style="display:flex; flex-direction:row; padding:0; overflow:hidden;">
+             <div class="bg-slate-100 w-2/3 h-full border-r border-slate-200"></div>
+             <div class="w-1/3 flex flex-col h-full">
+               <div class="bg-blue-600 w-full h-1/3"></div>
+               <div class="bg-blue-200 w-full h-2/3"></div>
+             </div>
+          </div>
+          <div style="font-size:11px; color:#64748b; text-align:center;">Shrinks to content, sticks on scroll</div>
+        </div>
+      </div>
+
+      <p><strong>The Rule:</strong> By default, CSS Grid and Flexbox use <code>align-items: stretch</code>. This forces all children to be the exact same height. The utility <code>md:self-start</code> overrides this for a single child, shrinking it to its natural height.</p>
+
+      <div class="callout">
+        <strong>Your Mission:</strong><br>
+        Add <code>md:self-start md:sticky md:top-4</code> to the <code>&lt;aside&gt;</code> tag.<br>
+        Then, <strong>scroll inside the preview iframe</strong> to see the sidebar stick to the top.
+      </div>
+    `,
+    naive: `<!-- 4. Sticky Sidebar Mission -->
+<article class="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 p-6 md:p-8 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl h-[800px]">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <main class="md:col-span-2">
+      <h1 class="text-2xl font-black mb-4">Scroll Down</h1>
+      <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">Scroll inside this preview box. Notice how the sidebar scrolls away with the text. It shouldn't do that on desktop.</p>
+      <div class="h-96 bg-slate-100 dark:bg-slate-700 rounded-lg mb-4"></div>
+      <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">Keep scrolling...</p>
+      <div class="h-96 bg-slate-100 dark:bg-slate-700 rounded-lg mb-4"></div>
+      <p class="text-slate-600 dark:text-slate-400 leading-relaxed">End of article.</p>
+    </main>
+    
+    <!-- STICKY SIDEBAR -->
+    <aside class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-200 dark:border-slate-700 h-fit">
+      <h3 class="font-bold text-sm uppercase tracking-wider mb-3">Related</h3>
+      <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+        <li>Flexbox Mechanics</li>
+        <li>Surface Tokens</li>
+        <li>Focus Rings</li>
+      </ul>
+    </aside>
+  </div>
+</article>`
+  }
+];
+
+let currentModule = 0;
+const iframe = document.getElementById('previewIframe');
+const codeEditor = document.getElementById('codeEditor');
+const widthSlider = document.getElementById('widthSlider');
+const widthLabel = document.getElementById('widthLabel');
+const bpLabel = document.getElementById('bpLabel');
+let isDarkPreview = false;
+
+// --- Studio Dark Mode Toggle ---
+document.getElementById('studioThemeToggle').addEventListener('click', () => {
+  document.documentElement.classList.toggle('dark');
+  document.body.classList.toggle('bg-slate-50');
+  document.body.classList.toggle('bg-slate-900');
+  document.body.classList.toggle('text-slate-900');
+  document.body.classList.toggle('text-slate-100');
+});
+
+// --- Render Modules ---
+function renderSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.innerHTML = modules.map((m, i) => `
+    <button class="module-btn ${i === currentModule ? 'active' : ''}" onclick="loadModule(${i})">
+      ${m.title}
+    </button>
+  `).join('');
+}
+
+function loadModule(index) {
+  currentModule = index;
+  const mod = modules[index];
+  
+  renderSidebar();
+  document.getElementById('moduleTitle').textContent = mod.title;
+  document.getElementById('moduleBadge').textContent = mod.badge;
+  document.getElementById('moduleTheory').innerHTML = mod.theory;
+  
+  codeEditor.value = mod.naive;
+  updateIframe();
+}
+
+// --- Real-World App Shell for Iframe ---
+function updateIframe() {
+  const darkClass = isDarkPreview ? 'dark' : '';
+  
+  // This template injects your code into a realistic application layout!
+  iframe.srcdoc = `
+    <!DOCTYPE html>
+    <html class="${darkClass}">
+    <head>
+      <meta charset="utf-8">
+      <script src="https://cdn.tailwindcss.com"></scr` + `ipt>
+      <script>
+        tailwind = { config: { darkMode: 'class' } }
+      </scr` + `ipt>
+      <style>
+        body { font-family: ui-sans-serif, system-ui, sans-serif; background-color: #f8fafc; margin: 0; padding: 0; }
+        .dark body { background-color: #0f172a; }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+      </style>
+    </head>
+    <body class="text-slate-900 dark:text-slate-100 h-full">
+      
+      <!-- REAL WORLD APP SHELL: TOP NAVIGATION -->
+      <nav class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+        <div class="font-black text-lg tracking-tight text-blue-600 dark:text-blue-400">MyBlog.</div>
+        <div class="flex gap-6 text-sm font-semibold text-slate-500 dark:text-slate-400">
+          <span class="text-slate-900 dark:text-white">Articles</span>
+          <span class="hover:text-blue-500 cursor-pointer transition">Resources</span>
+          <span class="hover:text-blue-500 cursor-pointer transition">About</span>
+        </div>
+      </nav>
+      
+      <!-- MAIN CONTENT AREA (WHERE YOUR CODE RENDERS) -->
+      <main class="max-w-7xl mx-auto p-4 md:p-8 h-full">
+        ${codeEditor.value}
+      </main>
+      
+    </body>
+    </html>
+  `;
+}
+
+// Live Sync
+codeEditor.addEventListener('input', updateIframe);
+
+// Resize Logic
+widthSlider.addEventListener('input', (e) => {
+  updateViewportSize(Number(e.target.value));
+});
+
+function setPreviewWidth(w, btn) {
+  widthSlider.value = w;
+  updateViewportSize(w);
+  document.querySelectorAll('.controls-bar .btn-toggle').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+function updateViewportSize(w) {
+  iframe.style.width = w + 'px';
+  widthLabel.textContent = w;
+  
+  // Update Breakpoint Tag
+  if (w >= 1024) {
+    bpLabel.textContent = "lg (Desktop)";
+    bpLabel.className = "bp-tag lg";
+  } else if (w >= 768) {
+    bpLabel.textContent = "md (Tablet)";
+    bpLabel.className = "bp-tag md";
+  } else {
+    bpLabel.textContent = "Base (Mobile)";
+    bpLabel.className = "bp-tag base";
+  }
+}
+
+// Preview Dark Mode Toggle
+document.getElementById('previewDarkToggle').addEventListener('click', () => {
+  isDarkPreview = !isDarkPreview;
+  updateIframe();
+  
+  if (isDarkPreview) {
+    document.getElementById('previewDarkToggle').classList.add('active');
+  } else {
+    document.getElementById('previewDarkToggle').classList.remove('active');
+  }
+});
+
+// Reset Button
+document.getElementById('btnReset').addEventListener('click', () => {
+  codeEditor.value = modules[currentModule].naive;
+  updateIframe();
+});
+
+// Init
+renderSidebar();
+loadModule(0);
+</script>
+</body>
+</html>

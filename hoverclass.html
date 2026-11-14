@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Module 08 — Tailwind States & Interaction Lab</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: { fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] } } }
+};
+</script>
+<style>
+  *{box-sizing:border-box}
+  :root{color-scheme:light}
+  body{margin:0;background:#f3f6fb;color:#172033;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+  button,input,select,textarea{font:inherit}
+  button,select,input[type=range],input[type=checkbox]{cursor:pointer}
+  button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
+  .shell{max-width:1480px;margin:auto;padding:22px}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:16px;background:white;border:1px solid #e2e8f0;border-radius:16px;padding:16px 20px;margin-bottom:18px}
+  .brand{display:flex;align-items:center;gap:12px}.mark{width:42px;height:42px;border-radius:12px;background:#172033;color:white;display:grid;place-items:center;font-size:12px;font-weight:900}
+  .eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.13em;color:#64748b;font-weight:800}
+  h1{font-size:18px;line-height:1.2;margin:3px 0 0;font-weight:850}
+  .status{font-size:11px;font-weight:750;color:#475569;background:#f8fafc;border:1px solid #e2e8f0;border-radius:99px;padding:8px 12px}
+  .layout{display:grid;grid-template-columns:255px minmax(0,1fr);gap:18px;align-items:start}
+  .sidebar,.panel,.bottom{background:white;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 3px 12px rgba(15,23,42,.025)}
+  .sidebar{padding:12px;position:sticky;top:14px;max-height:calc(100vh - 28px);overflow:auto}
+  .side-label{padding:8px 9px;color:#94a3b8;font-size:10px;letter-spacing:.12em;font-weight:850;text-transform:uppercase}
+  .nav{display:grid;gap:4px}.nav button{border:0;background:transparent;color:#475569;text-align:left;padding:11px 10px;border-radius:10px;display:flex;gap:10px;align-items:center;font-size:12px;font-weight:700}
+  .nav button:hover{background:#f1f5f9}.nav button.active{background:#eff6ff;color:#1d4ed8}
+  .nav .n{width:25px;height:25px;border:1px solid #e2e8f0;border-radius:7px;display:grid;place-items:center;font-size:10px;flex:none;background:white}
+  .nav button.active .n{background:#2563eb;color:white;border-color:#2563eb}
+  .main{min-width:0;display:grid;gap:16px}.panel{padding:19px;min-width:0}
+  .lesson-head{padding:23px}.badge{display:inline-flex;background:#eff6ff;color:#1d4ed8;border-radius:99px;padding:5px 10px;font-size:10px;font-weight:850;letter-spacing:.04em}
+  h2{font-size:23px;letter-spacing:-.03em;line-height:1.2;margin:9px 0 8px;font-weight:850}
+  .intro{font-size:13px;line-height:1.65;color:#64748b;max-width:850px}
+  .theory{margin-top:17px;padding-top:16px;border-top:1px solid #edf1f6;display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+  .theory h3{font-size:12px;margin:0 0 8px;color:#334155}.theory p,.theory li{font-size:12px;line-height:1.65;color:#475569}
+  .theory ul{margin:7px 0 0;padding-left:18px}.theory li{margin:3px 0}
+  code,.inline-code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#f1f5f9;border:1px solid #e2e8f0;padding:2px 5px;border-radius:5px;font-size:.92em;color:#0f172a}
+  .callout{background:#f8fafc;border-left:3px solid #3b82f6;border-radius:0 9px 9px 0;padding:11px 12px;margin-top:10px;font-size:11px;line-height:1.6;color:#334155}
+  .work{display:grid;grid-template-columns:minmax(260px,.78fr) minmax(0,1.22fr);gap:16px}
+  .panel-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px}
+  h3{font-size:13px;font-weight:800;margin:0;color:#172033}.sub{font-size:11px;color:#64748b;margin-top:4px;line-height:1.5}
+  .tag{font-size:9px;font-weight:850;letter-spacing:.08em;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;padding:4px 7px;border-radius:6px;white-space:nowrap}
+  .controls{display:grid;gap:10px}.control{border:1px solid #e2e8f0;background:#f8fafc;border-radius:10px;padding:11px}
+  .control label{display:flex;justify-content:space-between;gap:8px;font-size:10px;font-weight:800;color:#475569;margin-bottom:7px}
+  .control select{width:100%;background:white;border:1px solid #cbd5e1;border-radius:7px;padding:8px 9px;font-size:12px;color:#172033}
+  .control input[type=range]{width:100%;accent-color:#2563eb}
+  .control .hint{font-size:10px;color:#64748b;line-height:1.45;margin-top:6px}
+  .preview{background-color:#f8fafc;background-image:linear-gradient(#e5eaf1 1px,transparent 1px),linear-gradient(90deg,#e5eaf1 1px,transparent 1px);background-size:18px 18px;border:1px dashed #cbd5e1;border-radius:12px;min-height:330px;padding:22px;display:grid;place-items:center;overflow:auto}
+  .preview-note{font-size:10px;color:#64748b;text-align:center;margin-top:9px}
+  .diagram{min-height:112px;border:1px solid #e2e8f0;background:#f8fafc;border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center}
+  .diagram-inner{max-width:560px;width:100%}.diagram-flow{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:9px}
+  .node{background:white;border:1px solid #cbd5e1;border-radius:7px;padding:8px 10px;font:11px ui-monospace,monospace;color:#334155}
+  .arrow{color:#94a3b8;font-weight:900}.diagram-caption{font-size:11px;color:#64748b;line-height:1.5}
+  .code-panel{padding:18px}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+  .actions{display:flex;gap:7px;flex-wrap:wrap}.btn{border:1px solid #cbd5e1;background:white;color:#334155;padding:7px 10px;border-radius:7px;font-size:10px;font-weight:800}
+  .btn:hover{background:#f1f5f9}.btn.primary{background:#172033;color:white;border-color:#172033}.btn.primary:hover{background:#334155}
+  #codeEditor{display:block;width:100%;min-height:205px;resize:vertical;background:#101827;color:#dbeafe;caret-color:#fff;-webkit-text-fill-color:#dbeafe;border:1px solid #263449;border-radius:10px;padding:14px;font:11px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;tab-size:2;white-space:pre-wrap;overflow:auto}
+  #codeEditor::selection{background:#3b82f6;color:#fff;-webkit-text-fill-color:#fff}
+  .editor-foot{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:8px;font-size:10px;color:#64748b}
+  .bottom{padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .takeaway{font-size:11px;line-height:1.5;color:#166534;font-weight:700}
+  .bottom-actions{display:flex;gap:8px}.bottom button{border:0;background:#172033;color:white;border-radius:8px;padding:9px 13px;font-size:10px;font-weight:800}.bottom button:disabled{opacity:.4;cursor:not-allowed}
+  .muted{color:#64748b}.kbd{font:10px ui-monospace,monospace;border:1px solid #cbd5e1;border-bottom-width:2px;background:white;padding:2px 5px;border-radius:4px}
+  @media(max-width:1000px){.layout{grid-template-columns:1fr}.sidebar{position:static;max-height:none}.nav{grid-template-columns:repeat(2,minmax(0,1fr))}.work{grid-template-columns:1fr}.theory{grid-template-columns:1fr}}
+  @media(max-width:600px){.shell{padding:10px}.top{align-items:flex-start}.status{display:none}.nav{grid-template-columns:1fr}.panel{padding:14px}.lesson-head{padding:17px}h2{font-size:20px}.preview{min-height:260px;padding:12px}.bottom{align-items:flex-start;flex-direction:column;width:100%}.bottom-actions{width:100%}.bottom button{flex:1}}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <div class="brand"><div class="mark">MOD 08</div><div><div class="eyebrow">Tailwind CSS · Interactive course</div><h1>States & Interaction Laboratory</h1></div></div>
+    <div class="status">5 lessons · live preview · editable code</div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="side-label">Module lessons</div>
+      <nav class="nav" id="lessonNav" aria-label="Lessons"></nav>
+      <div style="margin:14px 8px 5px;padding-top:12px;border-top:1px solid #edf1f6">
+        <div class="eyebrow">How to use the lab</div>
+        <p style="font-size:11px;line-height:1.6;color:#64748b;margin:7px 0">Change a control, interact with the preview, then inspect the complete markup. Use <span class="kbd">Tab</span> to test keyboard focus.</p>
+      </div>
+    </aside>
+    <main class="main">
+      <section class="panel lesson-head">
+        <div class="badge" id="lessonBadge">LESSON 01</div>
+        <h2 id="lessonTitle">Pseudo-classes and element states</h2>
+        <div class="intro" id="lessonIntro"></div>
+        <div class="theory" id="theory"></div>
+      </section>
+
+      <div class="work">
+        <section class="panel">
+          <div class="panel-head"><div><h3>Experiment controls</h3><div class="sub">Adjust the settings to change the example.</div></div><span class="tag">CONFIGURE</span></div>
+          <div class="controls" id="controls"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><div><h3>Live component preview</h3><div class="sub" id="previewDescription">Interact with the component to observe its states.</div></div><span class="tag">LIVE</span></div>
+          <div class="preview" id="previewStage"></div>
+          <div class="preview-note" id="previewNote">The preview is a real HTML element, not a static illustration.</div>
+        </section>
+      </div>
+
+      <section class="panel">
+        <div class="panel-head"><div><h3>What is happening?</h3><div class="sub">A lesson-specific model of the selector relationship.</div></div><span class="tag">CSS MODEL</span></div>
+        <div class="diagram" id="diagram"></div>
+      </section>
+
+      <section class="panel code-panel">
+        <div class="toolbar">
+          <div><h3>Markup editor</h3><div class="sub">The preview updates as you change controls or type in this editor.</div></div>
+          <div class="actions"><button class="btn" id="copyCode">Copy code</button><button class="btn" id="resetCode">Reset preset</button><button class="btn primary" id="runCode">Run edited code</button></div>
+        </div>
+        <textarea id="codeEditor" spellcheck="false" aria-label="HTML markup editor"></textarea>
+        <div class="editor-foot"><span id="editorStatus">Generated from the current lesson.</span><span>Preview runs in an isolated iframe.</span></div>
+      </section>
+
+      <footer class="bottom">
+        <div class="takeaway" id="takeaway"></div>
+        <div class="bottom-actions"><button id="prevLesson">← Previous</button><button id="nextLesson">Next lesson →</button></div>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+const lessons = [
+{
+ title:"Pseudo-classes and element states",
+ intro:"A state modifier prefixes an ordinary utility so that it applies only while an element matches a CSS state or structural condition. The utility still describes the style; the modifier describes when it applies.",
+ theory:`<div><h3>Core idea</h3><p><code>hover:bg-blue-700</code> means: apply the background utility when this element matches the CSS <code>:hover</code> pseudo-class. Tailwind variants are a shorthand for conditional CSS selectors.</p><ul><li><code>hover:</code> pointer is over the element.</li><li><code>active:</code> the element is being activated, commonly while a pointer is pressed.</li><li><code>focus:</code> the element has keyboard or programmatic focus.</li><li><code>focus-visible:</code> focus should be visibly indicated, typically for keyboard interaction.</li><li><code>disabled:</code> the element matches the native disabled state.</li><li><code>enabled:</code> the element is not disabled.</li><li><code>checked:</code> a checkbox, radio or option is checked/selected.</li><li><code>first:</code> or <code>last:</code> the element occupies that position among its siblings.</li></ul></div><div><h3>Important distinction</h3><p>These variants do not create the state. For example, <code>disabled:opacity-50</code> styles a button that is actually disabled; it does not disable the button. Use the real HTML <code>disabled</code> attribute.</p><div class="callout"><strong>Try it:</strong> change the button state, then hover, press and focus the preview button. A disabled button cannot be activated, so its hover and active interactions are unavailable.</div></div>`,
+ takeaway:"A modifier selects a condition; the utility after the colon supplies the styling.",
+ controls:[
+  {id:"buttonState",label:"Native button state",type:"select",value:"enabled",options:[["enabled","Enabled"],["disabled","Disabled"]]},
+  {id:"buttonTone",label:"Hover treatment",type:"select",value:"dark",options:[["dark","Darken background"],["bright","Change text colour"],["none","No hover utility"]]},
+  {id:"showList",label:"Structural pseudo-class example",type:"select",value:"first",options:[["first","Highlight first item"],["last","Highlight last item"],["none","No item highlighted"]]}
+ ],
+ description:"Hover, press and focus the button. Change its actual disabled attribute using the control.",
+ diagram:`<div class="diagram-inner"><div class="diagram-caption">A state variant combines a CSS pseudo-class selector with a utility declaration.</div><div class="diagram-flow"><span class="node">button</span><span class="arrow">+</span><span class="node">:hover</span><span class="arrow">→</span><span class="node">background-color</span></div><div class="diagram-caption" style="margin-top:9px">Tailwind spelling: <code>hover:bg-blue-700</code></div></div>`,
+ preview:()=>`<div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm">
+  <div class="mb-4 text-left"><span class="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-blue-700">State test</span></div>
+  <button id="stateButton" ${S.buttonState==="disabled"?"disabled":""} class="rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-sm transition-colors duration-200 ${S.buttonState==="disabled"?"disabled:cursor-not-allowed disabled:opacity-50":""} ${S.buttonTone==="dark"?"enabled:hover:bg-blue-800":S.buttonTone==="bright"?"enabled:hover:text-yellow-200":""} enabled:active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">${S.buttonState==="disabled"?"Disabled button":"Try hover, press or focus"}</button>
+  <p class="mt-4 text-xs text-slate-500">Native state: <code>${S.buttonState}</code></p>
+  <div class="mt-5 border-t border-slate-100 pt-4 text-left"><p class="mb-2 text-[10px] font-bold uppercase tracking-wide text-slate-500">Structural variants</p><div class="grid grid-cols-3 gap-2 text-xs">${["First","Middle","Last"].map((x,i)=>`<div class="rounded-lg border p-3 text-center ${S.showList==="first"&&i===0||S.showList==="last"&&i===2?"border-blue-500 bg-blue-50 font-bold text-blue-700":"border-slate-200 bg-white text-slate-600"}">${x}</div>`).join("")}</div></div>
+ </div>`
+},
+{
+ title:"Focus management and accessibility",
+ intro:"Focus styles help people understand which control will receive keyboard input. The goal is not to remove the browser indicator; it is to provide a clear, consistent indicator that remains usable with a keyboard.",
+ theory:`<div><h3>Focus states</h3><p><code>focus:</code> applies whenever the element matches <code>:focus</code>, regardless of how focus was obtained.</p><p><code>focus-visible:</code> follows the browser's <code>:focus-visible</code> heuristic. It commonly displays the indicator for keyboard navigation without forcing the same ring after every pointer click.</p><ul><li><code>focus:outline-none</code> removes the outline.</li><li><code>focus:ring-2</code> adds a two-pixel Tailwind ring.</li><li><code>focus:ring-blue-500</code> sets its colour.</li><li><code>focus:ring-offset-2</code> adds separation around the ring.</li></ul></div><div><h3>Accessibility rule</h3><p>Never remove the native outline unless a visible, sufficiently contrasting replacement is provided. Test with the keyboard, not only the mouse.</p><div class="callout"><strong>Try it:</strong> click the field, then use Tab and Shift+Tab to move focus. Compare the <code>focus:</code> and <code>focus-visible:</code> options.</div></div>`,
+ takeaway:"Use focus-visible for keyboard-oriented indicators, and never leave a focused control without a visible focus treatment.",
+ controls:[
+  {id:"focusStyle",label:"Focus variant",type:"select",value:"visible",options:[["visible","focus-visible:"],["focus","focus:"],["native","Browser default"]]},
+  {id:"focusRing",label:"Ring thickness",type:"select",value:"2",options:[["1","1px ring"],["2","2px ring"],["4","4px ring"]]},
+  {id:"focusOffset",label:"Ring offset",type:"select",value:"2",options:[["0","No offset"],["2","2px offset"],["4","4px offset"]]}
+ ],
+ description:"Use Tab to focus the input and button. Pointer focus may behave differently with focus-visible.",
+ diagram:`<div class="diagram-inner"><div class="diagram-caption">The browser determines whether an element matches <code>:focus-visible</code>; Tailwind applies the selected utilities when it does.</div><div class="diagram-flow"><span class="node">Keyboard navigation</span><span class="arrow">→</span><span class="node">:focus-visible</span><span class="arrow">→</span><span class="node">visible ring</span></div></div>`,
+ preview:()=>`<div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6">
+  <p class="mb-4 text-sm font-bold text-slate-800">Account sign in</p>
+  <label for="focusEmail" class="mb-1.5 block text-xs font-semibold text-slate-600">Email address</label>
+  <input id="focusEmail" type="email" placeholder="you@example.com" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 ${S.focusStyle==="native"?"":S.focusStyle==="focus"?"focus:outline-none focus:ring-"+S.focusRing+" focus:ring-blue-500 focus:ring-offset-"+S.focusOffset:"focus-visible:outline-none focus-visible:ring-"+S.focusRing+" focus-visible:ring-blue-500 focus-visible:ring-offset-"+S.focusOffset}">
+  <button class="mt-3 rounded-lg bg-slate-900 px-4 py-2.5 text-xs font-bold text-white ${S.focusStyle==="native"?"":S.focusStyle==="focus"?"focus:outline-none focus:ring-"+S.focusRing+" focus:ring-blue-500 focus:ring-offset-"+S.focusOffset:"focus-visible:outline-none focus-visible:ring-"+S.focusRing+" focus-visible:ring-blue-500 focus-visible:ring-offset-"+S.focusOffset}">Continue</button>
+  <p class="mt-4 text-[11px] leading-5 text-slate-500">Tab to the input and button. Try clicking the input as well. The <code>focus-visible</code> heuristic is browser-controlled.</p>
+ </div>`
+},
+{
+ title:"Parent-child coordination with group",
+ intro:"A child can respond to a state on an ancestor. Add the group marker to the parent, then use a group variant on a descendant to style it when the parent enters that state.",
+ theory:`<div><h3>How group works</h3><p>Put <code>group</code> on the parent element. A descendant can then use variants such as <code>group-hover:</code> or <code>group-focus:</code>.</p><ul><li><code>group</code> marks the ancestor whose state descendants can observe.</li><li><code>group-hover:text-blue-600</code> changes a child when the parent is hovered.</li><li><code>group-focus:</code> responds when the group parent is focused.</li><li>Named groups, such as <code>group/card</code> and <code>group-hover/card:</code>, distinguish nested or overlapping group relationships.</li></ul></div><div><h3>Why named groups?</h3><p>When nested parents both use <code>group</code>, a named group lets a descendant specify which ancestor's state it should respond to. The child must still be inside that named group in the DOM.</p><div class="callout"><strong>Try it:</strong> hover the outer card and then the inner card. Watch the labels and arrow respond to their respective parent.</div></div>`,
+ takeaway:"group establishes an ancestor state context; group-* variants let descendants react without JavaScript event handlers.",
+ controls:[
+  {id:"groupEffect",label:"Parent state to trigger",type:"select",value:"hover",options:[["hover","Hover parent"],["focus","Focus parent"]]},
+  {id:"groupChild",label:"Child reaction",type:"select",value:"both",options:[["text","Change child text colour"],["move","Move child arrow"],["both","Change text and move arrow"]]},
+  {id:"nestedGroup",label:"Nested group example",type:"select",value:"on",options:[["on","Show named nested group"],["off","Hide nested group"]]}
+ ],
+ description:"Hover the outer card. If the nested example is enabled, hover the inner card separately.",
+ diagram:`<div class="diagram-inner"><div class="diagram-caption">The parent owns the state. Descendants match that ancestor state through a group variant.</div><div class="diagram-flow"><span class="node">Parent.group</span><span class="arrow">:hover</span><span class="arrow">→</span><span class="node">Child.group-hover:*</span></div><div class="diagram-caption" style="margin-top:8px">Named groups add an explicit group name to the relationship.</div></div>`,
+ preview:()=>`<div class="w-full max-w-md space-y-3">
+  <div tabindex="0" class="group/outer rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 ${S.groupEffect==="hover"?"hover:border-blue-400 hover:shadow-lg":"focus:border-blue-400 focus:shadow-lg"}">
+   <div class="flex items-center justify-between"><span class="rounded-full bg-blue-50 px-2 py-1 text-[10px] font-bold uppercase text-blue-700">Outer group</span><span class="text-xs text-slate-400 transition-transform duration-200 ${S.groupEffect==="hover"?"group-hover/outer:translate-x-1":"group-focus/outer:translate-x-1"}">→</span></div>
+   <h4 class="mt-3 text-sm font-bold text-slate-900 transition-colors ${S.groupEffect==="hover"?"group-hover/outer:text-blue-600":"group-focus/outer:text-blue-600"}">Parent controls this heading</h4>
+   <p class="mt-1 text-xs text-slate-500">The outer container is the group. Its descendants respond to its state.</p>
+   ${S.nestedGroup==="on"?`<div tabindex="0" class="group/inner mt-4 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-3 ${S.groupEffect==="hover"?"hover:border-violet-400":"focus:border-violet-400"}"><span class="text-[10px] font-bold uppercase text-slate-500">Nested named group</span><p class="mt-2 text-xs font-semibold text-slate-700 ${S.groupEffect==="hover"?"group-hover/inner:text-violet-700":"group-focus/inner:text-violet-700"}">I respond to the inner group only.</p><span class="mt-1 inline-block text-xs text-slate-400 ${S.groupEffect==="hover"?"group-hover/inner:translate-x-1":"group-focus/inner:translate-x-1"} transition-transform">Inner arrow →</span></div>`:""}
+  </div>
+  <p class="text-center text-[10px] text-slate-500">The parent card is keyboard-focusable. Use Tab to test the focus variant.</p>
+ </div>`
+},
+{
+ title:"Sibling state reactivity with peer",
+ intro:"A peer variant lets one element respond to the state of an earlier sibling. This is useful for custom checkboxes, toggles and validation messages when the HTML structure follows the selector relationship.",
+ theory:`<div><h3>How peer works</h3><p>Add <code>peer</code> to the form control. A later sibling can use a variant such as <code>peer-checked:</code> to respond to the control's checked state.</p><ul><li><code>peer-checked:bg-blue-600</code> styles a later sibling when the peer is checked.</li><li><code>peer-focus:</code> responds when the peer receives focus.</li><li><code>peer-invalid:</code> responds when a form control is invalid.</li><li>The peer must precede the element that reacts to it.</li></ul></div><div><h3>Important limitation</h3><p>Peer styling relies on the subsequent-sibling relationship. It does not select an earlier sibling, and the target must share the appropriate parent with the peer.</p><div class="callout"><strong>Try it:</strong> toggle the checkbox. Then enter an invalid email address and blur the field to see the validation message.</div></div>`,
+ takeaway:"peer marks an earlier sibling as the state source; peer-* styles a later sibling. DOM order matters.",
+ controls:[
+  {id:"peerKind",label:"Peer demonstration",type:"select",value:"checkbox",options:[["checkbox","Checkbox / checked"],["toggle","Toggle switch"],["validation","Email validation"]]},
+  {id:"peerInitial",label:"Initial checked state",type:"select",value:"checked",options:[["checked","Checked"],["unchecked","Unchecked"]]}
+ ],
+ description:"Interact with the checkbox, toggle or email field. The styled element is a later sibling of the peer.",
+ diagram:`<div class="diagram-inner"><div class="diagram-caption">CSS subsequent-sibling relationship: the peer must come before the element it styles.</div><div class="diagram-flow"><span class="node">input.peer</span><span class="arrow">~</span><span class="node">label.peer-checked:*</span></div><div class="diagram-caption" style="margin-top:8px">The peer does not style arbitrary earlier elements.</div></div>`,
+ preview:()=>S.peerKind==="validation"?`<form class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6" onsubmit="return false">
+  <label for="peerEmail" class="mb-2 block text-xs font-bold text-slate-700">Work email</label>
+  <input id="peerEmail" type="email" placeholder="name@example.com" class="peer w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500 invalid:border-red-500">
+  <p class="mt-2 hidden text-xs text-red-600 peer-invalid:block">Please enter a valid email address.</p>
+  <p class="mt-3 text-[10px] text-slate-500">The message is a later sibling of the email input. Try typing an invalid address.</p>
+ </form>`:`<div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6">
+  <p class="mb-4 text-sm font-bold text-slate-800">${S.peerKind==="toggle"?"Email notifications":"Notification preferences"}</p>
+  <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 p-4">
+   <input id="peerInput" type="checkbox" class="peer sr-only" ${S.peerInitial==="checked"?"checked":""}>
+   ${S.peerKind==="toggle"?`<span class="relative h-6 w-11 rounded-full bg-slate-300 transition-colors peer-checked:bg-blue-600 peer-checked:[&>span]:translate-x-5"><span class="absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow transition-transform"></span></span>`:`<span class="grid h-5 w-5 place-items-center rounded border-2 border-slate-300 text-xs text-transparent transition-colors peer-checked:border-blue-600 peer-checked:bg-blue-600 peer-checked:text-white">✓</span>`}
+   <span class="text-xs font-semibold text-slate-700 peer-checked:text-blue-700">${S.peerKind==="toggle"?"Receive product updates":"Enable push notifications"}</span>
+  </label>
+  <p class="mt-3 text-[10px] text-slate-500">The real checkbox is visually hidden, not removed from the accessibility tree. Its later siblings respond to its checked state.</p>
+ </div>`
+},
+{
+ title:"Transitions, timing and transforms",
+ intro:"Transitions interpolate supported CSS property changes over time. Transforms change an element's visual position, size or rotation without changing the normal document flow.",
+ theory:`<div><h3>Transition utilities</h3><p><code>transition</code> applies a default set of commonly transitioned properties. More specific choices include <code>transition-colors</code>, <code>transition-opacity</code> and <code>transition-transform</code>. <code>transition-all</code> transitions all changing properties that support interpolation.</p><ul><li><code>duration-300</code> sets a 300ms duration.</li><li><code>delay-150</code> delays the start by 150ms.</li><li><code>ease-in</code>, <code>ease-out</code> and <code>ease-in-out</code> control timing.</li></ul></div><div><h3>Transforms and motion</h3><p>Utilities such as <code>translate-y-*</code>, <code>scale-*</code> and <code>rotate-*</code> change the rendered transform. They do not normally push neighbouring elements away.</p><div class="callout"><strong>Try it:</strong> hover the card to see the transform. Adjust duration and easing, then enable reduced motion to compare the experience.</div></div>`,
+ takeaway:"Transitions control how a property change happens; transforms define the visual change itself. Respect reduced-motion preferences.",
+ controls:[
+  {id:"transformType",label:"Hover transform",type:"select",value:"lift",options:[["lift","Lift upward"],["scale","Scale up"],["rotate","Rotate slightly"],["combined","Lift and scale"]]},
+  {id:"duration",label:"Transition duration",type:"range",value:300,min:100,max:1000,step:100,suffix:"ms"},
+  {id:"easing",label:"Timing function",type:"select",value:"ease-out",options:[["linear","linear"],["ease-in","ease-in"],["ease-out","ease-out"],["ease-in-out","ease-in-out"]]},
+  {id:"reducedMotion",label:"Reduced-motion simulation",type:"select",value:"off",options:[["off","Normal motion"],["on","Reduce motion"]]}
+ ],
+ description:"Hover the card to activate the transform. Adjust the timing controls and compare.",
+ diagram:`<div class="diagram-inner"><div class="diagram-caption">A state change triggers a new property value; the transition interpolates between the old and new values.</div><div class="diagram-flow"><span class="node">hover state</span><span class="arrow">→</span><span class="node">transform changes</span><span class="arrow">→</span><span class="node">transition timing</span></div></div>`,
+ preview:()=>{
+  const durCls=[75,100,150,200,300,500,700,1000].includes(S.duration)?`duration-${S.duration}`:`duration-[${S.duration}ms]`;
+  const easeCls=S.easing==="linear"?"ease-linear":S.easing;
+  const moveCls=S.transformType==="lift"?"hover:-translate-y-2":S.transformType==="scale"?"hover:scale-105":S.transformType==="rotate"?"hover:rotate-2":"hover:-translate-y-2 hover:scale-105";
+  const motionCls=S.reducedMotion==="on"?"transition-colors hover:border-blue-400 hover:shadow-lg":`transition-transform ${durCls} ${easeCls} ${moveCls}`;
+  return `<div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-7 text-center shadow-sm ${motionCls}">
+  <div class="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-xl bg-blue-600 text-xl text-white">✦</div>
+  <h4 class="text-sm font-bold text-slate-900">Interactive product card</h4>
+  <p class="mt-2 text-xs leading-5 text-slate-500">Move your pointer over this card to trigger its transform. The transition controls how the change is interpolated.</p>
+  <span class="mt-4 inline-block rounded-lg bg-slate-900 px-4 py-2 text-xs font-bold text-white">Explore component</span>
+  <p class="mt-4 text-[10px] text-slate-400">${S.reducedMotion==="on"?"reduced motion: no movement, colour/shadow only":durCls+" · "+easeCls}</p>
+ </div>`;
+ }
+}
+];
+
+const S = {};
+lessons.forEach(l=>l.controls.forEach(c=>S[c.id]=c.value));
+let current=0;
+let editorDirty=false;
+const $=id=>document.getElementById(id);
+
+function renderTheory(l){$("theory").innerHTML=l.theory;}
+function renderNav(){
+ $("lessonNav").innerHTML=lessons.map((l,i)=>`<button type="button" data-lesson="${i}" class="${i===current?"active":""}" ${i===current?'aria-current="step"':""}><span class="n">${String(i+1).padStart(2,"0")}</span><span>${l.title}</span></button>`).join("");
+ $("lessonNav").querySelectorAll("[data-lesson]").forEach(b=>b.addEventListener("click",()=>goTo(Number(b.dataset.lesson))));
+}
+function renderControls(){
+ const l=lessons[current];
+ $("controls").innerHTML=l.controls.map(c=>{
+  if(c.type==="range")return `<div class="control"><label for="${c.id}"><span>${c.label}</span><span id="${c.id}Value">${S[c.id]}${c.suffix||""}</span></label><input id="${c.id}" type="range" min="${c.min}" max="${c.max}" step="${c.step}" value="${S[c.id]}"></div>`;
+  return `<div class="control"><label for="${c.id}">${c.label}</label><select id="${c.id}">${c.options.map(o=>`<option value="${o[0]}" ${S[c.id]===o[0]?"selected":""}>${o[1]}</option>`).join("")}</select></div>`;
+ }).join("");
+ l.controls.forEach(c=>{
+  const el=$(c.id);
+  el.addEventListener(c.type==="range"?"input":"change",()=>{
+   S[c.id]=c.type==="range"?Number(el.value):el.value;
+   if(c.type==="range")$(c.id+"Value").textContent=S[c.id]+(c.suffix||"");
+   updatePreviewAndCode();
+  });
+ });
+}
+function markupForCurrent(){return lessons[current].preview();}
+const PREVIEW_NOTE_DEFAULT="The preview is a real HTML element, not a static illustration.";
+let previewFrame=null,previewReady=false,pendingMarkup="",liveTimer=null;
+function iframeShell(){
+ return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script src="https://cdn.tailwindcss.com"><\/script><style>body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;padding:18px;background:#f8fafc;display:grid;place-items:center;min-height:calc(100vh - 36px);box-sizing:border-box;margin:0}*{box-sizing:border-box}</style></head><body><script>
+window.addEventListener("message",function(e){if(e.data&&e.data.type==="render")document.body.innerHTML=e.data.html;});
+window.addEventListener("load",function(){parent.postMessage({type:"ready",tailwind:typeof tailwind!=="undefined"},"*");});
+<\/script></body></html>`;
+}
+function postPreview(){
+ if(previewFrame&&previewReady)previewFrame.contentWindow.postMessage({type:"render",html:pendingMarkup},"*");
+}
+function showPreview(markup){
+ pendingMarkup=markup;
+ if(previewFrame){postPreview();return;}
+ const frame=document.createElement("iframe");
+ frame.title="Interactive Tailwind component preview";
+ frame.setAttribute("sandbox","allow-scripts allow-forms");
+ frame.style.cssText="width:100%;height:100%;min-height:300px;border:0;background:transparent";
+ frame.srcdoc=iframeShell();
+ previewFrame=frame;previewReady=false;
+ $("previewStage").replaceChildren(frame);
+}
+window.addEventListener("message",e=>{
+ if(!previewFrame||e.source!==previewFrame.contentWindow||!e.data||e.data.type!=="ready")return;
+ previewReady=true;postPreview();
+ $("previewNote").textContent=e.data.tailwind?PREVIEW_NOTE_DEFAULT:"⚠ The Tailwind CDN script did not load in the preview. Check your internet connection or ad-blocker, then reload.";
+});
+function updatePreviewAndCode(){
+ const markup=markupForCurrent();
+ showPreview(markup);
+ $("codeEditor").value=markup;
+ $("editorStatus").textContent=editorDirty?"Controls changed: editor regenerated from the current settings (manual edits replaced).":"Generated from the current lesson.";
+ editorDirty=false;
+}
+function updateDiagram(){ $("diagram").innerHTML=lessons[current].diagram; }
+function renderLesson(){
+ const l=lessons[current];
+ $("lessonBadge").textContent=`LESSON ${String(current+1).padStart(2,"0")} · ${["STATES","ACCESSIBILITY","GROUP","PEER","MOTION"][current]}`;
+ $("lessonTitle").textContent=l.title;
+ $("lessonIntro").textContent=l.intro;
+ $("previewDescription").textContent=l.description;
+ $("takeaway").textContent="KEY TAKEAWAY · "+l.takeaway;
+ renderTheory(l);renderNav();renderControls();updateDiagram();
+ editorDirty=false;updatePreviewAndCode();
+ $("prevLesson").disabled=current===0;
+ $("nextLesson").textContent=current===lessons.length-1?"Module complete ✓":"Next lesson →";
+ $("nextLesson").disabled=current===lessons.length-1;
+}
+function goTo(i){if(i<0||i>=lessons.length)return;current=i;renderLesson();}
+$("prevLesson").addEventListener("click",()=>goTo(current-1));
+$("nextLesson").addEventListener("click",()=>goTo(current+1));
+$("codeEditor").addEventListener("input",()=>{
+ editorDirty=true;
+ $("editorStatus").textContent="Updating live preview…";
+ clearTimeout(liveTimer);
+ liveTimer=setTimeout(()=>{showPreview($("codeEditor").value);$("editorStatus").textContent="Live preview updated from your edited code.";},200);
+});
+$("runCode").addEventListener("click",()=>{
+ clearTimeout(liveTimer);
+ showPreview($("codeEditor").value);
+ $("editorStatus").textContent="Your edited markup is running in the isolated preview.";
+});
+$("resetCode").addEventListener("click",()=>{
+ editorDirty=false;$("codeEditor").value=markupForCurrent();showPreview($("codeEditor").value);
+ $("editorStatus").textContent="Preset restored for the current lesson.";
+});
+$("copyCode").addEventListener("click",async()=>{
+ const ed=$("codeEditor");
+ try{await navigator.clipboard.writeText(ed.value);$("editorStatus").textContent="Code copied to clipboard.";return;}catch(e){}
+ ed.focus();ed.select();
+ let ok=false;try{ok=document.execCommand("copy");}catch(e){}
+ $("editorStatus").textContent=ok?"Code copied to clipboard.":"Clipboard blocked here; code is selected, press Ctrl+C (or Cmd+C) to copy.";
+});
+renderLesson();
+</script>
+</body>
+</html>

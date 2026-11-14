@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tailwind Color & Surface Class Explorer</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    safelist: [
+      // Backgrounds & Colors
+      'bg-white', 'bg-slate-50', 'bg-slate-100', 'bg-slate-800', 'bg-slate-900', 'bg-blue-50', 'bg-blue-500', 'bg-red-50', 'bg-red-500', 'bg-green-50', 'bg-green-500',
+      // Text Colors
+      'text-white', 'text-slate-900', 'text-slate-800', 'text-slate-700', 'text-slate-600', 'text-slate-500', 'text-blue-600', 'text-blue-800', 'text-red-500', 'text-red-800', 'text-green-800',
+      // Borders & Dividers
+      'border-0', 'border', 'border-2', 'border-4', 'border-slate-200', 'border-slate-300', 'border-slate-700', 'border-blue-500', 'border-red-500',
+      'divide-y', 'divide-slate-200', 'divide-blue-200', 'divide-none',
+      // Radius
+      'rounded-none', 'rounded-sm', 'rounded-md', 'rounded-lg', 'rounded-xl', 'rounded-2xl', 'rounded-full',
+      // Shadows
+      'shadow-none', 'shadow-sm', 'shadow-md', 'shadow-lg', 'shadow-xl', 'shadow-2xl',
+      // Rings
+      'ring-0', 'ring-1', 'ring-2', 'ring-4', 'ring-blue-500', 'ring-red-500', 'ring-slate-400', 'ring-offset-0', 'ring-offset-2', 'ring-offset-4',
+      // Gradients
+      'bg-gradient-to-r', 'bg-gradient-to-br', 'bg-gradient-to-b', 'from-blue-500', 'from-indigo-500', 'from-purple-500', 'to-purple-500', 'to-pink-500', 'to-blue-500', 'bg-clip-text', 'text-transparent',
+      // Sizing & Layout
+      'w-full', 'w-3/4', 'w-1/2', 'w-64', 'max-w-xs', 'max-w-sm', 'max-w-md'
+    ]
+  };
+</script>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:#f4f6fb; color:#0f172a; font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+  button, input, select, textarea { font:inherit; }
+  button { cursor:pointer; }
+  .app { max-width:1400px; margin:0 auto; padding:20px; }
+  .topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:18px; background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:14px 20px; }
+  .brand { display:flex; align-items:center; gap:10px; }
+  .brand-mark { width:38px;height:38px;border-radius:10px;background:#0f172a;color:#fff;display:grid;place-items:center;font-weight:900;font-size:14px; }
+  .eyebrow { font-size:10px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#64748b; }
+  .topbar h1 { margin:2px 0 0; font-size:18px; line-height:1.2; font-weight:800; }
+  .status { border:1px solid #e2e8f0; background:#f8fafc; border-radius:999px; padding:6px 12px; font-size:11px; font-weight:700; color:#475569; }
+  .layout { display:grid; grid-template-columns:240px minmax(0,1fr); gap:18px; align-items:start; }
+  .sidebar,.panel { background:#fff;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 4px 14px rgba(15,23,42,0.02); }
+  .sidebar { padding:12px; position:sticky;top:16px; max-height:calc(100vh - 32px); overflow-y:auto; }
+  .side-label { margin:6px 8px 8px; font-size:10px; font-weight:800; letter-spacing:.12em; color:#94a3b8; text-transform:uppercase; }
+  .lesson-nav { display:flex;flex-direction:column;gap:3px; }
+  .lesson-btn { display:flex;align-items:center;gap:8px;text-align:left;border:0;background:transparent;padding:8px 10px;border-radius:8px;color:#475569;font-size:12px;font-weight:650; width:100%; transition:all 0.15s; }
+  .lesson-btn:hover { background:#f1f5f9; color:#0f172a; }
+  .lesson-btn .num { display:grid;place-items:center;width:22px;height:22px;border:1px solid #e2e8f0;border-radius:6px;font-size:10px;color:#64748b;background:#f8fafc;flex-shrink:0; }
+  .lesson-btn.active { background:#eff6ff;color:#1d4ed8;font-weight:700; }
+  .lesson-btn.active .num { background:#2563eb;color:white;border-color:#2563eb; }
+  
+  .main { min-width:0; display:flex; flex-direction:column; gap:16px; }
+  .lesson-head { padding:20px; }
+  .lesson-badge { display:inline-flex; align-items:center; gap:6px; color:#1d4ed8; background:#eff6ff; border-radius:999px; padding:4px 10px; font-size:10px; font-weight:800; }
+  .lesson-head h2 { margin:6px 0 6px; font-size:22px; letter-spacing:-.02em; font-weight:800; }
+  
+  .theory { margin-top:12px; padding-top:12px; border-top:1px solid #f1f5f9; color:#334155; font-size:13px; line-height:1.65; }
+  .theory p { margin:0 0 10px; }
+  .theory ul { margin:0 0 10px; padding-left:16px; }
+  .theory li { margin-bottom:4px; }
+  .theory code { background:#f1f5f9; padding:2px 5px; border-radius:4px; font-family:monospace; font-size:11px; color:#0f172a; border:1px solid #e2e8f0; }
+  .callout { background:#f8fafc; padding:12px; border-left:4px solid #3b82f6; margin:12px 0; border-radius:0 8px 8px 0; font-size:12px; border:1px solid #e2e8f0; border-left-width:4px; }
+
+  .work-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .panel { padding:16px; min-width:0; }
+  .panel-head { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:12px; }
+  .panel h3 { margin:0; font-size:13px; font-weight:700; color:#0f172a; }
+  .sub { margin-top:2px; color:#64748b; font-size:11px; }
+  .tag { border-radius:5px; padding:2px 6px; background:#f1f5f9; color:#475569; font-size:9px; font-weight:800; border:1px solid #e2e8f0; }
+  
+  .controls { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .control { padding:9px 10px; border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc; }
+  .control.full { grid-column:1/-1; }
+  .control-top { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:5px; }
+  .control label { color:#475569; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+  .value { font-size:11px; font-weight:800; color:#1d4ed8; }
+  select { width:100%; border:1px solid #cbd5e1; border-radius:6px; background:#fff; padding:6px 8px; color:#0f172a; font-size:12px; font-weight:600; outline:none; }
+  input[type=range] { width:100%; accent-color:#2563eb; }
+  
+  .preview-stage { 
+    background-color: #f8fafc;
+    background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+    background-size: 16px 16px;
+    border: 1px dashed #cbd5e1; 
+    border-radius: 10px; 
+    padding: 20px; 
+    min-height: 320px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto; 
+    margin-top: 10px;
+  }
+  
+  .diagram-wrap { border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc; padding:12px; height:100%; min-height:360px; display:flex; flex-direction:column; justify-content:center; }
+  .diagram { position:relative; display:flex; flex-direction: column; align-items:center; justify-content:center; overflow:auto; padding:10px; }
+  
+  .code-panel { margin-top:2px; }
+  .code-toolbar { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px; }
+  .code-toolbar button { border:1px solid #cbd5e1; background:#fff; color:#334155; border-radius:6px; padding:5px 9px; font-size:11px; font-weight:750; }
+  .code-editor { width:100%; min-height:180px; resize:vertical; border:1px solid #0f172a; border-radius:8px; background:#0f172a; color:#e2e8f0; padding:12px; font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace; outline:none; }
+  
+  .lesson-bottom { display:flex; justify-content:space-between; align-items:center; gap:12px; background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:12px 16px; }
+  .takeaway { flex:1; color:#065f46; font-size:12px; font-weight:600; line-height:1.4; }
+  .lesson-bottom button { border:0; border-radius:8px; background:#0f172a; color:#fff; padding:9px 15px; font-size:11px; font-weight:750; }
+  .lesson-bottom button:disabled { opacity:0.4; cursor:not-allowed; }
+
+  @media(max-width:950px){.layout{grid-template-columns:1fr}.work-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">TW</div>
+      <div>
+        <div class="eyebrow">Syntax & Reference Lab</div>
+        <h1>Color & Surface Class Explorer</h1>
+      </div>
+    </div>
+    <div class="status">Utility Mechanics · Live Parsing</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="side-label">Utility Modules</div>
+      <nav class="lesson-nav" id="lessonNav"></nav>
+    </aside>
+
+    <main class="main">
+      <section class="panel lesson-head">
+        <div class="lesson-badge" id="badge">LESSON 01</div>
+        <h2 id="lessonTitle">Lesson Title</h2>
+        <div id="lessonTheory" class="theory"></div>
+      </section>
+      
+      <div class="work-grid">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Interactive Controls</h3>
+              <div class="sub">Select options to update Tailwind classes.</div>
+            </div>
+            <span class="tag">SYNTAX TOKENS</span>
+          </div>
+          <div class="controls" id="controls"></div>
+          <div class="preview-stage" id="previewStage"></div>
+        </section>
+        
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>CSS Mechanics Model</h3>
+              <div class="sub">Visualizing layout and rendering rules.</div>
+            </div>
+            <span class="tag">DIAGRAM</span>
+          </div>
+          <div class="diagram-wrap">
+            <div class="diagram" id="diagramArea"></div>
+          </div>
+        </section>
+      </div>
+      
+      <section class="panel code-panel">
+        <div class="code-toolbar">
+          <div>
+            <h3>Live Code Editor</h3>
+            <div class="sub">Edit classes directly. State syncs automatically via DOM parsing.</div>
+          </div>
+          <button id="resetCode">Reset to Preset Values</button>
+        </div>
+        <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+      </section>
+      
+      <div class="lesson-bottom">
+        <div class="takeaway" id="takeaway"></div>
+        <button id="nextLesson">Next Lesson →</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const lessons = [
+  {
+    title: "Backgrounds & Text Color Tokens",
+    badge: "01 · BG & TEXT",
+    theory: `<p>Tailwind provides color tokens formatted as <code>[property]-[color]-[shade]</code> (e.g., <code>bg-blue-500</code>, <code>text-slate-800</code>).</p>
+    <ul>
+      <li><code>bg-*</code>: Controls background fill color.</li>
+      <li><code>text-*</code>: Controls foreground text color.</li>
+    </ul>
+    <div class="callout">
+      <strong>Syntax Tip:</strong> Shade scales range from <code>50</code> (lightest tint) to <code>950</code> (deepest shade).
+    </div>`,
+    takeaway: "Pair light background tokens (e.g., bg-blue-50) with dark text tokens (e.g., text-blue-800) for readable alert surfaces.",
+    controls: ["bgColor", "textColor"],
+    component: "alertCard"
+  },
+  {
+    title: "Opacity Modifiers (Slash Syntax)",
+    badge: "02 · OPACITY SYNTAX",
+    theory: `<p>Tailwind allows inline alpha transparency using slash syntax: <code>bg-black/50</code> or <code>bg-blue-500/20</code>.</p>
+    <ul>
+      <li>Modifies surface alpha opacity without affecting child elements.</li>
+      <li>Eliminates the need for custom RGBA strings or extra opacity classes.</li>
+    </ul>`,
+    takeaway: "Use the slash syntax (bg-color/opacity) to quickly configure transparent surface overlays and subtle pill fills.",
+    controls: ["bgColor", "bgOpacity"],
+    component: "opacityCard"
+  },
+  {
+    title: "Borders & List Dividers",
+    badge: "03 · BORDERS & DIVIDES",
+    theory: `<p>Surface boundaries are configured via stroke width (<code>border-2</code>) and color tokens (<code>border-slate-200</code>).</p>
+    <ul>
+      <li><code>border</code>: Sets stroke thickness.</li>
+      <li><code>divide-y</code>: Automatically injects horizontal borders between child list elements without adding border classes to each child.</li>
+    </ul>`,
+    takeaway: "Use divide-y on parent containers to format multi-row lists cleanly and keep HTML DRY.",
+    controls: ["borderWidth", "borderColor", "divideStyle"],
+    component: "listCard"
+  },
+  {
+    title: "Border Radius Scale",
+    badge: "04 · CORNER RADIUS",
+    theory: `<p>Corner rounding ranges from <code>rounded-none</code> (0px) up to <code>rounded-full</code> (9999px pill shapes).</p>
+    <ul>
+      <li><code>rounded-sm</code> / <code>rounded-md</code> / <code>rounded-lg</code>: Standard container options.</li>
+      <li><code>rounded-2xl</code>: Modern cards and dialog overlays.</li>
+    </ul>`,
+    takeaway: "Match border radius across nested surfaces so inner boundaries align harmoniously with outer container curves.",
+    controls: ["borderRadius"],
+    component: "radiusCard"
+  },
+  {
+    title: "Elevation Drop Shadows",
+    badge: "05 · DROP SHADOWS",
+    theory: `<p>Shadow utilities (<code>shadow-sm</code> to <code>shadow-2xl</code>) simulate physical distance above the background canvas.</p>
+    <ul>
+      <li><code>shadow-sm</code>: Subtle card baseline.</li>
+      <li><code>shadow-xl</code>: Floating popovers, dropdown menus, and modal dialogs.</li>
+    </ul>`,
+    takeaway: "Use smaller shadow tokens for static cards; reserve larger shadows for floating overlay elements.",
+    controls: ["shadowSize"],
+    component: "shadowCard"
+  },
+  {
+    title: "Accessibility Focus Rings",
+    badge: "06 · RINGS & OFFSETS",
+    theory: `<p>Ring utilities (<code>ring-2 ring-blue-500</code>) create outline strokes that sit <strong>outside</strong> the element's box model.</p>
+    <ul>
+      <li>Does not trigger layout shifts or alter dimensions.</li>
+      <li><code>ring-offset-2</code>: Adds whitespace padding between the element edge and the focus outline.</li>
+    </ul>`,
+    takeaway: "Rings provide essential focus indicator outlines for keyboard navigation without breaking CSS layout measurements.",
+    controls: ["ringSize", "ringOffset"],
+    component: "ringCard"
+  },
+  {
+    title: "Gradients & Text Clipping",
+    badge: "07 · GRADIENT STOPS",
+    theory: `<p>Linear gradients combine direction (<code>bg-gradient-to-r</code>) with color stops (<code>from-blue-500 to-purple-500</code>).</p>
+    <ul>
+      <li><code>bg-clip-text text-transparent</code>: Clips the background gradient into the shape of the foreground glyphs.</li>
+    </ul>`,
+    takeaway: "Combine bg-clip-text with text-transparent to create high-impact gradient headlines.",
+    controls: ["gradientStyle", "clipText"],
+    component: "gradientCard"
+  }
+];
+
+const state = {
+  bgColor: "bg-blue-50",
+  textColor: "text-blue-800",
+  bgOpacity: "100",
+  borderWidth: "border-2",
+  borderColor: "border-slate-300",
+  divideStyle: "divide-y divide-slate-200",
+  borderRadius: "rounded-xl",
+  shadowSize: "shadow-md",
+  ringSize: "ring-2",
+  ringOffset: "ring-offset-2",
+  gradientStyle: "from-blue-500 to-purple-500",
+  clipText: false
+};
+
+let current = 0;
+let typingTimer = null;
+const $ = id => document.getElementById(id);
+
+/* ---------- Component HTML Generator ---------- */
+function generateHTML() {
+  const l = lessons[current];
+
+  if (l.component === "alertCard") {
+    return `<div class="w-full max-w-sm mx-auto p-5 ${state.bgColor} ${state.textColor} border border-slate-300 rounded-xl shadow-sm">
+  <h4 class="font-bold text-sm mb-1">System Status Notification</h4>
+  <p class="text-xs opacity-90 leading-relaxed">Background and text colors configured via utility tokens.</p>
+</div>`;
+  }
+
+  if (l.component === "opacityCard") {
+    const opacityClass = state.bgOpacity === "100" ? state.bgColor : `${state.bgColor}/${state.bgOpacity}`;
+    return `<div class="w-full max-w-sm mx-auto p-6 ${opacityClass} text-slate-800 border border-slate-300 rounded-xl shadow-sm text-center">
+  <span class="text-xs font-bold uppercase tracking-wider block mb-1">Alpha Opacity Test</span>
+  <p class="text-xs font-semibold">Active Surface Class: <code>${opacityClass}</code></p>
+</div>`;
+  }
+
+  if (l.component === "listCard") {
+    return `<div class="w-full max-w-sm mx-auto bg-white ${state.borderWidth} ${state.borderColor} ${state.divideStyle} rounded-xl shadow-sm overflow-hidden">
+  <div class="p-4 text-xs font-semibold text-slate-800">Item Row 01</div>
+  <div class="p-4 text-xs font-semibold text-slate-800">Item Row 02</div>
+  <div class="p-4 text-xs font-semibold text-slate-800">Item Row 03</div>
+</div>`;
+  }
+
+  if (l.component === "radiusCard") {
+    return `<div class="w-full max-w-sm mx-auto p-8 bg-slate-900 text-white ${state.borderRadius} shadow-md text-center">
+  <h3 class="font-bold text-base mb-1">Corner Radius Scale</h3>
+  <p class="text-xs text-slate-400">Class: <code>${state.borderRadius}</code></p>
+</div>`;
+  }
+
+  if (l.component === "shadowCard") {
+    return `<div class="w-full max-w-sm mx-auto p-8 bg-white border border-slate-200 rounded-xl ${state.shadowSize} text-center transition-all">
+  <h3 class="font-bold text-slate-900 text-base mb-1">Elevation Model</h3>
+  <p class="text-xs text-slate-500">Active Shadow: <code>${state.shadowSize}</code></p>
+</div>`;
+  }
+
+  if (l.component === "ringCard") {
+    const offsetCls = state.ringOffset !== "ring-offset-0" ? `${state.ringOffset} ring-offset-white` : "";
+    return `<div class="w-full max-w-sm mx-auto p-8 bg-white border border-slate-200 rounded-xl shadow-sm text-center">
+  <button class="bg-blue-600 text-white font-bold px-6 py-2.5 rounded-lg text-xs ${state.ringSize} ring-blue-500 ${offsetCls}">
+    Focus State Target
+  </button>
+</div>`;
+  }
+
+  if (l.component === "gradientCard") {
+    const textCls = state.clipText ? `bg-gradient-to-r ${state.gradientStyle} bg-clip-text text-transparent` : "text-white";
+    const bgCls = state.clipText ? "bg-slate-900" : `bg-gradient-to-r ${state.gradientStyle}`;
+    return `<div class="w-full max-w-sm mx-auto p-8 ${bgCls} rounded-2xl shadow-lg text-center">
+  <h2 class="text-2xl font-black ${textCls}">Gradient Output</h2>
+  <p class="text-xs ${state.clipText ? 'text-slate-400' : 'text-white/80'} mt-2 font-medium">Inspecting linear gradient stops.</p>
+</div>`;
+  }
+
+  return "";
+}
+
+/* ---------- Visualizer Model Renderer ---------- */
+function updateVisualizer() {
+  const l = lessons[current];
+  let diag = "";
+
+  if (l.component === "ringCard") {
+    diag = `<div class="w-full text-center">
+      <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Ring Box Model</h4>
+      <div class="inline-block p-4 bg-white border border-slate-300 rounded-lg ${state.ringSize} ring-blue-500 ${state.ringOffset !== 'ring-offset-0' ? state.ringOffset : ''}">
+        <span class="text-xs font-bold text-slate-700">Element Content</span>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-4">Rings wrap outer boundaries without triggering layout reflows.</p>
+    </div>`;
+  } else if (l.component === "listCard") {
+    diag = `<div class="w-full text-center">
+      <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Border vs Divide Mechanics</h4>
+      <div class="bg-white border-2 border-dashed border-blue-400 p-2 max-w-[200px] mx-auto rounded-lg">
+        <div class="text-[11px] font-bold p-2 bg-slate-100 border-b border-slate-300">Child Row 1</div>
+        <div class="text-[11px] font-bold p-2 bg-slate-100">Child Row 2</div>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-4">Dividers target sibling borders automatically.</p>
+    </div>`;
+  } else {
+    diag = `<div class="text-center text-slate-400 text-sm py-12">
+      <span class="text-3xl block mb-2">🎨</span>
+      Inspecting active utility class mechanics.
+    </div>`;
+  }
+
+  $("diagramArea").innerHTML = diag;
+}
+
+/* ---------- Control Builders & Listeners ---------- */
+function select(id, label, opts) {
+  return `<div class="control"><div class="control-top"><label for="${id}">${label}</label></div><select id="${id}">${opts.map(o=>`<option value="${o[0]}" ${o[0]===state[id]?'selected':''}>${o[1]}</option>`).join("")}</select></div>`;
+}
+function slider(id, label, val) {
+  return `<div class="control full"><div class="control-top"><label>${label}</label><span class="value" id="${id}Val">${val}%</span></div><input type="range" id="${id}" min="10" max="100" step="10" value="${val}"></div>`;
+}
+function toggle(id, label, val) {
+  return `<div class="control full"><div class="control-top"><label>${label}</label></div><div class="seg"><button id="${id}Btn" class="${val ? 'selected' : ''}">${val ? 'ON' : 'OFF'}</button></div></div>`;
+}
+
+function renderControls() {
+  const l = lessons[current];
+  let c = "";
+
+  l.controls.forEach(ctrl => {
+    switch(ctrl) {
+      case "bgColor":
+        c += select("bgColor", "Background Token", [["bg-blue-50","bg-blue-50"],["bg-red-50","bg-red-50"],["bg-green-50","bg-green-50"],["bg-slate-900","bg-slate-900"],["bg-white","bg-white"]]);
+        break;
+      case "textColor":
+        c += select("textColor", "Text Color Token", [["text-blue-800","text-blue-800"],["text-red-800","text-red-800"],["text-green-800","text-green-800"],["text-slate-900","text-slate-900"],["text-white","text-white"]]);
+        break;
+      case "bgOpacity":
+        c += slider("bgOpacity", "Surface Opacity", state.bgOpacity);
+        break;
+      case "borderWidth":
+        c += select("borderWidth", "Border Width", [["border-0","border-0"],["border","border (1px)"],["border-2","border-2"],["border-4","border-4"]]);
+        break;
+      case "borderColor":
+        c += select("borderColor", "Border Color", [["border-slate-200","border-slate-200"],["border-slate-300","border-slate-300"],["border-blue-500","border-blue-500"],["border-red-500","border-red-500"]]);
+        break;
+      case "divideStyle":
+        c += select("divideStyle", "List Dividers", [["divide-y divide-slate-200","divide-y slate-200"],["divide-y divide-blue-200","divide-y blue-200"],["divide-none","divide-none"]]);
+        break;
+      case "borderRadius":
+        c += select("borderRadius", "Border Radius", [["rounded-none","rounded-none"],["rounded-md","rounded-md"],["rounded-xl","rounded-xl"],["rounded-2xl","rounded-2xl"],["rounded-full","rounded-full"]]);
+        break;
+      case "shadowSize":
+        c += select("shadowSize", "Drop Shadow", [["shadow-none","shadow-none"],["shadow-sm","shadow-sm"],["shadow-md","shadow-md"],["shadow-lg","shadow-lg"],["shadow-xl","shadow-xl"],["shadow-2xl","shadow-2xl"]]);
+        break;
+      case "ringSize":
+        c += select("ringSize", "Focus Ring Width", [["ring-0","ring-0"],["ring-1","ring-1"],["ring-2","ring-2"],["ring-4","ring-4"]]);
+        break;
+      case "ringOffset":
+        c += select("ringOffset", "Ring Offset Width", [["ring-offset-0","ring-offset-0"],["ring-offset-2","ring-offset-2"],["ring-offset-4","ring-offset-4"]]);
+        break;
+      case "gradientStyle":
+        c += select("gradientStyle", "Gradient Stops", [["from-blue-500 to-purple-500","Blue to Purple"],["from-indigo-500 to-pink-500","Indigo to Pink"],["from-purple-500 to-blue-500","Purple to Blue"]]);
+        break;
+      case "clipText":
+        c += toggle("clipText", "Clip Gradient to Text", state.clipText);
+        break;
+    }
+  });
+
+  $("controls").innerHTML = c;
+
+  $("controls").querySelectorAll("select").forEach(el => {
+    el.addEventListener("change", () => {
+      state[el.id] = el.value;
+      updateAll();
+    });
+  });
+
+  const rangeInput = $("bgOpacity");
+  if (rangeInput) {
+    rangeInput.addEventListener("input", (e) => {
+      state.bgOpacity = e.target.value;
+      $("bgOpacityVal").textContent = `${e.target.value}%`;
+      updateAll();
+    });
+  }
+
+  const clipBtn = $("clipTextBtn");
+  if (clipBtn) {
+    clipBtn.onclick = () => {
+      state.clipText = !state.clipText;
+      updateAll();
+    };
+  }
+}
+
+/* ---------- State & DOM Sync Engine ---------- */
+function updateAll(skipEditor = false) {
+  const html = generateHTML();
+  if (!skipEditor) $("codeEditor").value = html;
+  $("previewStage").innerHTML = html;
+  updateVisualizer();
+}
+
+function parseEditorDOM() {
+  const rawHTML = $("codeEditor").value;
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(rawHTML, "text/html");
+  const el = doc.querySelector("div, button, h2");
+  if (!el) return;
+
+  [...el.classList].forEach(cls => {
+    if (cls.startsWith("bg-") && !cls.includes("gradient") && !cls.includes("clip")) {
+      if (cls.includes("/")) {
+        const parts = cls.split("/");
+        state.bgColor = parts[0];
+        state.bgOpacity = parts[1];
+      } else {
+        state.bgColor = cls;
+      }
+    }
+    if (cls.startsWith("text-")) {
+      if (cls === "text-transparent") state.clipText = true;
+      else state.textColor = cls;
+    }
+    if (cls.startsWith("border") && !cls.startsWith("border-slate") && !cls.startsWith("border-blue") && !cls.startsWith("border-red")) state.borderWidth = cls;
+    if (cls.startsWith("border-slate") || cls.startsWith("border-blue") || cls.startsWith("border-red")) state.borderColor = cls;
+    if (cls.startsWith("rounded-")) state.borderRadius = cls;
+    if (cls.startsWith("shadow-")) state.shadowSize = cls;
+    if (cls.startsWith("ring-") && !cls.startsWith("ring-offset")) state.ringSize = cls;
+    if (cls.startsWith("ring-offset-")) state.ringOffset = cls;
+  });
+
+  renderControls();
+}
+
+/* ---------- Navigation & Init ---------- */
+function renderNav() {
+  $("lessonNav").innerHTML = lessons.map((l, i) =>
+    `<button class="lesson-btn ${i === current ? 'active' : ''}" data-i="${i}">
+      <span class="num">${String(i + 1).padStart(2, "0")}</span>
+      <span>${l.title}</span>
+    </button>`
+  ).join("");
+  document.querySelectorAll("[data-i]").forEach(b => b.onclick = () => { current = +b.dataset.i; renderLesson(); });
+}
+
+function renderLesson() {
+  const l = lessons[current];
+  $("badge").textContent = l.badge;
+  $("lessonTitle").textContent = l.title;
+  $("lessonTheory").innerHTML = l.theory;
+  $("takeaway").textContent = l.takeaway;
+  
+  renderNav();
+  renderControls();
+  updateAll();
+  
+  $("nextLesson").textContent = current === lessons.length - 1 ? "Complete Module ✓" : "Next Lesson →";
+  $("nextLesson").disabled = current === lessons.length - 1;
+}
+
+$("codeEditor").addEventListener("input", () => {
+  $("previewStage").innerHTML = $("codeEditor").value;
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(() => {
+    parseEditorDOM();
+    updateVisualizer();
+  }, 300);
+});
+
+$("resetCode").onclick = () => updateAll();
+$("nextLesson").onclick = () => { if (current < lessons.length - 1) { current++; renderLesson(); } };
+
+renderLesson();
+</script>
+</body>
+</html>

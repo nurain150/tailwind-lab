@@ -1,0 +1,3282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tailwind Mastery Lab YES — Offline Curriculum</title>
+
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:#f3f6fb; color:#172033; font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+  button, input, select, textarea { font:inherit; }
+  button { cursor:pointer; }
+  .app { max-width:1440px; margin:0 auto; padding:22px; }
+  .topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; }
+  .brand { display:flex; align-items:center; gap:12px; }
+  .brand-mark { width:42px;height:42px;border-radius:13px;background:#0f172a;color:#fff;display:grid;place-items:center;font-weight:800;letter-spacing:-.05em; }
+  .eyebrow { font-size:11px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; color:#64748b; }
+  .topbar h1 { margin:2px 0 0; font-size:22px; line-height:1.2; letter-spacing:-.03em; }
+  .status { border:1px solid #dbe3ee; background:#fff; border-radius:999px; padding:8px 12px; font-size:12px; color:#526078; }
+  .layout { display:grid; grid-template-columns:235px minmax(0,1fr); gap:18px; align-items:start; }
+  .sidebar,.panel { background:#fff;border:1px solid #e1e7ef;border-radius:18px;box-shadow:0 5px 20px rgba(20,35,65,.035); }
+  .sidebar { padding:14px; position:sticky;top:12px; max-height:calc(100vh - 24px); overflow-y:auto;}
+  .side-label { margin:7px 8px 10px; font-size:10px; font-weight:800; letter-spacing:.12em; color:#8490a3; text-transform:uppercase; }
+  .lesson-nav { display:flex;flex-direction:column;gap:5px; }
+  .lesson-nav button { display:flex;align-items:center;gap:10px;text-align:left;border:0;background:transparent;padding:10px;border-radius:11px;color:#526078;font-size:13px;font-weight:650; }
+  .lesson-nav button .num { display:grid;place-items:center;width:25px;height:25px;border:1px solid #e0e6ef;border-radius:8px;font-size:11px;color:#718096;background:#fff;flex-shrink:0; }
+  .lesson-nav button.active { background:#edf4ff;color:#194ca0; }
+  .lesson-nav button.active .num { background:#2259b5;color:white;border-color:#2259b5; }
+  
+  .main { min-width:0; }
+  .lesson-head { padding:23px 25px;margin-bottom:16px; }
+  .lesson-head h2 { margin:6px 0 8px;font-size:25px;letter-spacing:-.035em;line-height:1.2; }
+  .lesson-badge { display:inline-flex; align-items:center; gap:6px; color:#2563a8; background:#edf5ff; border-radius:999px; padding:5px 9px; font-size:11px; font-weight:800; }
+  
+  .theory { margin-top:16px; padding-top:16px; border-top:1px solid #e1e7ef; color:#475569; font-size:14px; line-height:1.7; }
+  .theory p { margin:0 0 14px; }
+  .theory ul { margin:0 0 14px; padding-left:20px; }
+  .theory li { margin-bottom:8px; }
+  .theory code { background:#f1f5f9; padding:2px 6px; border-radius:4px; font-family:monospace; font-size:13px; color:#0f172a; border:1px solid #e2e8f0; }
+  .callout { background:#f8fafc; padding:16px; border-left:4px solid #3b82f6; margin:16px 0; border-radius:0 8px 8px 0; font-size:13px; }
+  .callout.warning { border-left-color: #ef4444; background: #fef2f2; }
+  .callout.success { border-left-color: #10b981; background: #ecfdf5; }
+
+  .work-grid { display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px; }
+  .panel { padding:18px;min-width:0; }
+  .panel-head { display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px; }
+  .panel h3 { margin:0;font-size:15px;letter-spacing:-.01em; }
+  .sub { margin-top:4px;color:#8390a4;font-size:12px;line-height:1.5; }
+  .tag { border-radius:7px;padding:4px 7px;background:#f0f3f8;color:#637087;font-size:10px;font-weight:750;white-space:nowrap; }
+  
+  .controls { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+  .control { padding:11px 12px;border:1px solid #e8edf4;border-radius:12px;background:#fbfcfe; }
+  .control.full { grid-column:1/-1; }
+  .control-top { display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:9px; }
+  .control label { color:#536078;font-size:12px;font-weight:700; }
+  .value { font-size:12px;font-weight:800;color:#2156a7;font-variant-numeric:tabular-nums; }
+  input[type=range] { width:100%;accent-color:#3268c7; }
+  select { width:100%;border:1px solid #dce4ee;border-radius:8px;background:#fff;padding:8px;color:#344158;font-size:12px; }
+  .seg { display:flex;gap:4px;flex-wrap:wrap; }
+  .seg button { border:1px solid #dce4ee;background:#fff;color:#647087;border-radius:8px;padding:7px 9px;font-size:11px;font-weight:700; }
+  .seg button.selected { background:#eaf2ff;border-color:#8eb5f2;color:#1d55a6; }
+  
+  .preview-stage { 
+    background-color: #f8fafc;
+    background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+    background-size: 20px 20px;
+    border: 1px dashed #cbd5e1; 
+    border-radius: 13px; 
+    padding: 24px; 
+    min-height: 400px; 
+    display: block; 
+    overflow: auto; 
+  }
+  
+  .sample-card { background:#fff; border:1px solid #dce3ec; border-radius:13px; box-shadow:0 5px 15px rgba(25,45,80,.07); transition: all 0.2s ease; }
+  .sample-banner { height:8px; background:linear-gradient(90deg,#3b82f6,#7c3aed); border-radius:13px 13px 0 0; }
+  .sample-card h4 { margin:0 0 8px; font-size:16px; line-height:1.35; font-weight:800; color:#1e293b; }
+  .sample-card p { margin:0; color:#64748b; font-size:12px; line-height:1.6; }
+  .sample-btn { background:#245bb4; color:white; border-radius:8px; padding:8px 11px; font-size:11px; font-weight:750; white-space:nowrap; }
+
+  .diagram-wrap { border:1px solid #e4eaf2; border-radius:13px; background:#fbfcff; padding:12px; }
+  .diagram { position:relative; min-height:400px; display:flex; align-items:center; justify-content:center; overflow:auto; padding:12px; }
+  .margin-box { position:relative; background:#f8dca7; border:1px dashed #c68c2e; border-radius:8px; min-width:220px; max-width:100%; transition: padding 0.2s; }
+  .margin-label { position:absolute; top:5px; left:8px; font-size:10px; font-weight:800; color:#885c14; background:rgba(248,220,167,.95); padding:2px 6px; border-radius:4px; }
+  .border-box { background:#b9d6ff; border:2px solid #4f83d3; border-radius:5px; min-width:150px; transition: padding 0.2s; }
+  .border-label { font-size:10px; font-weight:800; color:#214f91; margin-bottom:6px; background:rgba(185,214,255,.95); display:inline-block; padding:2px 6px; border-radius:4px; }
+  .content-box { min-height:56px; min-width:100px; display:flex; align-items:center; justify-content:center; text-align:center; background:#c9efd9; border:1px solid #56a979; border-radius:4px; padding:8px; color:#236443; font-size:11px; font-weight:750; transition: min-height 0.2s; }
+  .diagram-key { display:flex; flex-wrap:wrap; gap:8px 14px; margin-top:10px; font-size:11px; color:#69768b; font-weight:600; }
+  .key { display:flex; align-items:center; gap:6px; }
+  .swatch { width:12px; height:12px; border-radius:3px; border:1px solid rgba(0,0,0,0.1); }
+  
+
+  .demo-zone { width:100%; min-height:190px; padding:12px; border:1px dashed #cbd5e1; border-radius:12px; background-color:#f8fafc; background-image:linear-gradient(#e2e8f0 1px,transparent 1px),linear-gradient(90deg,#e2e8f0 1px,transparent 1px); background-size:20px 20px; overflow:auto; }
+  .demo-item { min-width:0; min-height:52px; padding:12px; display:flex; align-items:center; justify-content:center; text-align:center; border:1px solid #93b4e8; border-radius:9px; background:#dbeafe; color:#1e3a8a; font-size:12px; font-weight:800; }
+  .mini-code { margin-top:8px; padding:8px 10px; border-radius:8px; background:#172b4d; color:#e6efff; font:11px/1.5 ui-monospace,monospace; overflow-wrap:anywhere; }
+  @media(max-width:650px){.controls{grid-template-columns:1fr}}
+  .code-panel { margin-top:16px; }
+  .code-toolbar { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; }
+  .code-toolbar button { border:1px solid #dce4ee; background:#fff; color:#43516a; border-radius:8px; padding:7px 10px; font-size:11px; font-weight:750; }
+  .code-editor { width:100%; min-height:220px; resize:vertical; border:1px solid #25334c; border-radius:11px; background:#0f172a; color:#e2e8f0; padding:16px; font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace; outline:none; }
+  
+  .flex-lesson-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+  .concept-card { min-width:0; border:1px solid #e3eaf3; border-radius:13px; padding:14px; background:#fff; }
+  .concept-card h5 { margin:0 0 5px; font-size:13px; color:#26364f; }
+  .concept-card .explain { margin:0 0 11px; color:#718096; font-size:11px; line-height:1.5; }
+  .work-grid.layout-lesson > section:nth-child(2) { display:none; }
+  .work-grid.layout-lesson { grid-template-columns:1fr; }
+  .demo-zone { min-height:150px; padding:12px; border:1px dashed #cbd5e1; border-radius:10px; background:#f8fafc; }
+  .demo-item { min-width:0; padding:12px 10px; border:1px solid #93b8ed; border-radius:9px; background:#dbeafe; color:#1e477e; text-align:center; font-size:11px; font-weight:800; }
+  .mini-code { margin-top:9px; padding:7px 8px; background:#0f172a; color:#dbeafe; border-radius:7px; font:10px/1.5 ui-monospace,monospace; overflow-wrap:anywhere; }
+  .capstone-controls { grid-column:1/-1; padding:10px 0 2px; color:#64748b; font-size:10px; font-weight:850; letter-spacing:.1em; text-transform:uppercase; border-bottom:1px solid #e5eaf1; }
+  @media(max-width:700px){.flex-lesson-grid{grid-template-columns:1fr}.controls{grid-template-columns:1fr}.control.full{grid-column:auto}}
+  .lesson-bottom { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:16px; }
+  .takeaway { flex:1; padding:13px 15px; border-radius:12px; background:#eef8f2; color:#3d6e50; font-size:13px; font-weight:600; line-height:1.55; }
+  .lesson-bottom button { border:0; border-radius:10px; background:#172b4d; color:#fff; padding:11px 14px; font-size:12px; font-weight:750; }
+  
+  @media(max-width:950px){.layout{grid-template-columns:1fr}.work-grid{grid-template-columns:1fr}.preview-stage{padding:16px}}
+</style>
+
+
+<style id="tailwind-offline-css">
+/*! tailwindcss v4.1.10 | MIT License | https://tailwindcss.com */
+@layer properties;
+@layer theme, base, components, utilities;
+@layer theme {
+  :root, :host {
+    --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+      "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+    --color-emerald-100: oklch(95% 0.052 163.051);
+    --color-emerald-700: oklch(50.8% 0.118 165.612);
+    --color-emerald-800: oklch(43.2% 0.095 166.913);
+    --color-blue-50: oklch(97% 0.014 254.604);
+    --color-blue-100: oklch(93.2% 0.032 255.585);
+    --color-blue-200: oklch(88.2% 0.059 254.128);
+    --color-blue-300: oklch(80.9% 0.105 251.813);
+    --color-blue-500: oklch(62.3% 0.214 259.815);
+    --color-blue-600: oklch(54.6% 0.245 262.881);
+    --color-blue-700: oklch(48.8% 0.243 264.376);
+    --color-blue-800: oklch(42.4% 0.199 265.638);
+    --color-violet-100: oklch(94.3% 0.029 294.588);
+    --color-purple-600: oklch(55.8% 0.288 302.321);
+    --color-slate-50: oklch(98.4% 0.003 247.858);
+    --color-slate-100: oklch(96.8% 0.007 247.896);
+    --color-slate-200: oklch(92.9% 0.013 255.508);
+    --color-slate-300: oklch(86.9% 0.022 252.894);
+    --color-slate-400: oklch(70.4% 0.04 256.788);
+    --color-slate-500: oklch(55.4% 0.046 257.417);
+    --color-slate-600: oklch(44.6% 0.043 257.281);
+    --color-slate-800: oklch(27.9% 0.041 260.031);
+    --color-white: #fff;
+    --spacing: 0.25rem;
+    --container-sm: 24rem;
+    --container-md: 28rem;
+    --container-lg: 32rem;
+    --text-xs: 0.75rem;
+    --text-xs--line-height: calc(1 / 0.75);
+    --text-sm: 0.875rem;
+    --text-sm--line-height: calc(1.25 / 0.875);
+    --text-base: 1rem;
+    --text-base--line-height: calc(1.5 / 1);
+    --text-lg: 1.125rem;
+    --text-lg--line-height: calc(1.75 / 1.125);
+    --text-2xl: 1.5rem;
+    --text-2xl--line-height: calc(2 / 1.5);
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    --font-weight-black: 900;
+    --tracking-widest: 0.1em;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.75rem;
+    --default-font-family: var(--font-sans);
+    --default-mono-font-family: var(--font-mono);
+  }
+}
+@layer base {
+  *, ::after, ::before, ::backdrop, ::file-selector-button {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0 solid;
+  }
+  html, :host {
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    tab-size: 4;
+    font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
+    font-feature-settings: var(--default-font-feature-settings, normal);
+    font-variation-settings: var(--default-font-variation-settings, normal);
+    -webkit-tap-highlight-color: transparent;
+  }
+  hr {
+    height: 0;
+    color: inherit;
+    border-top-width: 1px;
+  }
+  abbr:where([title]) {
+    -webkit-text-decoration: underline dotted;
+    text-decoration: underline dotted;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  a {
+    color: inherit;
+    -webkit-text-decoration: inherit;
+    text-decoration: inherit;
+  }
+  b, strong {
+    font-weight: bolder;
+  }
+  code, kbd, samp, pre {
+    font-family: var(--default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);
+    font-feature-settings: var(--default-mono-font-feature-settings, normal);
+    font-variation-settings: var(--default-mono-font-variation-settings, normal);
+    font-size: 1em;
+  }
+  small {
+    font-size: 80%;
+  }
+  sub, sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+  }
+  sub {
+    bottom: -0.25em;
+  }
+  sup {
+    top: -0.5em;
+  }
+  table {
+    text-indent: 0;
+    border-color: inherit;
+    border-collapse: collapse;
+  }
+  :-moz-focusring {
+    outline: auto;
+  }
+  progress {
+    vertical-align: baseline;
+  }
+  summary {
+    display: list-item;
+  }
+  ol, ul, menu {
+    list-style: none;
+  }
+  img, svg, video, canvas, audio, iframe, embed, object {
+    display: block;
+    vertical-align: middle;
+  }
+  img, video {
+    max-width: 100%;
+    height: auto;
+  }
+  button, input, select, optgroup, textarea, ::file-selector-button {
+    font: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    border-radius: 0;
+    background-color: transparent;
+    opacity: 1;
+  }
+  :where(select:is([multiple], [size])) optgroup {
+    font-weight: bolder;
+  }
+  :where(select:is([multiple], [size])) optgroup option {
+    padding-inline-start: 20px;
+  }
+  ::file-selector-button {
+    margin-inline-end: 4px;
+  }
+  ::placeholder {
+    opacity: 1;
+  }
+  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {
+    ::placeholder {
+      color: currentcolor;
+      @supports (color: color-mix(in lab, red, red)) {
+        color: color-mix(in oklab, currentcolor 50%, transparent);
+      }
+    }
+  }
+  textarea {
+    resize: vertical;
+  }
+  ::-webkit-search-decoration {
+    -webkit-appearance: none;
+  }
+  ::-webkit-date-and-time-value {
+    min-height: 1lh;
+    text-align: inherit;
+  }
+  ::-webkit-datetime-edit {
+    display: inline-flex;
+  }
+  ::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+  }
+  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {
+    padding-block: 0;
+  }
+  :-moz-ui-invalid {
+    box-shadow: none;
+  }
+  button, input:where([type="button"], [type="reset"], [type="submit"]), ::file-selector-button {
+    appearance: button;
+  }
+  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {
+    height: auto;
+  }
+  [hidden]:where(:not([hidden="until-found"])) {
+    display: none !important;
+  }
+}
+@layer utilities {
+  .order-0 {
+    order: 0;
+  }
+  .order-1 {
+    order: 1;
+  }
+  .order-2 {
+    order: 2;
+  }
+  .order-3 {
+    order: 3;
+  }
+  .order-first {
+    order: -9999;
+  }
+  .order-last {
+    order: 9999;
+  }
+  .col-span-1 {
+    grid-column: span 1 / span 1;
+  }
+  .col-span-2 {
+    grid-column: span 2 / span 2;
+  }
+  .col-span-3 {
+    grid-column: span 3 / span 3;
+  }
+  .col-span-4 {
+    grid-column: span 4 / span 4;
+  }
+  .col-start-1 {
+    grid-column-start: 1;
+  }
+  .col-start-2 {
+    grid-column-start: 2;
+  }
+  .col-start-3 {
+    grid-column-start: 3;
+  }
+  .row-span-1 {
+    grid-row: span 1 / span 1;
+  }
+  .row-span-2 {
+    grid-row: span 2 / span 2;
+  }
+  .row-span-3 {
+    grid-row: span 3 / span 3;
+  }
+  .m-0 {
+    margin: calc(var(--spacing) * 0);
+  }
+  .m-1 {
+    margin: calc(var(--spacing) * 1);
+  }
+  .m-2 {
+    margin: calc(var(--spacing) * 2);
+  }
+  .m-3 {
+    margin: calc(var(--spacing) * 3);
+  }
+  .m-4 {
+    margin: calc(var(--spacing) * 4);
+  }
+  .m-5 {
+    margin: calc(var(--spacing) * 5);
+  }
+  .m-6 {
+    margin: calc(var(--spacing) * 6);
+  }
+  .m-7 {
+    margin: calc(var(--spacing) * 7);
+  }
+  .m-8 {
+    margin: calc(var(--spacing) * 8);
+  }
+  .m-9 {
+    margin: calc(var(--spacing) * 9);
+  }
+  .m-10 {
+    margin: calc(var(--spacing) * 10);
+  }
+  .m-11 {
+    margin: calc(var(--spacing) * 11);
+  }
+  .m-12 {
+    margin: calc(var(--spacing) * 12);
+  }
+  .m-13 {
+    margin: calc(var(--spacing) * 13);
+  }
+  .m-14 {
+    margin: calc(var(--spacing) * 14);
+  }
+  .m-15 {
+    margin: calc(var(--spacing) * 15);
+  }
+  .m-16 {
+    margin: calc(var(--spacing) * 16);
+  }
+  .mx-auto {
+    margin-inline: auto;
+  }
+  .-mt-0 {
+    margin-top: calc(var(--spacing) * -0);
+  }
+  .-mt-1 {
+    margin-top: calc(var(--spacing) * -1);
+  }
+  .-mt-2 {
+    margin-top: calc(var(--spacing) * -2);
+  }
+  .-mt-3 {
+    margin-top: calc(var(--spacing) * -3);
+  }
+  .-mt-4 {
+    margin-top: calc(var(--spacing) * -4);
+  }
+  .-mt-5 {
+    margin-top: calc(var(--spacing) * -5);
+  }
+  .-mt-6 {
+    margin-top: calc(var(--spacing) * -6);
+  }
+  .-mt-7 {
+    margin-top: calc(var(--spacing) * -7);
+  }
+  .-mt-8 {
+    margin-top: calc(var(--spacing) * -8);
+  }
+  .-mt-9 {
+    margin-top: calc(var(--spacing) * -9);
+  }
+  .-mt-10 {
+    margin-top: calc(var(--spacing) * -10);
+  }
+  .-mt-11 {
+    margin-top: calc(var(--spacing) * -11);
+  }
+  .-mt-12 {
+    margin-top: calc(var(--spacing) * -12);
+  }
+  .-mt-13 {
+    margin-top: calc(var(--spacing) * -13);
+  }
+  .-mt-14 {
+    margin-top: calc(var(--spacing) * -14);
+  }
+  .-mt-15 {
+    margin-top: calc(var(--spacing) * -15);
+  }
+  .-mt-16 {
+    margin-top: calc(var(--spacing) * -16);
+  }
+  .-mt-17 {
+    margin-top: calc(var(--spacing) * -17);
+  }
+  .-mt-18 {
+    margin-top: calc(var(--spacing) * -18);
+  }
+  .-mt-19 {
+    margin-top: calc(var(--spacing) * -19);
+  }
+  .-mt-20 {
+    margin-top: calc(var(--spacing) * -20);
+  }
+  .mt-0 {
+    margin-top: calc(var(--spacing) * 0);
+  }
+  .mt-1 {
+    margin-top: calc(var(--spacing) * 1);
+  }
+  .mt-2 {
+    margin-top: calc(var(--spacing) * 2);
+  }
+  .mt-3 {
+    margin-top: calc(var(--spacing) * 3);
+  }
+  .mt-4 {
+    margin-top: calc(var(--spacing) * 4);
+  }
+  .mt-5 {
+    margin-top: calc(var(--spacing) * 5);
+  }
+  .mt-6 {
+    margin-top: calc(var(--spacing) * 6);
+  }
+  .mt-7 {
+    margin-top: calc(var(--spacing) * 7);
+  }
+  .mt-8 {
+    margin-top: calc(var(--spacing) * 8);
+  }
+  .mt-9 {
+    margin-top: calc(var(--spacing) * 9);
+  }
+  .mt-10 {
+    margin-top: calc(var(--spacing) * 10);
+  }
+  .mt-11 {
+    margin-top: calc(var(--spacing) * 11);
+  }
+  .mt-12 {
+    margin-top: calc(var(--spacing) * 12);
+  }
+  .mt-13 {
+    margin-top: calc(var(--spacing) * 13);
+  }
+  .mt-14 {
+    margin-top: calc(var(--spacing) * 14);
+  }
+  .mt-15 {
+    margin-top: calc(var(--spacing) * 15);
+  }
+  .mt-16 {
+    margin-top: calc(var(--spacing) * 16);
+  }
+  .mt-\[0px\] {
+    margin-top: 0px;
+  }
+  .mt-\[1px\] {
+    margin-top: 1px;
+  }
+  .mt-\[2px\] {
+    margin-top: 2px;
+  }
+  .mt-\[3px\] {
+    margin-top: 3px;
+  }
+  .mt-\[4px\] {
+    margin-top: 4px;
+  }
+  .mt-\[5px\] {
+    margin-top: 5px;
+  }
+  .mt-\[6px\] {
+    margin-top: 6px;
+  }
+  .mt-\[7px\] {
+    margin-top: 7px;
+  }
+  .mt-\[8px\] {
+    margin-top: 8px;
+  }
+  .mt-\[9px\] {
+    margin-top: 9px;
+  }
+  .mt-\[10px\] {
+    margin-top: 10px;
+  }
+  .mt-\[11px\] {
+    margin-top: 11px;
+  }
+  .mt-\[12px\] {
+    margin-top: 12px;
+  }
+  .mt-\[13px\] {
+    margin-top: 13px;
+  }
+  .mt-\[14px\] {
+    margin-top: 14px;
+  }
+  .mt-\[15px\] {
+    margin-top: 15px;
+  }
+  .mt-\[16px\] {
+    margin-top: 16px;
+  }
+  .mt-\[17px\] {
+    margin-top: 17px;
+  }
+  .mt-\[18px\] {
+    margin-top: 18px;
+  }
+  .mt-\[19px\] {
+    margin-top: 19px;
+  }
+  .mt-\[20px\] {
+    margin-top: 20px;
+  }
+  .mt-\[21px\] {
+    margin-top: 21px;
+  }
+  .mt-\[22px\] {
+    margin-top: 22px;
+  }
+  .mt-\[23px\] {
+    margin-top: 23px;
+  }
+  .mt-\[24px\] {
+    margin-top: 24px;
+  }
+  .mt-\[25px\] {
+    margin-top: 25px;
+  }
+  .mt-\[26px\] {
+    margin-top: 26px;
+  }
+  .mt-\[27px\] {
+    margin-top: 27px;
+  }
+  .mt-\[28px\] {
+    margin-top: 28px;
+  }
+  .mt-\[29px\] {
+    margin-top: 29px;
+  }
+  .mt-\[30px\] {
+    margin-top: 30px;
+  }
+  .mt-\[31px\] {
+    margin-top: 31px;
+  }
+  .mt-\[32px\] {
+    margin-top: 32px;
+  }
+  .mt-\[33px\] {
+    margin-top: 33px;
+  }
+  .mt-\[34px\] {
+    margin-top: 34px;
+  }
+  .mt-\[35px\] {
+    margin-top: 35px;
+  }
+  .mt-\[36px\] {
+    margin-top: 36px;
+  }
+  .mt-\[37px\] {
+    margin-top: 37px;
+  }
+  .mt-\[38px\] {
+    margin-top: 38px;
+  }
+  .mt-\[39px\] {
+    margin-top: 39px;
+  }
+  .mt-\[40px\] {
+    margin-top: 40px;
+  }
+  .mt-\[41px\] {
+    margin-top: 41px;
+  }
+  .mt-\[42px\] {
+    margin-top: 42px;
+  }
+  .mt-\[43px\] {
+    margin-top: 43px;
+  }
+  .mt-\[44px\] {
+    margin-top: 44px;
+  }
+  .mt-\[45px\] {
+    margin-top: 45px;
+  }
+  .mt-\[46px\] {
+    margin-top: 46px;
+  }
+  .mt-\[47px\] {
+    margin-top: 47px;
+  }
+  .mt-\[48px\] {
+    margin-top: 48px;
+  }
+  .mr-0 {
+    margin-right: calc(var(--spacing) * 0);
+  }
+  .mr-1 {
+    margin-right: calc(var(--spacing) * 1);
+  }
+  .mr-2 {
+    margin-right: calc(var(--spacing) * 2);
+  }
+  .mr-3 {
+    margin-right: calc(var(--spacing) * 3);
+  }
+  .mr-4 {
+    margin-right: calc(var(--spacing) * 4);
+  }
+  .mr-5 {
+    margin-right: calc(var(--spacing) * 5);
+  }
+  .mr-6 {
+    margin-right: calc(var(--spacing) * 6);
+  }
+  .mr-7 {
+    margin-right: calc(var(--spacing) * 7);
+  }
+  .mr-8 {
+    margin-right: calc(var(--spacing) * 8);
+  }
+  .mr-9 {
+    margin-right: calc(var(--spacing) * 9);
+  }
+  .mr-10 {
+    margin-right: calc(var(--spacing) * 10);
+  }
+  .mr-11 {
+    margin-right: calc(var(--spacing) * 11);
+  }
+  .mr-12 {
+    margin-right: calc(var(--spacing) * 12);
+  }
+  .mr-13 {
+    margin-right: calc(var(--spacing) * 13);
+  }
+  .mr-14 {
+    margin-right: calc(var(--spacing) * 14);
+  }
+  .mr-15 {
+    margin-right: calc(var(--spacing) * 15);
+  }
+  .mr-16 {
+    margin-right: calc(var(--spacing) * 16);
+  }
+  .mb-0 {
+    margin-bottom: calc(var(--spacing) * 0);
+  }
+  .mb-1 {
+    margin-bottom: calc(var(--spacing) * 1);
+  }
+  .mb-1\.5 {
+    margin-bottom: calc(var(--spacing) * 1.5);
+  }
+  .mb-2 {
+    margin-bottom: calc(var(--spacing) * 2);
+  }
+  .mb-3 {
+    margin-bottom: calc(var(--spacing) * 3);
+  }
+  .mb-4 {
+    margin-bottom: calc(var(--spacing) * 4);
+  }
+  .mb-5 {
+    margin-bottom: calc(var(--spacing) * 5);
+  }
+  .mb-6 {
+    margin-bottom: calc(var(--spacing) * 6);
+  }
+  .mb-7 {
+    margin-bottom: calc(var(--spacing) * 7);
+  }
+  .mb-8 {
+    margin-bottom: calc(var(--spacing) * 8);
+  }
+  .mb-9 {
+    margin-bottom: calc(var(--spacing) * 9);
+  }
+  .mb-10 {
+    margin-bottom: calc(var(--spacing) * 10);
+  }
+  .mb-11 {
+    margin-bottom: calc(var(--spacing) * 11);
+  }
+  .mb-12 {
+    margin-bottom: calc(var(--spacing) * 12);
+  }
+  .mb-13 {
+    margin-bottom: calc(var(--spacing) * 13);
+  }
+  .mb-14 {
+    margin-bottom: calc(var(--spacing) * 14);
+  }
+  .mb-15 {
+    margin-bottom: calc(var(--spacing) * 15);
+  }
+  .mb-16 {
+    margin-bottom: calc(var(--spacing) * 16);
+  }
+  .ml-0 {
+    margin-left: calc(var(--spacing) * 0);
+  }
+  .ml-1 {
+    margin-left: calc(var(--spacing) * 1);
+  }
+  .ml-2 {
+    margin-left: calc(var(--spacing) * 2);
+  }
+  .ml-3 {
+    margin-left: calc(var(--spacing) * 3);
+  }
+  .ml-4 {
+    margin-left: calc(var(--spacing) * 4);
+  }
+  .ml-5 {
+    margin-left: calc(var(--spacing) * 5);
+  }
+  .ml-6 {
+    margin-left: calc(var(--spacing) * 6);
+  }
+  .ml-7 {
+    margin-left: calc(var(--spacing) * 7);
+  }
+  .ml-8 {
+    margin-left: calc(var(--spacing) * 8);
+  }
+  .ml-9 {
+    margin-left: calc(var(--spacing) * 9);
+  }
+  .ml-10 {
+    margin-left: calc(var(--spacing) * 10);
+  }
+  .ml-11 {
+    margin-left: calc(var(--spacing) * 11);
+  }
+  .ml-12 {
+    margin-left: calc(var(--spacing) * 12);
+  }
+  .ml-13 {
+    margin-left: calc(var(--spacing) * 13);
+  }
+  .ml-14 {
+    margin-left: calc(var(--spacing) * 14);
+  }
+  .ml-15 {
+    margin-left: calc(var(--spacing) * 15);
+  }
+  .ml-16 {
+    margin-left: calc(var(--spacing) * 16);
+  }
+  .block {
+    display: block;
+  }
+  .flex {
+    display: flex;
+  }
+  .grid {
+    display: grid;
+  }
+  .hidden {
+    display: none;
+  }
+  .inline-flex {
+    display: inline-flex;
+  }
+  .h-2 {
+    height: calc(var(--spacing) * 2);
+  }
+  .h-7 {
+    height: calc(var(--spacing) * 7);
+  }
+  .h-12 {
+    height: calc(var(--spacing) * 12);
+  }
+  .h-20 {
+    height: calc(var(--spacing) * 20);
+  }
+  .h-32 {
+    height: calc(var(--spacing) * 32);
+  }
+  .h-\[150px\] {
+    height: 150px;
+  }
+  .h-\[190px\] {
+    height: 190px;
+  }
+  .h-\[260px\] {
+    height: 260px;
+  }
+  .h-\[280px\] {
+    height: 280px;
+  }
+  .h-\[320px\] {
+    height: 320px;
+  }
+  .h-full {
+    height: 100%;
+  }
+  .min-h-\[40px\] {
+    min-height: 40px;
+  }
+  .min-h-\[48px\] {
+    min-height: 48px;
+  }
+  .min-h-\[60px\] {
+    min-height: 60px;
+  }
+  .min-h-\[80px\] {
+    min-height: 80px;
+  }
+  .min-h-\[100px\] {
+    min-height: 100px;
+  }
+  .min-h-\[120px\] {
+    min-height: 120px;
+  }
+  .min-h-\[140px\] {
+    min-height: 140px;
+  }
+  .min-h-\[150px\] {
+    min-height: 150px;
+  }
+  .min-h-\[160px\] {
+    min-height: 160px;
+  }
+  .min-h-\[180px\] {
+    min-height: 180px;
+  }
+  .min-h-\[200px\] {
+    min-height: 200px;
+  }
+  .min-h-\[220px\] {
+    min-height: 220px;
+  }
+  .min-h-\[240px\] {
+    min-height: 240px;
+  }
+  .min-h-\[260px\] {
+    min-height: 260px;
+  }
+  .min-h-\[280px\] {
+    min-height: 280px;
+  }
+  .min-h-\[300px\] {
+    min-height: 300px;
+  }
+  .w-1\/2 {
+    width: calc(1/2 * 100%);
+  }
+  .w-1\/3 {
+    width: calc(1/3 * 100%);
+  }
+  .w-1\/4 {
+    width: calc(1/4 * 100%);
+  }
+  .w-2\/3 {
+    width: calc(2/3 * 100%);
+  }
+  .w-4\/6 {
+    width: calc(4/6 * 100%);
+  }
+  .w-5\/6 {
+    width: calc(5/6 * 100%);
+  }
+  .w-5\/12 {
+    width: calc(5/12 * 100%);
+  }
+  .w-7 {
+    width: calc(var(--spacing) * 7);
+  }
+  .w-20 {
+    width: calc(var(--spacing) * 20);
+  }
+  .w-24 {
+    width: calc(var(--spacing) * 24);
+  }
+  .w-64 {
+    width: calc(var(--spacing) * 64);
+  }
+  .w-\[42\%\] {
+    width: 42%;
+  }
+  .w-full {
+    width: 100%;
+  }
+  .max-w-\[200px\] {
+    max-width: 200px;
+  }
+  .max-w-\[220px\] {
+    max-width: 220px;
+  }
+  .max-w-\[240px\] {
+    max-width: 240px;
+  }
+  .max-w-\[260px\] {
+    max-width: 260px;
+  }
+  .max-w-\[280px\] {
+    max-width: 280px;
+  }
+  .max-w-\[300px\] {
+    max-width: 300px;
+  }
+  .max-w-\[320px\] {
+    max-width: 320px;
+  }
+  .max-w-\[340px\] {
+    max-width: 340px;
+  }
+  .max-w-\[360px\] {
+    max-width: 360px;
+  }
+  .max-w-\[380px\] {
+    max-width: 380px;
+  }
+  .max-w-\[390px\] {
+    max-width: 390px;
+  }
+  .max-w-\[400px\] {
+    max-width: 400px;
+  }
+  .max-w-\[420px\] {
+    max-width: 420px;
+  }
+  .max-w-\[440px\] {
+    max-width: 440px;
+  }
+  .max-w-\[460px\] {
+    max-width: 460px;
+  }
+  .max-w-\[480px\] {
+    max-width: 480px;
+  }
+  .max-w-\[500px\] {
+    max-width: 500px;
+  }
+  .max-w-\[520px\] {
+    max-width: 520px;
+  }
+  .max-w-\[540px\] {
+    max-width: 540px;
+  }
+  .max-w-\[560px\] {
+    max-width: 560px;
+  }
+  .max-w-lg {
+    max-width: var(--container-lg);
+  }
+  .max-w-md {
+    max-width: var(--container-md);
+  }
+  .max-w-none {
+    max-width: none;
+  }
+  .max-w-sm {
+    max-width: var(--container-sm);
+  }
+  .min-w-0 {
+    min-width: calc(var(--spacing) * 0);
+  }
+  .flex-1 {
+    flex: 1;
+  }
+  .flex-none {
+    flex: none;
+  }
+  .shrink {
+    flex-shrink: 1;
+  }
+  .shrink-0 {
+    flex-shrink: 0;
+  }
+  .grow {
+    flex-grow: 1;
+  }
+  .grow-0 {
+    flex-grow: 0;
+  }
+  .basis-0 {
+    flex-basis: calc(var(--spacing) * 0);
+  }
+  .basis-1\/2 {
+    flex-basis: calc(1/2 * 100%);
+  }
+  .basis-1\/3 {
+    flex-basis: calc(1/3 * 100%);
+  }
+  .basis-1\/4 {
+    flex-basis: calc(1/4 * 100%);
+  }
+  .basis-auto {
+    flex-basis: auto;
+  }
+  .grid-flow-col {
+    grid-auto-flow: column;
+  }
+  .grid-flow-col-dense {
+    grid-auto-flow: column dense;
+  }
+  .grid-flow-row {
+    grid-auto-flow: row;
+  }
+  .grid-flow-row-dense {
+    grid-auto-flow: row dense;
+  }
+  .auto-rows-auto {
+    grid-auto-rows: auto;
+  }
+  .auto-rows-fr {
+    grid-auto-rows: minmax(0, 1fr);
+  }
+  .auto-rows-max {
+    grid-auto-rows: max-content;
+  }
+  .auto-rows-min {
+    grid-auto-rows: min-content;
+  }
+  .grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .grid-rows-1 {
+    grid-template-rows: repeat(1, minmax(0, 1fr));
+  }
+  .grid-rows-2 {
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+  }
+  .grid-rows-3 {
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+  }
+  .flex-col {
+    flex-direction: column;
+  }
+  .flex-col-reverse {
+    flex-direction: column-reverse;
+  }
+  .flex-row {
+    flex-direction: row;
+  }
+  .flex-row-reverse {
+    flex-direction: row-reverse;
+  }
+  .flex-nowrap {
+    flex-wrap: nowrap;
+  }
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+  .flex-wrap-reverse {
+    flex-wrap: wrap-reverse;
+  }
+  .place-content-around {
+    place-content: space-around;
+  }
+  .place-content-between {
+    place-content: space-between;
+  }
+  .place-content-center {
+    place-content: center;
+  }
+  .place-content-end {
+    place-content: end;
+  }
+  .place-content-evenly {
+    place-content: space-evenly;
+  }
+  .place-content-start {
+    place-content: start;
+  }
+  .place-items-center {
+    place-items: center;
+  }
+  .place-items-end {
+    place-items: end;
+  }
+  .place-items-start {
+    place-items: start;
+  }
+  .place-items-stretch {
+    place-items: stretch;
+  }
+  .content-around {
+    align-content: space-around;
+  }
+  .content-between {
+    align-content: space-between;
+  }
+  .content-center {
+    align-content: center;
+  }
+  .content-end {
+    align-content: flex-end;
+  }
+  .content-evenly {
+    align-content: space-evenly;
+  }
+  .content-start {
+    align-content: flex-start;
+  }
+  .content-stretch {
+    align-content: stretch;
+  }
+  .items-baseline {
+    align-items: baseline;
+  }
+  .items-center {
+    align-items: center;
+  }
+  .items-end {
+    align-items: flex-end;
+  }
+  .items-start {
+    align-items: flex-start;
+  }
+  .items-stretch {
+    align-items: stretch;
+  }
+  .justify-around {
+    justify-content: space-around;
+  }
+  .justify-between {
+    justify-content: space-between;
+  }
+  .justify-center {
+    justify-content: center;
+  }
+  .justify-end {
+    justify-content: flex-end;
+  }
+  .justify-evenly {
+    justify-content: space-evenly;
+  }
+  .justify-start {
+    justify-content: flex-start;
+  }
+  .gap-0 {
+    gap: calc(var(--spacing) * 0);
+  }
+  .gap-1 {
+    gap: calc(var(--spacing) * 1);
+  }
+  .gap-2 {
+    gap: calc(var(--spacing) * 2);
+  }
+  .gap-3 {
+    gap: calc(var(--spacing) * 3);
+  }
+  .gap-4 {
+    gap: calc(var(--spacing) * 4);
+  }
+  .gap-5 {
+    gap: calc(var(--spacing) * 5);
+  }
+  .gap-6 {
+    gap: calc(var(--spacing) * 6);
+  }
+  .gap-7 {
+    gap: calc(var(--spacing) * 7);
+  }
+  .gap-8 {
+    gap: calc(var(--spacing) * 8);
+  }
+  .gap-9 {
+    gap: calc(var(--spacing) * 9);
+  }
+  .gap-10 {
+    gap: calc(var(--spacing) * 10);
+  }
+  .gap-11 {
+    gap: calc(var(--spacing) * 11);
+  }
+  .gap-12 {
+    gap: calc(var(--spacing) * 12);
+  }
+  .gap-13 {
+    gap: calc(var(--spacing) * 13);
+  }
+  .gap-14 {
+    gap: calc(var(--spacing) * 14);
+  }
+  .gap-15 {
+    gap: calc(var(--spacing) * 15);
+  }
+  .gap-16 {
+    gap: calc(var(--spacing) * 16);
+  }
+  .space-y-0 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 0) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 0) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-y-1 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 1) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 1) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-y-2 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 2) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 2) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-y-3 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 3) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 3) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-y-4 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 4) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 4) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-y-5 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 5) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 5) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-y-6 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 6) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 6) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-y-7 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 7) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 7) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-y-8 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 8) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 8) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-y-9 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 9) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 9) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-y-10 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 10) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 10) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-y-11 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 11) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 11) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-y-12 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 12) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 12) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-y-13 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 13) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 13) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-y-14 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 14) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 14) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-y-15 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 15) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 15) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-y-16 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 16) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 16) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-x-0 {
+    :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 0;
+      margin-inline-start: calc(calc(var(--spacing) * 0) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 0) * calc(1 - var(--tw-space-x-reverse)));
+    }
+  }
+  .space-x-1 {
+    :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 0;
+      margin-inline-start: calc(calc(var(--spacing) * 1) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 1) * calc(1 - var(--tw-space-x-reverse)));
+    }
+  }
+  .space-x-2 {
+    :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 0;
+      margin-inline-start: calc(calc(var(--spacing) * 2) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 2) * calc(1 - var(--tw-space-x-reverse)));
+    }
+  }
+  .space-x-3 {
+    :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 0;
+      margin-inline-start: calc(calc(var(--spacing) * 3) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 3) * calc(1 - var(--tw-space-x-reverse)));
+    }
+  }
+  .space-x-4 {
+    :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 0;
+      margin-inline-start: calc(calc(var(--spacing) * 4) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 4) * calc(1 - var(--tw-space-x-reverse)));
+    }
+  }
+  .space-x-5 {
+    :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 0;
+      margin-inline-start: calc(calc(var(--spacing) * 5) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 5) * calc(1 - var(--tw-space-x-reverse)));
+    }
+  }
+  .space-x-6 {
+    :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 0;
+      margin-inline-start: calc(calc(var(--spacing) * 6) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 6) * calc(1 - var(--tw-space-x-reverse)));
+    }
+  }
+  .space-x-7 {
+    :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 0;
+      margin-inline-start: calc(calc(var(--spacing) * 7) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 7) * calc(1 - var(--tw-space-x-reverse)));
+    }
+  }
+  .space-x-8 {
+    :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 0;
+      margin-inline-start: calc(calc(var(--spacing) * 8) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 8) * calc(1 - var(--tw-space-x-reverse)));
+    }
+  }
+  .space-x-9 {
+    :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 0;
+      margin-inline-start: calc(calc(var(--spacing) * 9) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 9) * calc(1 - var(--tw-space-x-reverse)));
+    }
+  }
+  .space-x-10 {
+    :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 0;
+      margin-inline-start: calc(calc(var(--spacing) * 10) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 10) * calc(1 - var(--tw-space-x-reverse)));
+    }
+  }
+  .space-x-11 {
+    :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 0;
+      margin-inline-start: calc(calc(var(--spacing) * 11) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 11) * calc(1 - var(--tw-space-x-reverse)));
+    }
+  }
+  .space-x-12 {
+    :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 0;
+      margin-inline-start: calc(calc(var(--spacing) * 12) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 12) * calc(1 - var(--tw-space-x-reverse)));
+    }
+  }
+  .space-x-13 {
+    :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 0;
+      margin-inline-start: calc(calc(var(--spacing) * 13) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 13) * calc(1 - var(--tw-space-x-reverse)));
+    }
+  }
+  .space-x-14 {
+    :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 0;
+      margin-inline-start: calc(calc(var(--spacing) * 14) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 14) * calc(1 - var(--tw-space-x-reverse)));
+    }
+  }
+  .space-x-15 {
+    :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 0;
+      margin-inline-start: calc(calc(var(--spacing) * 15) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 15) * calc(1 - var(--tw-space-x-reverse)));
+    }
+  }
+  .space-x-16 {
+    :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 0;
+      margin-inline-start: calc(calc(var(--spacing) * 16) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 16) * calc(1 - var(--tw-space-x-reverse)));
+    }
+  }
+  .self-auto {
+    align-self: auto;
+  }
+  .self-center {
+    align-self: center;
+  }
+  .self-end {
+    align-self: flex-end;
+  }
+  .self-start {
+    align-self: flex-start;
+  }
+  .self-stretch {
+    align-self: stretch;
+  }
+  .overflow-hidden {
+    overflow: hidden;
+  }
+  .rounded-full {
+    border-radius: calc(infinity * 1px);
+  }
+  .rounded-lg {
+    border-radius: var(--radius-lg);
+  }
+  .rounded-xl {
+    border-radius: var(--radius-xl);
+  }
+  .rounded-t-xl {
+    border-top-left-radius: var(--radius-xl);
+    border-top-right-radius: var(--radius-xl);
+  }
+  .border {
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+  }
+  .border-2 {
+    border-style: var(--tw-border-style);
+    border-width: 2px;
+  }
+  .border-4 {
+    border-style: var(--tw-border-style);
+    border-width: 4px;
+  }
+  .border-dashed {
+    --tw-border-style: dashed;
+    border-style: dashed;
+  }
+  .border-blue-300 {
+    border-color: var(--color-blue-300);
+  }
+  .border-slate-200 {
+    border-color: var(--color-slate-200);
+  }
+  .border-slate-300 {
+    border-color: var(--color-slate-300);
+  }
+  .border-slate-400 {
+    border-color: var(--color-slate-400);
+  }
+  .border-white {
+    border-color: var(--color-white);
+  }
+  .bg-\[\#245bb4\] {
+    background-color: #245bb4;
+  }
+  .bg-blue-50 {
+    background-color: var(--color-blue-50);
+  }
+  .bg-blue-100 {
+    background-color: var(--color-blue-100);
+  }
+  .bg-blue-200 {
+    background-color: var(--color-blue-200);
+  }
+  .bg-blue-500 {
+    background-color: var(--color-blue-500);
+  }
+  .bg-blue-600 {
+    background-color: var(--color-blue-600);
+  }
+  .bg-emerald-100 {
+    background-color: var(--color-emerald-100);
+  }
+  .bg-emerald-700 {
+    background-color: var(--color-emerald-700);
+  }
+  .bg-slate-50 {
+    background-color: var(--color-slate-50);
+  }
+  .bg-slate-50\/50 {
+    background-color: color-mix(in srgb, oklch(98.4% 0.003 247.858) 50%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-slate-50) 50%, transparent);
+    }
+  }
+  .bg-slate-100 {
+    background-color: var(--color-slate-100);
+  }
+  .bg-slate-200 {
+    background-color: var(--color-slate-200);
+  }
+  .bg-violet-100 {
+    background-color: var(--color-violet-100);
+  }
+  .bg-white {
+    background-color: var(--color-white);
+  }
+  .bg-gradient-to-r {
+    --tw-gradient-position: to right in oklab;
+    background-image: linear-gradient(var(--tw-gradient-stops));
+  }
+  .from-blue-500 {
+    --tw-gradient-from: var(--color-blue-500);
+    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+  }
+  .to-purple-600 {
+    --tw-gradient-to: var(--color-purple-600);
+    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+  }
+  .p-0 {
+    padding: calc(var(--spacing) * 0);
+  }
+  .p-1 {
+    padding: calc(var(--spacing) * 1);
+  }
+  .p-2 {
+    padding: calc(var(--spacing) * 2);
+  }
+  .p-3 {
+    padding: calc(var(--spacing) * 3);
+  }
+  .p-4 {
+    padding: calc(var(--spacing) * 4);
+  }
+  .p-5 {
+    padding: calc(var(--spacing) * 5);
+  }
+  .p-6 {
+    padding: calc(var(--spacing) * 6);
+  }
+  .p-7 {
+    padding: calc(var(--spacing) * 7);
+  }
+  .p-8 {
+    padding: calc(var(--spacing) * 8);
+  }
+  .p-9 {
+    padding: calc(var(--spacing) * 9);
+  }
+  .p-10 {
+    padding: calc(var(--spacing) * 10);
+  }
+  .p-11 {
+    padding: calc(var(--spacing) * 11);
+  }
+  .p-12 {
+    padding: calc(var(--spacing) * 12);
+  }
+  .p-13 {
+    padding: calc(var(--spacing) * 13);
+  }
+  .p-14 {
+    padding: calc(var(--spacing) * 14);
+  }
+  .p-15 {
+    padding: calc(var(--spacing) * 15);
+  }
+  .p-16 {
+    padding: calc(var(--spacing) * 16);
+  }
+  .p-\[0px\] {
+    padding: 0px;
+  }
+  .p-\[1px\] {
+    padding: 1px;
+  }
+  .p-\[2px\] {
+    padding: 2px;
+  }
+  .p-\[3px\] {
+    padding: 3px;
+  }
+  .p-\[4px\] {
+    padding: 4px;
+  }
+  .p-\[5px\] {
+    padding: 5px;
+  }
+  .p-\[6px\] {
+    padding: 6px;
+  }
+  .p-\[7px\] {
+    padding: 7px;
+  }
+  .p-\[8px\] {
+    padding: 8px;
+  }
+  .p-\[9px\] {
+    padding: 9px;
+  }
+  .p-\[10px\] {
+    padding: 10px;
+  }
+  .p-\[11px\] {
+    padding: 11px;
+  }
+  .p-\[12px\] {
+    padding: 12px;
+  }
+  .p-\[13px\] {
+    padding: 13px;
+  }
+  .p-\[14px\] {
+    padding: 14px;
+  }
+  .p-\[15px\] {
+    padding: 15px;
+  }
+  .p-\[16px\] {
+    padding: 16px;
+  }
+  .p-\[17px\] {
+    padding: 17px;
+  }
+  .p-\[18px\] {
+    padding: 18px;
+  }
+  .p-\[19px\] {
+    padding: 19px;
+  }
+  .p-\[20px\] {
+    padding: 20px;
+  }
+  .p-\[21px\] {
+    padding: 21px;
+  }
+  .p-\[22px\] {
+    padding: 22px;
+  }
+  .p-\[23px\] {
+    padding: 23px;
+  }
+  .p-\[24px\] {
+    padding: 24px;
+  }
+  .p-\[25px\] {
+    padding: 25px;
+  }
+  .p-\[26px\] {
+    padding: 26px;
+  }
+  .p-\[27px\] {
+    padding: 27px;
+  }
+  .p-\[28px\] {
+    padding: 28px;
+  }
+  .p-\[29px\] {
+    padding: 29px;
+  }
+  .p-\[30px\] {
+    padding: 30px;
+  }
+  .p-\[31px\] {
+    padding: 31px;
+  }
+  .p-\[32px\] {
+    padding: 32px;
+  }
+  .p-\[33px\] {
+    padding: 33px;
+  }
+  .p-\[34px\] {
+    padding: 34px;
+  }
+  .p-\[35px\] {
+    padding: 35px;
+  }
+  .p-\[36px\] {
+    padding: 36px;
+  }
+  .p-\[37px\] {
+    padding: 37px;
+  }
+  .p-\[38px\] {
+    padding: 38px;
+  }
+  .p-\[39px\] {
+    padding: 39px;
+  }
+  .p-\[40px\] {
+    padding: 40px;
+  }
+  .p-\[41px\] {
+    padding: 41px;
+  }
+  .p-\[42px\] {
+    padding: 42px;
+  }
+  .p-\[43px\] {
+    padding: 43px;
+  }
+  .p-\[44px\] {
+    padding: 44px;
+  }
+  .p-\[45px\] {
+    padding: 45px;
+  }
+  .p-\[46px\] {
+    padding: 46px;
+  }
+  .p-\[47px\] {
+    padding: 47px;
+  }
+  .p-\[48px\] {
+    padding: 48px;
+  }
+  .px-0 {
+    padding-inline: calc(var(--spacing) * 0);
+  }
+  .px-1 {
+    padding-inline: calc(var(--spacing) * 1);
+  }
+  .px-2 {
+    padding-inline: calc(var(--spacing) * 2);
+  }
+  .px-3 {
+    padding-inline: calc(var(--spacing) * 3);
+  }
+  .px-4 {
+    padding-inline: calc(var(--spacing) * 4);
+  }
+  .px-5 {
+    padding-inline: calc(var(--spacing) * 5);
+  }
+  .px-6 {
+    padding-inline: calc(var(--spacing) * 6);
+  }
+  .px-7 {
+    padding-inline: calc(var(--spacing) * 7);
+  }
+  .px-8 {
+    padding-inline: calc(var(--spacing) * 8);
+  }
+  .px-9 {
+    padding-inline: calc(var(--spacing) * 9);
+  }
+  .px-10 {
+    padding-inline: calc(var(--spacing) * 10);
+  }
+  .px-11 {
+    padding-inline: calc(var(--spacing) * 11);
+  }
+  .px-12 {
+    padding-inline: calc(var(--spacing) * 12);
+  }
+  .px-13 {
+    padding-inline: calc(var(--spacing) * 13);
+  }
+  .px-14 {
+    padding-inline: calc(var(--spacing) * 14);
+  }
+  .px-15 {
+    padding-inline: calc(var(--spacing) * 15);
+  }
+  .px-16 {
+    padding-inline: calc(var(--spacing) * 16);
+  }
+  .px-\[0px\] {
+    padding-inline: 0px;
+  }
+  .px-\[4px\] {
+    padding-inline: 4px;
+  }
+  .px-\[8px\] {
+    padding-inline: 8px;
+  }
+  .px-\[12px\] {
+    padding-inline: 12px;
+  }
+  .px-\[16px\] {
+    padding-inline: 16px;
+  }
+  .px-\[20px\] {
+    padding-inline: 20px;
+  }
+  .px-\[24px\] {
+    padding-inline: 24px;
+  }
+  .px-\[28px\] {
+    padding-inline: 28px;
+  }
+  .px-\[32px\] {
+    padding-inline: 32px;
+  }
+  .px-\[36px\] {
+    padding-inline: 36px;
+  }
+  .px-\[40px\] {
+    padding-inline: 40px;
+  }
+  .py-0 {
+    padding-block: calc(var(--spacing) * 0);
+  }
+  .py-1 {
+    padding-block: calc(var(--spacing) * 1);
+  }
+  .py-2 {
+    padding-block: calc(var(--spacing) * 2);
+  }
+  .py-3 {
+    padding-block: calc(var(--spacing) * 3);
+  }
+  .py-4 {
+    padding-block: calc(var(--spacing) * 4);
+  }
+  .py-5 {
+    padding-block: calc(var(--spacing) * 5);
+  }
+  .py-6 {
+    padding-block: calc(var(--spacing) * 6);
+  }
+  .py-7 {
+    padding-block: calc(var(--spacing) * 7);
+  }
+  .py-8 {
+    padding-block: calc(var(--spacing) * 8);
+  }
+  .py-9 {
+    padding-block: calc(var(--spacing) * 9);
+  }
+  .py-10 {
+    padding-block: calc(var(--spacing) * 10);
+  }
+  .py-11 {
+    padding-block: calc(var(--spacing) * 11);
+  }
+  .py-12 {
+    padding-block: calc(var(--spacing) * 12);
+  }
+  .py-13 {
+    padding-block: calc(var(--spacing) * 13);
+  }
+  .py-14 {
+    padding-block: calc(var(--spacing) * 14);
+  }
+  .py-15 {
+    padding-block: calc(var(--spacing) * 15);
+  }
+  .py-16 {
+    padding-block: calc(var(--spacing) * 16);
+  }
+  .py-\[0px\] {
+    padding-block: 0px;
+  }
+  .py-\[4px\] {
+    padding-block: 4px;
+  }
+  .py-\[8px\] {
+    padding-block: 8px;
+  }
+  .py-\[12px\] {
+    padding-block: 12px;
+  }
+  .py-\[16px\] {
+    padding-block: 16px;
+  }
+  .py-\[20px\] {
+    padding-block: 20px;
+  }
+  .py-\[24px\] {
+    padding-block: 24px;
+  }
+  .py-\[28px\] {
+    padding-block: 28px;
+  }
+  .py-\[32px\] {
+    padding-block: 32px;
+  }
+  .py-\[36px\] {
+    padding-block: 36px;
+  }
+  .py-\[40px\] {
+    padding-block: 40px;
+  }
+  .pt-0 {
+    padding-top: calc(var(--spacing) * 0);
+  }
+  .pt-1 {
+    padding-top: calc(var(--spacing) * 1);
+  }
+  .pt-2 {
+    padding-top: calc(var(--spacing) * 2);
+  }
+  .pt-3 {
+    padding-top: calc(var(--spacing) * 3);
+  }
+  .pt-4 {
+    padding-top: calc(var(--spacing) * 4);
+  }
+  .pt-5 {
+    padding-top: calc(var(--spacing) * 5);
+  }
+  .pt-6 {
+    padding-top: calc(var(--spacing) * 6);
+  }
+  .pt-7 {
+    padding-top: calc(var(--spacing) * 7);
+  }
+  .pt-8 {
+    padding-top: calc(var(--spacing) * 8);
+  }
+  .pt-9 {
+    padding-top: calc(var(--spacing) * 9);
+  }
+  .pt-10 {
+    padding-top: calc(var(--spacing) * 10);
+  }
+  .pt-11 {
+    padding-top: calc(var(--spacing) * 11);
+  }
+  .pt-12 {
+    padding-top: calc(var(--spacing) * 12);
+  }
+  .pt-13 {
+    padding-top: calc(var(--spacing) * 13);
+  }
+  .pt-14 {
+    padding-top: calc(var(--spacing) * 14);
+  }
+  .pt-15 {
+    padding-top: calc(var(--spacing) * 15);
+  }
+  .pt-16 {
+    padding-top: calc(var(--spacing) * 16);
+  }
+  .pt-\[0px\] {
+    padding-top: 0px;
+  }
+  .pt-\[4px\] {
+    padding-top: 4px;
+  }
+  .pt-\[8px\] {
+    padding-top: 8px;
+  }
+  .pt-\[12px\] {
+    padding-top: 12px;
+  }
+  .pt-\[16px\] {
+    padding-top: 16px;
+  }
+  .pt-\[20px\] {
+    padding-top: 20px;
+  }
+  .pt-\[24px\] {
+    padding-top: 24px;
+  }
+  .pt-\[28px\] {
+    padding-top: 28px;
+  }
+  .pt-\[32px\] {
+    padding-top: 32px;
+  }
+  .pt-\[36px\] {
+    padding-top: 36px;
+  }
+  .pt-\[40px\] {
+    padding-top: 40px;
+  }
+  .pr-0 {
+    padding-right: calc(var(--spacing) * 0);
+  }
+  .pr-1 {
+    padding-right: calc(var(--spacing) * 1);
+  }
+  .pr-2 {
+    padding-right: calc(var(--spacing) * 2);
+  }
+  .pr-3 {
+    padding-right: calc(var(--spacing) * 3);
+  }
+  .pr-4 {
+    padding-right: calc(var(--spacing) * 4);
+  }
+  .pr-5 {
+    padding-right: calc(var(--spacing) * 5);
+  }
+  .pr-6 {
+    padding-right: calc(var(--spacing) * 6);
+  }
+  .pr-7 {
+    padding-right: calc(var(--spacing) * 7);
+  }
+  .pr-8 {
+    padding-right: calc(var(--spacing) * 8);
+  }
+  .pr-9 {
+    padding-right: calc(var(--spacing) * 9);
+  }
+  .pr-10 {
+    padding-right: calc(var(--spacing) * 10);
+  }
+  .pr-11 {
+    padding-right: calc(var(--spacing) * 11);
+  }
+  .pr-12 {
+    padding-right: calc(var(--spacing) * 12);
+  }
+  .pr-13 {
+    padding-right: calc(var(--spacing) * 13);
+  }
+  .pr-14 {
+    padding-right: calc(var(--spacing) * 14);
+  }
+  .pr-15 {
+    padding-right: calc(var(--spacing) * 15);
+  }
+  .pr-16 {
+    padding-right: calc(var(--spacing) * 16);
+  }
+  .pb-0 {
+    padding-bottom: calc(var(--spacing) * 0);
+  }
+  .pb-1 {
+    padding-bottom: calc(var(--spacing) * 1);
+  }
+  .pb-2 {
+    padding-bottom: calc(var(--spacing) * 2);
+  }
+  .pb-3 {
+    padding-bottom: calc(var(--spacing) * 3);
+  }
+  .pb-4 {
+    padding-bottom: calc(var(--spacing) * 4);
+  }
+  .pb-5 {
+    padding-bottom: calc(var(--spacing) * 5);
+  }
+  .pb-6 {
+    padding-bottom: calc(var(--spacing) * 6);
+  }
+  .pb-7 {
+    padding-bottom: calc(var(--spacing) * 7);
+  }
+  .pb-8 {
+    padding-bottom: calc(var(--spacing) * 8);
+  }
+  .pb-9 {
+    padding-bottom: calc(var(--spacing) * 9);
+  }
+  .pb-10 {
+    padding-bottom: calc(var(--spacing) * 10);
+  }
+  .pb-11 {
+    padding-bottom: calc(var(--spacing) * 11);
+  }
+  .pb-12 {
+    padding-bottom: calc(var(--spacing) * 12);
+  }
+  .pb-13 {
+    padding-bottom: calc(var(--spacing) * 13);
+  }
+  .pb-14 {
+    padding-bottom: calc(var(--spacing) * 14);
+  }
+  .pb-15 {
+    padding-bottom: calc(var(--spacing) * 15);
+  }
+  .pb-16 {
+    padding-bottom: calc(var(--spacing) * 16);
+  }
+  .pb-\[0px\] {
+    padding-bottom: 0px;
+  }
+  .pb-\[4px\] {
+    padding-bottom: 4px;
+  }
+  .pb-\[8px\] {
+    padding-bottom: 8px;
+  }
+  .pb-\[12px\] {
+    padding-bottom: 12px;
+  }
+  .pb-\[16px\] {
+    padding-bottom: 16px;
+  }
+  .pb-\[20px\] {
+    padding-bottom: 20px;
+  }
+  .pb-\[24px\] {
+    padding-bottom: 24px;
+  }
+  .pb-\[28px\] {
+    padding-bottom: 28px;
+  }
+  .pb-\[32px\] {
+    padding-bottom: 32px;
+  }
+  .pb-\[36px\] {
+    padding-bottom: 36px;
+  }
+  .pb-\[40px\] {
+    padding-bottom: 40px;
+  }
+  .pl-0 {
+    padding-left: calc(var(--spacing) * 0);
+  }
+  .pl-1 {
+    padding-left: calc(var(--spacing) * 1);
+  }
+  .pl-2 {
+    padding-left: calc(var(--spacing) * 2);
+  }
+  .pl-3 {
+    padding-left: calc(var(--spacing) * 3);
+  }
+  .pl-4 {
+    padding-left: calc(var(--spacing) * 4);
+  }
+  .pl-5 {
+    padding-left: calc(var(--spacing) * 5);
+  }
+  .pl-6 {
+    padding-left: calc(var(--spacing) * 6);
+  }
+  .pl-7 {
+    padding-left: calc(var(--spacing) * 7);
+  }
+  .pl-8 {
+    padding-left: calc(var(--spacing) * 8);
+  }
+  .pl-9 {
+    padding-left: calc(var(--spacing) * 9);
+  }
+  .pl-10 {
+    padding-left: calc(var(--spacing) * 10);
+  }
+  .pl-11 {
+    padding-left: calc(var(--spacing) * 11);
+  }
+  .pl-12 {
+    padding-left: calc(var(--spacing) * 12);
+  }
+  .pl-13 {
+    padding-left: calc(var(--spacing) * 13);
+  }
+  .pl-14 {
+    padding-left: calc(var(--spacing) * 14);
+  }
+  .pl-15 {
+    padding-left: calc(var(--spacing) * 15);
+  }
+  .pl-16 {
+    padding-left: calc(var(--spacing) * 16);
+  }
+  .text-center {
+    text-align: center;
+  }
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+  .text-2xl {
+    font-size: var(--text-2xl);
+    line-height: var(--tw-leading, var(--text-2xl--line-height));
+  }
+  .text-base {
+    font-size: var(--text-base);
+    line-height: var(--tw-leading, var(--text-base--line-height));
+  }
+  .text-lg {
+    font-size: var(--text-lg);
+    line-height: var(--tw-leading, var(--text-lg--line-height));
+  }
+  .text-sm {
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+  }
+  .text-xs {
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
+  }
+  .text-\[10px\] {
+    font-size: 10px;
+  }
+  .font-black {
+    --tw-font-weight: var(--font-weight-black);
+    font-weight: var(--font-weight-black);
+  }
+  .font-bold {
+    --tw-font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-bold);
+  }
+  .font-extrabold {
+    --tw-font-weight: var(--font-weight-extrabold);
+    font-weight: var(--font-weight-extrabold);
+  }
+  .tracking-widest {
+    --tw-tracking: var(--tracking-widest);
+    letter-spacing: var(--tracking-widest);
+  }
+  .text-\[\#3268c7\] {
+    color: #3268c7;
+  }
+  .text-\[\#4776bb\] {
+    color: #4776bb;
+  }
+  .text-blue-700 {
+    color: var(--color-blue-700);
+  }
+  .text-blue-800 {
+    color: var(--color-blue-800);
+  }
+  .text-emerald-700 {
+    color: var(--color-emerald-700);
+  }
+  .text-emerald-800 {
+    color: var(--color-emerald-800);
+  }
+  .text-slate-400 {
+    color: var(--color-slate-400);
+  }
+  .text-slate-500 {
+    color: var(--color-slate-500);
+  }
+  .text-slate-600 {
+    color: var(--color-slate-600);
+  }
+  .text-slate-800 {
+    color: var(--color-slate-800);
+  }
+  .text-white {
+    color: var(--color-white);
+  }
+  .shadow-sm {
+    --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .sm\:grid-cols-2 {
+    @media (width >= 40rem) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .sm\:grid-cols-3 {
+    @media (width >= 40rem) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .md\:col-span-1 {
+    @media (width >= 48rem) {
+      grid-column: span 1 / span 1;
+    }
+  }
+  .md\:col-span-2 {
+    @media (width >= 48rem) {
+      grid-column: span 2 / span 2;
+    }
+  }
+  .md\:col-span-3 {
+    @media (width >= 48rem) {
+      grid-column: span 3 / span 3;
+    }
+  }
+  .md\:col-span-4 {
+    @media (width >= 48rem) {
+      grid-column: span 4 / span 4;
+    }
+  }
+  .md\:w-1\/4 {
+    @media (width >= 48rem) {
+      width: calc(1/4 * 100%);
+    }
+  }
+  .md\:grid-cols-1 {
+    @media (width >= 48rem) {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+  }
+  .md\:grid-cols-2 {
+    @media (width >= 48rem) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .md\:grid-cols-3 {
+    @media (width >= 48rem) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .md\:grid-cols-4 {
+    @media (width >= 48rem) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .md\:flex-row {
+    @media (width >= 48rem) {
+      flex-direction: row;
+    }
+  }
+  .lg\:grid-cols-2 {
+    @media (width >= 64rem) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .lg\:grid-cols-4 {
+    @media (width >= 64rem) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+}
+@property --tw-space-y-reverse {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-space-x-reverse {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-border-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
+@property --tw-gradient-position {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-gradient-from {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #0000;
+}
+@property --tw-gradient-via {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #0000;
+}
+@property --tw-gradient-to {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #0000;
+}
+@property --tw-gradient-stops {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-gradient-via-stops {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-gradient-from-position {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+@property --tw-gradient-via-position {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 50%;
+}
+@property --tw-gradient-to-position {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-font-weight {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-tracking {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-inset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-ring-inset {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-offset-width {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --tw-ring-offset-color {
+  syntax: "*";
+  inherits: false;
+  initial-value: #fff;
+}
+@property --tw-ring-offset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@layer properties {
+  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
+    *, ::before, ::after, ::backdrop {
+      --tw-space-y-reverse: 0;
+      --tw-space-x-reverse: 0;
+      --tw-border-style: solid;
+      --tw-gradient-position: initial;
+      --tw-gradient-from: #0000;
+      --tw-gradient-via: #0000;
+      --tw-gradient-to: #0000;
+      --tw-gradient-stops: initial;
+      --tw-gradient-via-stops: initial;
+      --tw-gradient-from-position: 0%;
+      --tw-gradient-via-position: 50%;
+      --tw-gradient-to-position: 100%;
+      --tw-font-weight: initial;
+      --tw-tracking: initial;
+      --tw-shadow: 0 0 #0000;
+      --tw-shadow-color: initial;
+      --tw-shadow-alpha: 100%;
+      --tw-inset-shadow: 0 0 #0000;
+      --tw-inset-shadow-color: initial;
+      --tw-inset-shadow-alpha: 100%;
+      --tw-ring-color: initial;
+      --tw-ring-shadow: 0 0 #0000;
+      --tw-inset-ring-color: initial;
+      --tw-inset-ring-shadow: 0 0 #0000;
+      --tw-ring-inset: initial;
+      --tw-ring-offset-width: 0px;
+      --tw-ring-offset-color: #fff;
+      --tw-ring-offset-shadow: 0 0 #0000;
+    }
+  }
+}
+
+</style>
+</head>
+<body>
+<div id="tailwindClassBank" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none" class="p-0 p-1 p-2 p-3 p-4 p-5 p-6 p-7 p-8 p-9 p-10 p-11 p-12 p-13 p-14 p-15 p-16 m-0 m-1 m-2 m-3 m-4 m-5 m-6 m-7 m-8 m-9 m-10 m-11 m-12 m-13 m-14 m-15 m-16 mt-0 mt-1 mt-2 mt-3 mt-4 mt-5 mt-6 mt-7 mt-8 mt-9 mt-10 mt-11 mt-12 mt-13 mt-14 mt-15 mt-16 mb-0 mb-1 mb-2 mb-3 mb-4 mb-5 mb-6 mb-7 mb-8 mb-9 mb-10 mb-11 mb-12 mb-13 mb-14 mb-15 mb-16 ml-0 ml-1 ml-2 ml-3 ml-4 ml-5 ml-6 ml-7 ml-8 ml-9 ml-10 ml-11 ml-12 ml-13 ml-14 ml-15 ml-16 mr-0 mr-1 mr-2 mr-3 mr-4 mr-5 mr-6 mr-7 mr-8 mr-9 mr-10 mr-11 mr-12 mr-13 mr-14 mr-15 mr-16 px-0 px-1 px-2 px-3 px-4 px-5 px-6 px-7 px-8 px-9 px-10 px-11 px-12 px-13 px-14 px-15 px-16 py-0 py-1 py-2 py-3 py-4 py-5 py-6 py-7 py-8 py-9 py-10 py-11 py-12 py-13 py-14 py-15 py-16 pt-0 pt-1 pt-2 pt-3 pt-4 pt-5 pt-6 pt-7 pt-8 pt-9 pt-10 pt-11 pt-12 pt-13 pt-14 pt-15 pt-16 pb-0 pb-1 pb-2 pb-3 pb-4 pb-5 pb-6 pb-7 pb-8 pb-9 pb-10 pb-11 pb-12 pb-13 pb-14 pb-15 pb-16 pl-0 pl-1 pl-2 pl-3 pl-4 pl-5 pl-6 pl-7 pl-8 pl-9 pl-10 pl-11 pl-12 pl-13 pl-14 pl-15 pl-16 pr-0 pr-1 pr-2 pr-3 pr-4 pr-5 pr-6 pr-7 pr-8 pr-9 pr-10 pr-11 pr-12 pr-13 pr-14 pr-15 pr-16 gap-0 gap-1 gap-2 gap-3 gap-4 gap-5 gap-6 gap-7 gap-8 gap-9 gap-10 gap-11 gap-12 gap-13 gap-14 gap-15 gap-16 space-x-0 space-x-1 space-x-2 space-x-3 space-x-4 space-x-5 space-x-6 space-x-7 space-x-8 space-x-9 space-x-10 space-x-11 space-x-12 space-x-13 space-x-14 space-x-15 space-x-16 space-y-0 space-y-1 space-y-2 space-y-3 space-y-4 space-y-5 space-y-6 space-y-7 space-y-8 space-y-9 space-y-10 space-y-11 space-y-12 space-y-13 space-y-14 space-y-15 space-y-16 -mt-0 -mt-1 -mt-2 -mt-3 -mt-4 -mt-5 -mt-6 -mt-7 -mt-8 -mt-9 -mt-10 -mt-11 -mt-12 -mt-13 -mt-14 -mt-15 -mt-16 -mt-17 -mt-18 -mt-19 -mt-20 grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4 lg:grid-cols-2 lg:grid-cols-4 sm:grid-cols-2 min-h-[48px] w-24 grid-rows-1 grid-rows-2 grid-rows-3 auto-rows-auto auto-rows-min auto-rows-max auto-rows-fr grid-flow-row grid-flow-col grid-flow-row-dense grid-flow-col-dense col-start-1 col-start-2 col-start-3 row-span-1 row-span-2 row-span-3 order-first order-last order-0 order-1 order-2 order-3 self-auto self-start self-center self-end self-stretch items-baseline items-stretch content-stretch justify-around justify-evenly inline-flex flex-row-reverse flex-col-reverse md:grid-cols-1 md:grid-cols-2 md:grid-cols-3 md:grid-cols-4 col-span-1 col-span-2 col-span-3 col-span-4 md:col-span-1 md:col-span-2 md:col-span-3 md:col-span-4 flex flex-row flex-col flex-wrap flex-nowrap grid block hidden items-start items-center items-end items-stretch justify-start justify-center justify-end justify-between flex-1 flex-none w-full w-1/2 w-64 w-5/6 w-4/6 w-1/3 w-2/3 max-w-none max-w-sm max-w-md max-w-lg mx-auto min-h-[40px] min-h-[80px] min-h-[120px] min-h-[160px] min-h-[200px] min-h-[240px] min-h-[300px] p-[0px] p-[1px] p-[18px] mt-[0px] mt-[48px] sm:grid-cols-2 p-[0px] p-[1px] p-[2px] p-[3px] p-[4px] p-[5px] p-[6px] p-[7px] p-[8px] p-[9px] p-[10px] p-[11px] p-[12px] p-[13px] p-[14px] p-[15px] p-[16px] p-[17px] p-[18px] p-[19px] p-[20px] p-[21px] p-[22px] p-[23px] p-[24px] p-[25px] p-[26px] p-[27px] p-[28px] p-[29px] p-[30px] p-[31px] p-[32px] p-[33px] p-[34px] p-[35px] p-[36px] p-[37px] p-[38px] p-[39px] p-[40px] p-[41px] p-[42px] p-[43px] p-[44px] p-[45px] p-[46px] p-[47px] p-[48px] mt-[0px] mt-[1px] mt-[2px] mt-[3px] mt-[4px] mt-[5px] mt-[6px] mt-[7px] mt-[8px] mt-[9px] mt-[10px] mt-[11px] mt-[12px] mt-[13px] mt-[14px] mt-[15px] mt-[16px] mt-[17px] mt-[18px] mt-[19px] mt-[20px] mt-[21px] mt-[22px] mt-[23px] mt-[24px] mt-[25px] mt-[26px] mt-[27px] mt-[28px] mt-[29px] mt-[30px] mt-[31px] mt-[32px] mt-[33px] mt-[34px] mt-[35px] mt-[36px] mt-[37px] mt-[38px] mt-[39px] mt-[40px] mt-[41px] mt-[42px] mt-[43px] mt-[44px] mt-[45px] mt-[46px] mt-[47px] mt-[48px] min-h-[40px] min-h-[60px] min-h-[80px] min-h-[100px] min-h-[120px] min-h-[140px] min-h-[160px] min-h-[180px] min-h-[200px] min-h-[220px] min-h-[240px] min-h-[260px] min-h-[280px] min-h-[300px] p-[0px] p-[4px] p-[8px] p-[12px] p-[16px] p-[20px] p-[24px] p-[28px] p-[32px] p-[36px] p-[40px] px-[0px] px-[4px] px-[8px] px-[12px] px-[16px] px-[20px] px-[24px] px-[28px] px-[32px] px-[36px] px-[40px] py-[0px] py-[4px] py-[8px] py-[12px] py-[16px] py-[20px] py-[24px] py-[28px] py-[32px] py-[36px] py-[40px] pt-[0px] pt-[4px] pt-[8px] pt-[12px] pt-[16px] pt-[20px] pt-[24px] pt-[28px] pt-[32px] pt-[36px] pt-[40px] pb-[0px] pb-[4px] pb-[8px] pb-[12px] pb-[16px] pb-[20px] pb-[24px] pb-[28px] pb-[32px] pb-[36px] pb-[40px] m-0 m-1 m-2 m-3 m-4 m-5 m-6 -mt-0 -mt-1 -mt-2 -mt-3 -mt-4 -mt-5 -mt-6 grow-0 text-[10px] text-emerald-700 bg-emerald-700 md:grid-cols-2 md:grid-cols-3 md:grid-cols-4 justify-around justify-evenly items-baseline content-start content-center content-end content-between content-around content-evenly content-stretch flex-wrap-reverse grow shrink shrink-0 basis-1/4 basis-1/3 basis-1/2 basis-auto basis-0 flex-none w-5/12 w-1/4 max-w-[390px] max-w-[220px] h-[150px] h-[190px] w-[42%] md:grid-cols-4 md:grid-cols-3 md:grid-cols-2 md:flex-row md:w-1/4 md:col-span-1 md:col-span-2 md:col-span-3 sm:grid-cols-3 sm:grid-cols-2 space-x-0 space-x-1 space-x-2 space-x-3 space-x-4 space-x-5 space-x-6 space-x-7 space-x-8 space-x-9 space-x-10"></div>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="brand-mark">TW</div><div><div class="eyebrow">Interactive Curriculum</div><h1>Tailwind Mastery Lab</h1></div></div>
+    <div class="status">Spacing · Flexbox · Grid</div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="side-label">Curriculum</div>
+      <nav class="lesson-nav" id="lessonNav"></nav>
+    </aside>
+    <main class="main">
+      <section class="panel lesson-head">
+        <div class="lesson-badge" id="badge">LESSON 01</div>
+        <h2 id="lessonTitle">Lesson Title</h2>
+        <div id="lessonTheory" class="theory"></div>
+      </section>
+      
+      <div class="work-grid">
+        <section class="panel">
+          <div class="panel-head"><div><h3>Interactive Controls</h3><div class="sub">Controls generate real Tailwind utility classes.</div></div><span class="tag">LIVE</span></div>
+          <div class="controls" id="controls"></div>
+          <div style="margin-top:14px">
+            <div class="panel-head" style="margin-bottom:9px"><div><h3>Real UI Preview</h3><div class="sub">Rendered from the complete Tailwind classes shown in the editor below.</div></div><span class="tag">PREVIEW</span></div>
+            <div class="preview-stage" id="previewStage"></div>
+          </div>
+        </section>
+        
+        <section class="panel">
+          <div class="panel-head"><div><h3>Box Model Breakdown</h3><div class="sub">Visualizing the applied utilities.</div></div><span class="tag">MODEL</span></div>
+          <div class="diagram-wrap">
+            <div class="diagram">
+              <div class="margin-box" id="marginBox">
+                <span class="margin-label" id="marginLabel">margin · m-0</span>
+                <div class="border-box" id="borderBox">
+                  <div class="border-label" id="borderLabel">padding · p-0</div>
+                  <div class="content-box" id="contentBox">Content</div>
+                </div>
+              </div>
+            </div>
+            <div class="diagram-key">
+              <span class="key"><i class="swatch" style="background:#f8dca7"></i>Margin (transparent)</span>
+              <span class="key"><i class="swatch" style="background:#b9d6ff"></i>Padding (takes bg)</span>
+              <span class="key"><i class="swatch" style="background:#c9efd9"></i>Content</span>
+            </div>
+          </div>
+        </section>
+      </div>
+      
+      <section class="panel code-panel">
+        <div class="code-toolbar">
+          <div><h3>Live Editor</h3><div class="sub">Type in this editor. The preview above updates instantly.</div></div>
+          <button id="resetCode">Reset to Slider Values</button>
+        </div>
+        <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+      </section>
+      
+      <div class="lesson-bottom">
+        <div class="takeaway" id="takeaway"></div>
+        <button id="nextLesson">Next lesson →</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const lessons = [
+ {title:"Padding vs Margin",badge:"01 · SPACING FOUNDATIONS",theory:`<p>Both utilities create space, but they act on different parts of the box model.</p><ul><li><code>p-*</code> adds space <strong>inside</strong> the border, between content and border. The background paints behind padding.</li><li><code>m-*</code> adds space <strong>outside</strong> the border, separating this box from neighbours. Margin is transparent.</li></ul><div class="callout success"><strong>Explore:</strong> increase padding and watch the coloured area expand inside the border. Increase margin and watch the whole inner box move away from the card edge.</div><p>Think about which element should own the space. If a button needs a larger clickable area, use padding on the button. If two cards need separation, use gap on their parent or margin between the cards.</p>`,takeaway:"Padding belongs to the element that needs internal breathing room; margin separates an element from its surroundings.",controls:["padding","margin","cardMargin"],kind:"box",component:"blog"},
+ {title:"The Spacing Scale",badge:"02 · SPACING SCALE",theory:`<p>Tailwind's default spacing scale is based on <code>rem</code>. In the usual browser setup, one scale unit is 0.25rem or 4px.</p><ul><li><code>1</code> = 4px · <code>2</code> = 8px · <code>3</code> = 12px</li><li><code>4</code> = 16px · <code>6</code> = 24px · <code>8</code> = 32px</li></ul><p>The suffix is a scale key, not a literal pixel count: <code>p-4</code> means 1rem, not 4px. The same scale is shared by padding, margin, gap, and many sizing utilities.</p><div class="callout">Prefer consistent scale values across related components. Reach for arbitrary values only when a real design constraint cannot be expressed cleanly with the scale.</div>`,takeaway:"Tailwind's spacing suffix maps to a design token. Remember: p-4 is normally 16px, not 4px.",controls:["scale","margin"],kind:"scale",component:"blog"},
+ {title:"Directional Spacing",badge:"03 · SPACING",theory:`<p>Use axis and side prefixes when equal spacing on every side is not what the design needs.</p><ul><li><code>px-*</code> left and right; <code>py-*</code> top and bottom.</li><li><code>pt-*</code>, <code>pr-*</code>, <code>pb-*</code>, <code>pl-*</code> target one side.</li><li>The same directional pattern exists for margin: <code>mx-*</code>, <code>my-*</code>, <code>mt-*</code>, and so on.</li></ul><p>Directional utilities are useful for a card with generous horizontal padding but compact vertical padding, or for adding space above a heading without changing its other sides.</p><div class="callout warning"><strong>Class conflicts:</strong> avoid stacking contradictory utilities and assuming the last class in the HTML string wins. CSS generation order determines the winner. Prefer one clear utility for each side/axis, or inspect the compiled CSS when debugging.</div>`,takeaway:"Choose all-sides, axis, or single-side utilities according to the space you actually need.",controls:["padding","margin","direction","directionMargin"],kind:"direction",component:"form"},
+ {title:"Sizing & Constraints",badge:"04 · SIZING",theory:`<p>Spacing does not determine the size of a box. Width and height utilities set dimensions; constraints limit how far an element may grow or shrink.</p><ul><li><code>w-full</code> fills the available parent width.</li><li><code>max-w-md</code> caps the width even when <code>w-full</code> is applied.</li><li><code>min-h-*</code> sets a minimum height; content can make the box taller.</li></ul><p>Tailwind Preflight applies <code>box-sizing: border-box</code>. Padding and border are included within the declared width, rather than added outside it.</p>`,takeaway:"Use width for the intended size, max-width to prevent over-expansion, and min-height when content needs room but may grow.",controls:["width","maxWidth","minHeight","padding"],kind:"sizing",component:"article"},
+ {title:"Centering & Auto Margins",badge:"05 · SPACING",theory:`<p><code>mx-auto</code> sets the left and right margins to auto. For a block with a constrained width, the browser divides the leftover horizontal space equally.</p><p>It does not magically center every child inside every parent. The element needs available free space and a width smaller than its containing block. For alignment of children inside a flex or grid container, use the relevant layout alignment utilities instead.</p><div class="callout">Compare <code>w-full</code> with <code>max-w-md mx-auto</code>: the first fills the parent; the second is capped and centered.</div>`,takeaway:"Use mx-auto to center a width-constrained block; use Flexbox or Grid alignment to position children inside a layout container.",controls:["width","centering","innerCentering","padding"],kind:"center",component:"blog"},
+ {title:"Flexbox 1 — Activate Flex & Choose Direction",badge:"06 · FLEXBOX · FOUNDATIONS",part:"activate",theory:`<p>Flexbox is a <strong>one-dimensional layout model</strong>. It arranges a container's direct children along one main axis. Before any alignment utility can work, the parent must become a flex container.</p><div class="callout success"><strong>Essential distinction:</strong> <code>flex</code> changes <em>display</em>. <code>flex-row</code> and <code>flex-col</code> change <em>direction</em>. Direction utilities do not activate Flexbox by themselves.</div><p>Only direct children become flex items. Grandchildren are not flex items of the outer container unless their own parent is also made a flex container.</p><p>Default direction is row. <code>flex-row</code> places items along the inline axis; <code>flex-col</code> stacks them along the block axis. Reverse variants reverse visual order without changing the underlying source order.</p>`,takeaway:"Put `flex` on the parent first. Then choose row or column; child elements become flex items.",controls:[],kind:"flexcourse",component:"flexcourse"},
+ {title:"Flexbox 2 — Main Axis & Justify",badge:"07 · FLEXBOX · MAIN AXIS",part:"justify",theory:`<p>The <strong>main axis</strong> follows the flex direction. In a row it runs horizontally; in a column it runs vertically. <code>justify-*</code> distributes free space along this main axis.</p><ul><li><code>justify-start</code>: pack items at the start.</li><li><code>justify-center</code> / <code>justify-end</code>: center or pack at the end.</li><li><code>justify-between</code>: put the first and last items at opposite edges, distributing remaining space between them.</li><li><code>justify-around</code> / <code>justify-evenly</code>: distribute space around or evenly.</li></ul><p>These utilities need free space to distribute. If items already fill the main axis, the differences may be difficult to see. Changing <code>flex-row</code> to <code>flex-col</code> rotates the axis, so justify is no longer necessarily horizontal.</p>`,takeaway:"Justify controls the main axis, not always the horizontal axis. The direction decides which axis is main.",controls:[],kind:"flexcourse",component:"flexcourse"},
+ {title:"Flexbox 3 — Cross Axis & Align Items",badge:"08 · FLEXBOX · CROSS AXIS",part:"align",theory:`<p>The <strong>cross axis</strong> is perpendicular to the main axis. <code>items-*</code> aligns flex items across that axis.</p><ul><li><code>items-start</code>, <code>items-center</code>, <code>items-end</code> align items at the cross-start, center, or cross-end.</li><li><code>items-stretch</code> stretches items to fill the cross axis when their cross size is auto.</li><li><code>items-baseline</code> aligns text baselines.</li></ul><p>Try changing the direction while keeping the same <code>items-center</code> class. The alignment direction changes because the cross axis rotates.</p><p>Individual children can override the parent with <code>self-start</code>, <code>self-center</code>, <code>self-end</code>, <code>self-stretch</code>, or <code>self-auto</code>.</p>`,takeaway:"Items aligns all flex children on the cross axis; self-* overrides alignment for one child.",controls:[],kind:"flexcourse",component:"flexcourse"},
+ {title:"Flexbox 4 — Wrapping & Multiple Lines",badge:"09 · FLEXBOX · WRAPPING",part:"wrap",theory:`<p>By default, flex items try to remain on one line: <code>flex-nowrap</code>. If they cannot fit, they may shrink. <code>flex-wrap</code> allows items to move onto additional lines; <code>flex-wrap-reverse</code> reverses the cross-axis line stacking order.</p><p>Each line behaves like its own main-axis layout. <code>content-*</code> distributes the <strong>lines</strong> along the cross axis when there is extra cross-axis space. It does not align individual items within a line.</p><div class="callout warning"><strong>Important:</strong> <code>content-between</code> is hard to see without wrapping and a container with extra height (or width in a column). If there is only one line, align-content has no useful distribution to perform.</div>`,takeaway:"Wrap controls whether extra lines are created. Content alignment distributes those lines when the container has spare cross-axis space.",controls:[],kind:"flexcourse",component:"flexcourse"},
+ {title:"Flexbox 5 — Flex Grow, Shrink & Basis",badge:"10 · FLEXBOX · ITEM SIZING",part:"sizing",theory:`<p>Flex container utilities control the group; these utilities control <strong>individual flex items</strong>.</p><ul><li><code>basis-*</code> sets the starting main size before free space is distributed.</li><li><code>grow</code> (or <code>grow-0</code>) controls whether an item receives positive free space.</li><li><code>shrink</code> (or <code>shrink-0</code>) controls whether an item gives up space when the line is too small.</li><li><code>flex-1</code> is a shorthand for a flexible item that can grow and shrink from a zero basis.</li><li><code>flex-none</code> prevents both growing and shrinking.</li></ul><p>Flex sizing is calculated across the line. A basis is not always the final rendered size: grow and shrink calculations can change it.</p>`,takeaway:"Basis is the starting size; grow shares positive free space; shrink handles negative free space. These classes belong on the children.",controls:[],kind:"flexcourse",component:"flexcourse"},
+ {title:"Flexbox 6 — Order, Self Alignment & Practical Patterns",badge:"11 · FLEXBOX · COMPOSITION",part:"patterns",theory:`<p>Flexbox also provides child-level controls for visual order and individual alignment.</p><ul><li><code>order-*</code> changes an item's visual position within the flex layout.</li><li><code>self-*</code> overrides the parent's <code>items-*</code> alignment for one item.</li><li><code>ml-auto</code> or <code>mt-auto</code> can absorb free space and push one item away from its siblings, depending on the main axis.</li></ul><p>These utilities are useful for navigation bars, action groups, card footers, and responsive rearrangement. Be careful: visual order does not change the document's reading or keyboard order. Do not use it to create a confusing experience for keyboard or screen-reader users.</p><div class="callout success"><strong>Pattern to remember:</strong> use Flexbox for alignment and distribution within a row or column; use Grid when you need deliberate two-dimensional tracks.</div>`,takeaway:"Order and self-* are child utilities. Visual reordering should not contradict the meaningful DOM and keyboard order.",controls:[],kind:"flexcourse",component:"flexcourse"},
+ {title:"Grid 1 — Grid Container, Columns & Rows",badge:"12 · GRID · FOUNDATIONS",part:"gridbase",theory:`<p>CSS Grid is a <strong>two-dimensional layout system</strong>: it controls columns and rows together. Activate it on the parent with <code>grid</code>.</p><ul><li><code>grid-cols-*</code> defines the explicit column tracks.</li><li><code>grid-rows-*</code> defines explicit row tracks.</li><li><code>auto-rows-*</code> controls the size of rows created implicitly.</li></ul><p>Grid items are placed into cells by the auto-placement algorithm unless you position them. Unlike Flexbox, a grid can align items in both dimensions at once. Tailwind's numbered tracks are commonly equal fractions of the available space.</p>`,takeaway:"Activate Grid on the parent, then define column and row tracks. Grid manages both dimensions together.",controls:[],kind:"gridcourse",component:"gridcourse"},
+ {title:"Grid 2 — Gaps, Track Sizing & Auto Rows",badge:"13 · GRID · TRACKS",part:"gridtracks",theory:`<p>Grid creates tracks; gaps sit between those tracks. <code>gap-*</code> sets both row and column gaps, while <code>gap-x-*</code> and <code>gap-y-*</code> control them independently.</p><p>Track sizing is not limited to equal columns. CSS Grid supports fixed sizes, percentages, fractions, min/max constraints and intrinsic sizing. Tailwind exposes common patterns such as <code>grid-cols-3</code>, <code>grid-cols-[...]</code>, and <code>auto-rows-fr</code>.</p><p>Implicit tracks are created when there are more items than explicit cells. Utilities such as <code>auto-rows-min</code>, <code>auto-rows-max</code>, and <code>auto-rows-fr</code> influence those automatically created rows.</p>`,takeaway:"Gaps separate tracks, not items by applying margins. Explicit tracks define the grid; implicit tracks appear as needed.",controls:[],kind:"gridcourse",component:"gridcourse"},
+ {title:"Grid 3 — Column & Row Spanning",badge:"14 · GRID · SPANNING",part:"gridspan",theory:`<p>Grid items can occupy more than one cell. <code>col-span-*</code> spans columns; <code>row-span-*</code> spans rows.</p><p>Spanning is useful for dashboard cards, editorial layouts and asymmetric galleries. A span does not create more tracks: it asks an item to occupy multiple existing tracks. If the requested placement cannot fit, the auto-placement algorithm may move items or create implicit tracks.</p><p>Use the parent to define the grid and the child to define its span. This parent/child distinction is central to Grid, just as it is in Flexbox.</p>`,takeaway:"Define tracks on the parent; apply col-span and row-span to the child that should occupy multiple tracks.",controls:[],kind:"gridcourse",component:"gridcourse"},
+ {title:"Grid 4 — Placement, Flow & Dense Packing",badge:"15 · GRID · PLACEMENT",part:"gridflow",theory:`<p>Grid's auto-placement algorithm places items in source order by default. <code>grid-flow-row</code> fills rows first; <code>grid-flow-col</code> fills columns first. Dense variants try to backfill earlier holes with later items.</p><ul><li><code>col-start-*</code> and <code>col-end-*</code> position an item on column grid lines.</li><li><code>row-start-*</code> and <code>row-end-*</code> position an item on row grid lines.</li><li><code>col-span-*</code> and <code>row-span-*</code> size an item's placement across tracks.</li></ul><div class="callout warning"><strong>Dense packing caution:</strong> dense flow can make visual order differ from source order. Avoid it when the sequence carries meaning or when predictable keyboard navigation is important.</div>`,takeaway:"Flow determines how auto-placed items fill the grid. Explicit start/end utilities place selected children on grid lines.",controls:[],kind:"gridcourse",component:"gridcourse"},
+ {title:"Grid 5 — Responsive Grid & Real Layout Patterns",badge:"16 · GRID · RESPONSIVE",part:"gridresponsive",theory:`<p>Responsive Grid changes its track definition at breakpoints. For example, <code>grid-cols-1 sm:grid-cols-2 lg:grid-cols-4</code> stacks on small screens, then adds columns as space becomes available.</p><p>Responsive prefixes are mobile-first: an unprefixed utility applies at all sizes until a larger breakpoint overrides it. A class such as <code>md:grid-cols-3</code> does not mean “tablet only”; it applies from that breakpoint upward unless another breakpoint overrides it.</p><p>Use the viewport control to compare narrow and wide layouts. In real projects, choose breakpoints based on when the content needs more room, not simply on device labels.</p>`,takeaway:"Build the small-screen layout first, then add breakpoint-prefixed track changes when the content has room.",controls:[],kind:"gridcourse",component:"gridcourse"},
+ {title:"Grid 6 — Align Items, Place Content & Self",badge:"17 · GRID · ALIGNMENT",part:"gridalign",theory:`<p>Grid alignment has two separate jobs: positioning the items inside their own grid areas, and positioning the tracks inside the grid container when extra space exists.</p><ul><li><code>justify-items-*</code> aligns each item horizontally within its cell; <code>items-*</code> aligns items vertically within their cells.</li><li><code>place-items-*</code> is shorthand for both axes.</li><li><code>justify-self-*</code> and <code>self-*</code> override alignment for an individual grid item.</li><li><code>place-content-*</code> distributes the grid tracks inside the container when the container is larger than the tracks.</li></ul><div class="callout warning"><strong>Do not confuse the two:</strong> <code>items-center</code> aligns the contents of each grid area; <code>content-center</code> moves the grid tracks as a group within the container. Track distribution needs spare container space to be visible.</div>`,takeaway:"Items/place-items align children inside their cells; content/place-content aligns the grid tracks within the container.",controls:[],kind:"gridcourse",component:"gridcourse"},
+ {title:"Gap vs Space-* — Understand the Difference",badge:"18 · SPACING BETWEEN SIBLINGS",theory:`<p><code>gap-*</code> is a native layout spacing mechanism for Flexbox and Grid. It creates gutters between rows and columns without adding space around the outside edges.</p><p><code>space-x-*</code> and <code>space-y-*</code> apply margins to selected direct children. <code>space-x</code> is intended for horizontal sibling spacing; <code>space-y</code> for vertical stacks. Because these are margins, they behave differently with wrapping, reversed directions, nested children and layout order.</p><div class="callout success"><strong>Practical default:</strong> prefer <code>gap-*</code> for modern Flexbox and Grid layouts. Use <code>space-*</code> when you specifically want the margin-based sibling pattern and understand its direction assumptions.</div>`,takeaway:"Gap belongs to the parent and creates gutters between tracks/items. Space-* applies margins to children and has different edge/wrapping behaviour.",controls:["groupDir","groupLayout","groupMethod","groupSpacing"],kind:"group",component:"groupdemo"},
+ {title:"Negative Margin",badge:"19 · OVERLAP",theory:`<p>Negative margin utilities such as <code>-mt-4</code> pull an element toward or across neighbouring content. They change the element's outer spacing and can create intentional overlap.</p><p>A common pattern is an avatar overlapping a cover image. Negative margins are powerful, but they should not conceal an underlying sizing or layout problem. Check the result at narrow widths and with longer content.</p>`,takeaway:"Negative margins pull elements across neighbouring space. Use them deliberately for overlap, not as a patch for broken layout.",controls:["negative","padding","width"],kind:"negative",component:"profile"},
+ {title:"Arbitrary Spacing Values",badge:"20 · CUSTOM VALUES",theory:`<p>When the spacing scale cannot express a genuine design requirement, Tailwind supports arbitrary values in square brackets, such as <code>p-[18px]</code> or <code>mt-[1.125rem]</code>.</p><p>Arbitrary values should remain readable and intentional. If the same value appears repeatedly, consider extending the design tokens in your Tailwind configuration rather than scattering one-off values.</p><div class="callout warning"><strong>Build note:</strong> in compiled Tailwind projects, arbitrary class names must appear as complete static strings in scanned source files. Dynamically constructing fragments can prevent the compiler from generating the class.</div>`,takeaway:"Use arbitrary values for real exceptions. Repeated values belong in a shared design scale or token.",controls:["customPadding","customMargin"],kind:"arbitrary",component:"product"}
+];
+
+const state = {
+  padding:32, margin:32, cardMargin:32, scale:6, direction:"px", directionMargin:"mt",
+  width:"w-full", maxWidth:"max-w-md", minHeight:80, centering:false, innerCentering:false,
+  flexDisplay:"flex", flexDirection:"flex-row", justify:"justify-start", items:"items-center", selfAlign:"self-auto", flexWrap:"flex-nowrap", flexAlignContent:"content-start", flexGrow:true, flexBasis:"basis-1/3", flexShrink:"shrink", flexOrder:"order-0", flexContainerWidth:360, gap:16,
+  gridCols:3, gridRows:2, colSpan:2, rowSpan:1, gridAutoRows:"auto-rows-fr", gridFlow:"grid-flow-row", gridDense:false, gridPlacement:"auto", gridResponsive:"responsive", gridPlaceItems:"place-items-stretch", gridPlaceContent:"place-content-start",
+  groupDir:"flex-row", groupLayout:"flex", groupMethod:"gap", groupSpacing:16,
+  negative:-40, customPadding:18, customMargin:12
+};
+
+let current = 0;
+let typingTimer;
+const $ = id => document.getElementById(id);
+
+/* ---------- Helpers ---------- */
+function getPadClass() {
+  const l = lessons[current];
+  if (l.kind === "scale") return `p-${state.scale}`;
+  if (l.kind === "arbitrary") return `p-[${state.customPadding}px]`;
+  if (l.kind === "direction") return `${state.direction}-${Math.round(state.padding/4)}`;
+  if (l.kind === "capstone") return state.capstonePaddingMode === "arbitrary" ? `${state.capstonePaddingAxis}-[${state.capstoneCardPadding}px]` : `${state.capstonePaddingAxis}-${state.capstoneCardPadding/4}`;
+  return `p-${Math.round(state.padding/4)}`;
+}
+
+function getPadPixels() {
+  const l = lessons[current];
+  let p = state.padding;
+  if (l.kind === "scale") p = Number(state.scale) * 4;
+  if (l.kind === "arbitrary") p = state.customPadding;
+  if (l.kind === "capstone") p = state.capstoneCardPadding;
+  let t=p,r=p,b=p,left=p;
+  if (l.kind === "capstone") {
+    t=r=b=left=0;
+    if (state.capstonePaddingAxis === "p") t=r=b=left=p;
+    else if (state.capstonePaddingAxis === "px") left=r=p;
+    else if (state.capstonePaddingAxis === "py") t=b=p;
+    else if (state.capstonePaddingAxis === "pt") t=p;
+    else if (state.capstonePaddingAxis === "pb") b=p;
+  }
+  if (l.kind === "direction") {
+    t=r=b=left=0;
+    if (state.direction==="px"){left=r=p;}
+    else if (state.direction==="py"){t=b=p;}
+    else if (state.direction==="pt"){t=p;}
+    else if (state.direction==="pr"){r=p;}
+    else if (state.direction==="pb"){b=p;}
+    else if (state.direction==="pl"){left=p;}
+  }
+  return {t,r,b,l:left};
+}
+
+function getMarginClass() {
+  const l = lessons[current];
+  if (l.kind === "center") return state.centering ? "mx-auto" : "m-0";
+  if (l.kind === "negative") return `-mt-${Math.abs(state.negative/4)}`;
+  if (l.kind === "arbitrary") return `mt-[${state.customMargin}px]`;
+  if (l.kind === "direction") {
+    if (state.directionMargin === "mx-auto") return "mx-auto";
+    return `${state.directionMargin}-${Math.round(state.margin/4)}`;
+  }
+  if (l.kind === "capstone") return "m-0";
+  return `m-${Math.round(state.margin/4)}`;
+}
+
+function getMarginPixels() {
+  const l = lessons[current];
+  if (l.kind === "center") return state.centering ? {t:0,r:'auto',b:0,l:'auto'} : {t:0,r:0,b:0,l:0};
+  if (l.kind === "negative") return {t:state.negative, r:0, b:0, l:0};
+  if (l.kind === "arbitrary") return {t:state.customMargin, r:0, b:0, l:0};
+  if (l.kind === "direction") {
+    if (state.directionMargin === "mx-auto") return {t:0,r:'auto',b:0,l:'auto'};
+    let t=0,r=0,b=0,left=0;
+    if (state.directionMargin==="mt"){t=state.margin;}
+    else if (state.directionMargin==="mb"){b=state.margin;}
+    else if (state.directionMargin==="ml"){left=state.margin;}
+    else if (state.directionMargin==="mr"){r=state.margin;}
+    return {t,r,b,l:left};
+  }
+  if (l.kind === "capstone") return {t:0,r:0,b:0,l:0};
+  return {t:state.margin, r:state.margin, b:state.margin, l:state.margin};
+}
+
+/* ---------- HTML Generation ---------- */
+function generateHTML() {
+  const l = lessons[current];
+  const pCls = getPadClass();
+  const mCls = getMarginClass();
+  const wCls = state.width;
+  const maxWCls = state.maxWidth;
+  const minHCls = `min-h-[${state.minHeight}px]`;
+
+  if (l.component === "blog") {
+    // FIXED: properly applies pCls for all kinds, not just 'box'
+    const innerBg = (l.kind === "box" && state.margin > 0) ? 'bg-slate-100' : '';
+    const inner = `<div class="${pCls} ${innerBg} rounded-lg"><div class="text-xs font-extrabold tracking-widest text-[#4776bb] mb-1.5">FIELD NOTES · 5 MIN READ</div><h4>Building a calmer reading experience</h4><p>Spacing gives content room to breathe and helps readers understand which pieces belong together.</p></div>`;
+    
+    const innerCenter = state.innerCentering ? 'mx-auto w-32 text-center' : '';
+    return `<article class="sample-card ${mCls} ${wCls} ${maxWCls} mt-${state.cardMargin/4}">
+  <div class="sample-banner"></div>
+  ${inner}
+  <div class="p-4 flex items-center ${state.innerCentering ? 'justify-center' : 'justify-between'}">
+    <button class="sample-btn ${innerCenter}">Read article</button>
+    <span class="text-xs font-bold text-[#3268c7] ${state.innerCentering ? 'hidden' : ''}">Save for later ↗</span>
+  </div>
+</article>`;
+  }
+
+  if (l.component === "form") {
+    return `<div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm ${wCls} ${maxWCls} ${mCls}">
+  <h4 class="text-lg font-bold mb-4">Contact Us</h4>
+  <div class="${pCls} bg-slate-50 border border-slate-300 rounded-lg mb-4 text-sm text-slate-500">Input field area</div>
+  <button class="bg-[#245bb4] text-white px-4 py-2 rounded-lg text-sm font-bold ${getMarginClass()} block">Submit</button>
+</div>`;
+  }
+
+  if (l.component === "article") {
+    return `<article class="bg-white rounded-xl border border-slate-200 shadow-sm ${wCls} ${maxWCls} ${mCls} mx-auto">
+  <div class="bg-blue-500 h-12 rounded-t-xl"></div>
+  <div class="${pCls} ${minHCls} flex flex-col justify-center bg-slate-50/50">
+    <h4 class="text-lg font-bold">Sizing Demo</h4>
+    <p class="text-sm text-slate-500 mt-2">Drag min-height to see this box grow.</p>
+  </div>
+</article>`;
+  }
+
+  if (l.component === "flexcourse") {
+    const item=(name,cls="")=>`<div class="demo-item ${cls}">${name}</div>`;
+    const d=state.flexDirection, g=`gap-${state.gap/4}`;
+    let parent="", children="", note="", parentClasses="", childClasses="";
+    if(l.part==="activate"){
+      parent=`${state.flexDisplay} ${d} gap-4`; parentClasses=parent;
+      children=item("Item A")+item("Item B")+item("Item C");
+      note="Toggle display between block and flex. When display is block, direction has no flex layout effect. The direction utility only matters once display is flex or inline-flex.";
+    } else if(l.part==="justify"){
+      parent=`flex ${d} ${state.justify} ${g}`; parentClasses=parent;
+      children=item("A")+item("B")+item("C");
+      note="The dashed parent has extra room on its main axis. Change direction: the main axis rotates, and justify follows it.";
+    } else if(l.part==="align"){
+      parent=`flex ${d} ${state.items} gap-3 h-[190px]`; parentClasses=parent;
+      children=item("Short","py-2 text-xs")+item("Self override",`${state.selfAlign} py-4 text-lg`)+item("Tall","py-8 text-sm"); childClasses=state.selfAlign;
+      note="The parent controls all items with items-*. The middle child receives self-* and can override the parent's alignment.";
+    } else if(l.part==="wrap"){
+      parent=`flex ${d} ${state.flexWrap} ${state.flexAlignContent} ${g} h-[260px]`; parentClasses=parent;
+      children=["A","B","C","D","E","F"].map(x=>item(x,"w-[42%] min-h-[48px]")).join("");
+      note="The fixed-height container creates spare cross-axis room. Enable wrapping to create multiple lines, then distribute those lines with content-* .";
+    } else if(l.part==="sizing"){
+      parent=`flex flex-row gap-2 w-full max-w-[${state.flexContainerWidth}px]`; parentClasses=parent;
+      children=item("Flexible child",`${state.flexGrow?"grow":"grow-0"} ${state.flexBasis} ${state.flexShrink}`)+item("Fixed · 96px","flex-none w-24")+item("Fixed · 80px","flex-none w-20"); childClasses=`${state.flexGrow?"grow":"grow-0"} ${state.flexBasis} ${state.flexShrink}`;
+      note="The first child gets the selected basis, grow and shrink utilities. The other children are fixed. Compare grow on/off, basis and shrink-0.";
+    } else {
+      parent=`flex ${d} items-center gap-3 h-[150px]`; parentClasses=parent;
+      children=item("First",`${state.flexOrder} ${state.selfAlign} bg-blue-100`)+item("Second","bg-emerald-100")+item("Third","bg-violet-100"); childClasses=`${state.flexOrder} ${state.selfAlign}`;
+      note="Order changes visual order. self-* overrides parent alignment for one item. The DOM order remains unchanged, so do not use visual order to contradict reading order.";
+    }
+    return `<div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 w-full"><div class="font-extrabold text-sm mb-2">${l.title}</div><p class="text-xs text-slate-500 mb-4">${note}</p><div class="demo-zone"><div class="${parentClasses} bg-slate-50 border-2 border-dashed border-slate-400 rounded-lg p-4 min-h-[150px] w-full">${children}</div></div><div class="mini-code">Parent classes: ${parentClasses}</div><div class="mini-code">Child classes: ${childClasses||"(base item styling only)"}</div><div class="callout" style="margin-bottom:0">Observe the parent and child separately. A utility applied to the wrong level will not produce the intended layout.</div></div>`;
+  }
+
+  if (l.component === "gridcourse") {
+    const gap=`gap-${state.gap/4}`;
+    const cols=state.gridResponsive==="responsive"?"grid-cols-1 sm:grid-cols-2 lg:grid-cols-4":state.gridResponsive==="two"?"grid-cols-1 sm:grid-cols-2":`grid-cols-${state.gridCols}`;
+    let parent="", children="", notes="", child="";
+    if(l.part==="gridbase"){
+      parent=`grid grid-cols-${state.gridCols} grid-rows-${state.gridRows} ${gap} h-[280px]`;
+      children=Array.from({length:8},(_,i)=>`<div class="demo-item">Cell ${i+1}</div>`).join(""); notes="Columns and rows are explicit tracks. Additional items may create implicit rows if the explicit grid is full.";
+    } else if(l.part==="gridtracks"){
+      parent=`grid grid-cols-${state.gridCols} ${state.gridAutoRows} ${gap} h-[280px]`;
+      children=["Short","A taller item with more content to demonstrate intrinsic sizing","Medium","Another item"].map((x,i)=>`<div class="demo-item ${i===1?"min-h-[130px]":""}">${x}</div>`).join(""); notes="The explicit columns remain; row sizing utility controls automatically created rows. Change auto-rows-min/max/fr to compare track sizing.";
+    } else if(l.part==="gridspan"){
+      const c=state.colSpan>1?`col-span-${state.colSpan}`:""; const r=state.rowSpan>1?`row-span-${state.rowSpan}`:""; child=`${c} ${r}`;
+      parent=`grid grid-cols-${state.gridCols} grid-rows-3 ${gap} auto-rows-fr h-[280px]`;
+      children=`<div class="demo-item ${child} bg-blue-100">Featured item<br><small>${child||"no span"}</small></div>`+Array.from({length:7},(_,i)=>`<div class="demo-item">Item ${i+2}</div>`).join(""); notes="The first child receives the span utilities. Row span is easiest to see when the grid has visible row tracks.";
+    } else if(l.part==="gridflow"){
+      parent=`grid grid-cols-${state.gridCols} ${state.gridFlow}${state.gridDense?"-dense":""} ${gap} min-h-[260px]`;
+      const place=state.gridPlacement==="auto"?"":state.gridPlacement;
+      children=`<div class="demo-item ${place} col-span-2">Wide item</div>`+Array.from({length:7},(_,i)=>`<div class="demo-item">${i+2}</div>`).join(""); child=place||"auto placement"; notes="The wide item leaves a hole in the first row. Compare row/column flow and dense packing to see how later items fill available cells.";
+    } else if(l.part==="gridalign"){
+      parent=`grid grid-cols-${state.gridCols} grid-rows-2 ${gap} ${state.gridPlaceItems} ${state.gridPlaceContent} h-[320px]`;
+      children=Array.from({length:6},(_,i)=>`<div class="demo-item ${i===1?"self-end":""}">Cell ${i+1}</div>`).join("");
+      child="Cell 2: self-end"; notes="Change place-items to align each item inside its own cell. Then change place-content to move the entire set of tracks within the fixed-height container. Cell 2 has an individual self-end override.";
+    } else {
+      parent=`grid ${cols} ${gap}`;
+      children=Array.from({length:8},(_,i)=>`<div class="demo-item">Card ${i+1}</div>`).join("");
+      notes="Resize the browser window. The responsive version moves from one column to two at sm and four at lg. The fixed version retains the selected column count.";
+    }
+    return `<div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 w-full"><div class="font-extrabold text-sm mb-2">${l.title}</div><p class="text-xs text-slate-500 mb-4">${notes}</p><div class="demo-zone"><div class="${parent} bg-slate-50 border-2 border-dashed border-slate-400 rounded-lg p-3 w-full">${children}</div></div><div class="mini-code">Parent classes: ${parent}</div><div class="mini-code">Child classes: ${child||"Grid items auto-place unless a span or placement utility is applied."}</div></div>`;
+  }
+
+  if (l.component === "flexdemo") {
+    const item = (n, extra="") => `<div class="demo-item ${extra}">${n}</div>`;
+    const direction = state.flexDirection;
+    const justify = state.justify;
+    const items = state.items;
+    const wrap = state.flexWrap;
+    const gap = `gap-${state.gap/4}`;
+    const alignContent = state.flexAlignContent;
+    const growClass = state.flexGrow ? "grow" : "grow-0";
+    const shrinkClass = state.flexShrink;
+    const basisClass = state.flexBasis;
+    return `<div class="bg-white rounded-xl border border-slate-200 shadow-sm w-full p-4">
+      <div class="mb-4"><div class="text-sm font-extrabold text-slate-800">Four focused Flexbox experiments</div><p class="text-xs text-slate-500 mt-1">The controls above are shared where the same property affects more than one experiment. Each panel labels its parent and child classes.</p></div>
+      <div class="flex-lesson-grid">
+        <section class="concept-card"><h5>1 · Direction + main-axis distribution</h5><p class="explain">The parent is a flex container. Change direction, then move items along the main axis with justify-content.</p>
+          <div class="demo-zone"><div class="flex ${direction} ${justify} ${gap} min-h-[120px] h-full w-full">${item("One")} ${item("Two")} ${item("Three")}</div></div>
+          <div class="mini-code">Parent: flex ${direction} ${justify} ${gap}</div>
+          <div class="mini-code">Child: demo-item (no layout utility required)</div>
+        </section>
+        <section class="concept-card"><h5>2 · Cross-axis alignment</h5><p class="explain">Items alignment works across the cross axis. Their different heights make start, center, end and stretch visible.</p>
+          <div class="demo-zone"><div class="flex ${direction} items-${items.replace("items-","")} ${gap} h-[150px] w-full">${item("Short","self-auto")} ${item("Medium","py-6")} ${item("Tall","py-10")}</div></div>
+          <div class="mini-code">Parent: flex ${direction} ${items} ${gap} h-[150px]</div>
+          <div class="mini-code">Remember: the cross axis rotates when direction changes.</div>
+        </section>
+        <section class="concept-card"><h5>3 · Wrapping + line alignment</h5><p class="explain">The narrow parent forces items onto multiple lines when wrapping is enabled. Content alignment distributes the lines, not individual items.</p>
+          <div class="demo-zone"><div class="flex ${wrap} ${alignContent} ${gap} h-[190px] w-full">${item("A","w-[42%]")} ${item("B","w-[42%]")} ${item("C","w-[42%]")} ${item("D","w-[42%]")} ${item("E","w-[42%]")}</div></div>
+          <div class="mini-code">Parent: flex ${wrap} ${alignContent} ${gap} h-[190px]</div>
+          <div class="mini-code">Child: w-[42%] · Try flex-nowrap vs flex-wrap</div>
+        </section>
+        <section class="concept-card"><h5>4 · Flex item sizing</h5><p class="explain">Flex sizing utilities belong on the child. Toggle growth, change the starting basis, and compare normal shrink with shrink-0.</p>
+          <div class="demo-zone"><div class="flex flex-row ${gap} w-full max-w-[220px]">${item("Flexible item",`${growClass} ${basisClass} ${shrinkClass}`)} ${item("Fixed item","flex-none w-20")} ${item("Fixed item","flex-none w-20")}</div></div>
+          <div class="mini-code">Parent: flex flex-row ${gap}</div>
+          <div class="mini-code">First child: ${growClass} ${basisClass} ${shrinkClass}</div>
+        </section>
+      </div>
+      <div class="callout" style="margin-bottom:0"><strong>Parent vs child:</strong> <code>flex</code>, direction, wrapping, justify, items, content and gap configure the container. <code>flex-1</code>, <code>basis-*</code>, <code>grow</code>, and <code>shrink-0</code> configure individual flex items.</div>
+    </div>`;
+  }
+
+  if (l.component === "griddemo") {
+    const spanCls = state.colSpan > 1 ? `col-span-${state.colSpan}` : '';
+    return `<div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm w-full">
+  <h4 class="text-sm font-bold mb-4">Grid Playground</h4>
+  <div class="grid grid-cols-${state.gridCols} gap-${state.gap/4} bg-slate-50 border-2 border-dashed border-slate-300 p-4 rounded-lg">
+    <div class="${spanCls} bg-blue-100 border border-blue-300 p-6 rounded-lg text-xs font-bold text-center">Item 1 ${state.colSpan>1?'(Spanned)':''}</div>
+    <div class="bg-blue-100 border border-blue-300 p-6 rounded-lg text-xs font-bold text-center">Item 2</div>
+    <div class="bg-blue-100 border border-blue-300 p-6 rounded-lg text-xs font-bold text-center">Item 3</div>
+    <div class="bg-blue-100 border border-blue-300 p-6 rounded-lg text-xs font-bold text-center">Item 4</div>
+  </div>
+</div>`;
+  }
+
+  if (l.component === "groupdemo") {
+    const isFlex = state.groupLayout === "flex";
+    const layoutCls = isFlex ? `flex ${state.groupDir} flex-wrap` : "grid grid-cols-2";
+    let spaceCls = "";
+    let methodNote = "";
+    if (state.groupMethod === "gap") {
+      spaceCls = `gap-${state.groupSpacing/4}`;
+      methodNote = "gap adds space between flex items or grid tracks.";
+    } else if (state.groupMethod === "space-x") {
+      spaceCls = `space-x-${state.groupSpacing/4}`;
+      methodNote = "space-x adds left margin to each child except the first; it is most intuitive in a row.";
+    } else {
+      spaceCls = `space-y-${state.groupSpacing/4}`;
+      methodNote = "space-y adds top margin to each child except the first; it is most intuitive in a column.";
+    }
+    return `<div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm w-full">
+      <h4 class="text-sm font-bold mb-2">Layout: ${isFlex ? state.groupDir : "grid grid-cols-2"}</h4>
+      <p class="text-xs text-slate-500 mb-4">${methodNote}</p>
+      <div class="${layoutCls} ${spaceCls} bg-slate-50 p-4 border border-dashed border-slate-300 rounded-lg">
+        <div class="bg-white border border-slate-200 p-4 rounded-lg text-xs font-bold shadow-sm">Item 1</div>
+        <div class="bg-white border border-slate-200 p-4 rounded-lg text-xs font-bold shadow-sm">Item 2</div>
+        <div class="bg-white border border-slate-200 p-4 rounded-lg text-xs font-bold shadow-sm">Item 3</div>
+        <div class="bg-white border border-slate-200 p-4 rounded-lg text-xs font-bold shadow-sm">Item 4</div>
+      </div>
+    </div>`;
+  }
+
+  if (l.component === "profile") {
+    return `<article class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden ${wCls} ${maxWCls} mt-${state.margin/4}">
+  <div class="h-32 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+  <div class="${pCls}">
+    <div class="-mt-${Math.abs(state.negative/4)} h-20 w-20 bg-slate-200 border-4 border-white rounded-full flex items-center justify-center text-slate-500 font-bold text-xs mb-4">Avatar</div>
+    <h4 class="text-lg font-bold">Jane Doe</h4>
+    <p class="text-sm text-slate-500">Product Designer</p>
+  </div>
+</article>`;
+  }
+
+  if (l.component === "product") {
+    return `<article class="bg-white rounded-xl border border-slate-200 shadow-sm ${wCls} ${maxWCls} ${mCls}">
+  <div class="${pCls}">
+    <h4 class="text-lg font-bold mb-2">Premium Plan</h4>
+    <p class="text-sm text-slate-500 mb-4">Unlock all features for your team.</p>
+    <button class="bg-[#245bb4] text-white px-4 py-2 rounded-lg text-sm font-bold w-full">Upgrade Now</button>
+  </div>
+</article>`;
+  }
+
+  if (l.component === "capstone") {
+    const mobile = state.capstoneViewport === "mobile";
+    const shellLayout = state.capstoneShell === "grid" ? `grid grid-cols-1 ${mobile?"":"md:grid-cols-"+state.capstoneCols}` : `flex flex-col ${mobile?"":"md:flex-row"}`;
+    const shellGap = state.capstoneGapMethod === "gap" ? `gap-${state.capstoneGap/4}` : `space-y-${state.capstoneGap/4}`;
+    const sidebarWidth = state.capstoneShell === "grid" ? (mobile?"":"md:col-span-1") : (mobile?"":"md:w-1/4");
+    const mainWidth = state.capstoneShell === "grid" ? (mobile?"":`md:col-span-${Math.max(1,state.capstoneCols-1)}`) : "flex-1";
+    const navSpace = state.capstoneNavMethod === "gap" ? `gap-${state.capstoneNavSpacing/4}` : `space-y-${state.capstoneNavSpacing/4}`;
+    const cardsSpace = state.capstoneCardGapMethod === "gap" ? `gap-${state.capstoneCardGap/4}` : `${state.capstoneCardGapMethod}-${state.capstoneCardGap/4}`;
+    const cardsLayout = state.capstoneCardsLayout === "grid" ? `grid grid-cols-1 ${mobile?"":"sm:grid-cols-"+state.capstoneCardCols}` : `flex flex-wrap`;
+    const cardWidth = state.capstoneCardsLayout === "flex" ? (state.capstoneCardCols===2?"w-5/12":state.capstoneCardCols===3?"w-1/4":"w-full") : "";
+    const outerPad = `p-${state.capstoneOuterPadding/4}`;
+    const cardPad = state.capstonePaddingMode === "arbitrary" ? `${state.capstonePaddingAxis}-[${state.capstoneCardPadding}px]` : `${state.capstonePaddingAxis}-${state.capstoneCardPadding/4}`;
+    const cardMargin = `m-${state.capstoneCardMargin/4}`;
+    const negativeBadge = `-mt-${state.capstoneNegativeMargin/4}`;
+    const data = [["Revenue","$24,500","+12.8%"],["Active users","1,204","+8.2%"],["Orders","846","+4.6%"]];
+    const cards = data.slice(0,state.capstoneCardCount).map((d,i)=>`<article class="bg-white rounded-xl border border-slate-200 shadow-sm ${cardPad} ${cardMargin} ${cardWidth}"><div class="text-xs font-bold text-slate-500 mb-2">${d[0]}</div><div class="text-2xl font-black text-slate-800">${d[1]}</div><div class="text-xs font-bold text-emerald-700 mt-2">${d[2]} this month</div><div class="mt-4 h-2 rounded-full bg-slate-100"><div class="h-2 rounded-full bg-blue-500" style="width:${[72,58,84][i]}%"></div></div></article>`).join("");
+    const previewWidth = mobile ? "max-w-[390px]" : "w-full";
+    return `<div class="${previewWidth} bg-slate-100 rounded-xl border border-slate-300 ${outerPad} mx-auto">
+      <div class="flex items-center justify-between gap-3 mb-4"><div><div class="text-xs font-extrabold tracking-widest text-slate-500">NORTHSTAR / ANALYTICS</div><div class="text-sm font-black text-slate-800">Workspace</div></div><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-blue-200"></div><div class="text-xs font-bold text-slate-600">Admin</div></div></div>
+      <div class="${shellLayout} ${shellGap} items-start">
+        <aside class="${sidebarWidth} bg-white border border-slate-200 rounded-xl ${cardPad} min-w-0">
+          <div class="font-black text-slate-800 text-sm mb-4">Navigation</div>
+          <nav class="flex flex-col ${navSpace}"><div class="bg-blue-50 text-blue-800 rounded-lg px-3 py-2 text-xs font-extrabold">Overview</div><div class="text-slate-500 rounded-lg px-3 py-2 text-xs font-bold">Analytics</div><div class="text-slate-500 rounded-lg px-3 py-2 text-xs font-bold">Customers</div><div class="text-slate-500 rounded-lg px-3 py-2 text-xs font-bold">Settings</div></nav>
+        </aside>
+        <main class="${mainWidth} min-w-0 flex flex-col gap-4">
+          <header class="bg-white border border-slate-200 rounded-xl ${cardPad} flex flex-wrap items-center ${state.capstoneHeaderAlign} gap-${state.capstoneHeaderGap/4}"><div><div class="text-base font-black text-slate-800">Dashboard overview</div><div class="text-xs text-slate-500 mt-1">Your workspace at a glance</div></div><div class="flex items-center gap-2"><span class="${negativeBadge} rounded-full bg-emerald-100 text-emerald-800 px-2 py-1 text-[10px] font-extrabold">LIVE</span><button class="bg-blue-600 text-white rounded-lg px-3 py-2 text-xs font-bold">Download report</button></div></header>
+          <section class="${cardsLayout} ${cardsSpace} items-stretch">${cards}</section>
+          <section class="bg-white border border-slate-200 rounded-xl ${cardPad}"><div class="flex items-center justify-between gap-3 mb-3"><div class="text-sm font-extrabold text-slate-800">Recent activity</div><div class="text-xs text-blue-700 font-bold">View all</div></div><div class="flex flex-col gap-3"><div class="flex items-center justify-between gap-3"><div class="text-xs text-slate-600">New customer registration</div><div class="text-xs text-slate-400">2 min ago</div></div><div class="flex items-center justify-between gap-3"><div class="text-xs text-slate-600">Monthly report generated</div><div class="text-xs text-slate-400">1 hour ago</div></div></div></section>
+        </main>
+      </div>
+      <div class="mt-3 text-[10px] text-slate-500 font-mono">Viewport: ${mobile?"mobile · 390px":"desktop"} · Shell: ${state.capstoneShell} · Cards: ${state.capstoneCardsLayout} · Spacing: ${state.capstoneCardGapMethod}</div>
+    </div>`;
+  }
+  return "";
+}
+
+/* ---------- Render Controls ---------- */
+function slider(id, label, min, max, step, val, suffix="px") {
+  return `<div class="control"><div class="control-top"><label>${label}</label><span class="value" id="${id}Value">${val}${suffix}</span></div><input id="${id}" type="range" min="${min}" max="${max}" step="${step}" value="${val}"></div>`;
+}
+function select(id, label, opts, val) {
+  return `<div class="control"><div class="control-top"><label>${label}</label></div><select id="${id}">${opts.map(o=>`<option value="${o[0]}" ${o[0]===val?'selected':''}>${o[1]}</option>`).join("")}</select></div>`;
+}
+function toggle(id, label, val) {
+  return `<div class="control"><div class="control-top"><label>${label}</label></div><div class="seg" data-seg="${id}"><button data-toggle="${id}" data-v="true" class="${val?'selected':''}">ON</button><button data-toggle="${id}" data-v="false" class="${!val?'selected':''}">OFF</button></div></div>`;
+}
+
+function renderControls() {
+  const l = lessons[current];
+  let c = "";
+  
+  if (l.controls.includes("padding")) c += slider("padding","Padding (p-*)",0,64,4,state.padding);
+  if (l.controls.includes("margin")) c += slider("margin","Margin (m-*)",0,64,4,state.margin);
+  if (l.controls.includes("cardMargin")) c += slider("cardMargin","Card Top Margin (mt-*)",0,64,4,state.cardMargin);
+  
+  if (l.controls.includes("scale")) c += select("scale","Scale Step (p-*)",[["1","1 (4px)"],["2","2 (8px)"],["4","4 (16px)"],["8","8 (32px)"]],String(state.scale));
+  
+  if (l.controls.includes("direction")) c += select("direction","Padding Direction",[["px","Horizontal (px)"],["py","Vertical (py)"],["pt","Top (pt)"],["pb","Bottom (pb)"]],state.direction);
+  if (l.controls.includes("directionMargin")) c += select("directionMargin","Margin Direction",[["mt","Top (mt)"],["mb","Bottom (mb)"],["ml","Left (ml)"],["mx-auto","Auto Horizontal (mx-auto)"]],state.directionMargin);
+  
+  if (l.controls.includes("width")) c += select("width","Width Class",[["w-full","w-full"],["w-1/2","w-1/2"],["w-64","w-64"]],state.width);
+  if (l.controls.includes("maxWidth")) c += select("maxWidth","Max-Width Class",[["max-w-sm","max-w-sm"],["max-w-md","max-w-md"],["max-w-lg","max-w-lg"],["max-w-none","None"]],state.maxWidth);
+  if (l.controls.includes("minHeight")) c += slider("minHeight","Min-Height",40,300,20,state.minHeight);
+  
+  if (l.controls.includes("centering")) c += toggle("centering","Use mx-auto on Card",state.centering);
+  if (l.controls.includes("innerCentering")) c += toggle("innerCentering","Center Inner Button",state.innerCentering);
+  
+  if (l.controls.includes("flexDirection")) c += select("flexDirection","Flex Direction",[["flex-row","Row (flex-row)"],["flex-col","Column (flex-col)"]],state.flexDirection);
+  if (l.controls.includes("justify")) c += select("justify","Justify · main axis",[["justify-start","Start"],["justify-center","Center"],["justify-end","End"],["justify-between","Between"],["justify-around","Around"],["justify-evenly","Evenly"]],state.justify);
+  if (l.controls.includes("items")) c += select("items","Align Items · cross axis",[["items-start","Start"],["items-center","Center"],["items-end","End"],["items-stretch","Stretch"],["items-baseline","Baseline"]],state.items);
+  if (l.controls.includes("flexWrap")) c += select("flexWrap","Flex Wrap",[["flex-nowrap","No wrap"],["flex-wrap","Wrap"],["flex-wrap-reverse","Wrap reverse"]],state.flexWrap);
+  if (l.controls.includes("flexAlignContent")) c += select("flexAlignContent","Align wrapped lines",[["content-start","Start"],["content-center","Center"],["content-end","End"],["content-between","Between"],["content-around","Around"],["content-evenly","Evenly"],["content-stretch","Stretch"]],state.flexAlignContent);
+  if (l.controls.includes("flexGrow")) c += toggle("flexGrow","First child grows (grow)",state.flexGrow);
+  if (l.controls.includes("flexBasis")) c += select("flexBasis","First child basis",[["basis-1/4","25%"],["basis-1/3","33%"],["basis-1/2","50%"],["basis-auto","Auto"],["basis-0","0%"]],state.flexBasis);
+  if (l.controls.includes("flexShrink")) c += select("flexShrink","First child shrink",[["shrink","Can shrink (default)"],["shrink-0","Cannot shrink (shrink-0)"]],state.flexShrink);
+  
+  if (l.controls.includes("gridCols")) c += select("gridCols","Grid Columns",[["1","1 Col"],["2","2 Cols"],["3","3 Cols"],["4","4 Cols"]],String(state.gridCols));
+  if (l.controls.includes("colSpan")) c += select("colSpan","Span Item 1",[["1","Span 1"],["2","Span 2"],["3","Span 3"]],String(state.colSpan));
+  if (l.controls.includes("gap")) c += slider("gap","Gap (gap-*)",0,32,4,state.gap);
+  
+  if (l.controls.includes("groupLayout")) c += select("groupLayout","Parent Layout",[["flex","Flexbox"],["grid","Grid"]],state.groupLayout);
+  if (l.controls.includes("groupDir")) c += select("groupDir","Flex Direction",[["flex-row","Row (flex-row)"],["flex-col","Column (flex-col)"]],state.groupDir);
+  if (l.controls.includes("groupMethod")) c += select("groupMethod","Spacing Method",[["gap","gap-*"],["space-x","space-x-*"],["space-y","space-y-*"]],state.groupMethod);
+  if (l.controls.includes("groupSpacing")) c += slider("groupSpacing","Spacing Size",0,32,4,state.groupSpacing);
+  
+  if (l.controls.includes("negative")) c += slider("negative","Negative Top Margin (-mt-*)",-80,0,8,state.negative);
+  
+  if (l.controls.includes("customPadding")) c += slider("customPadding","Arbitrary Padding [px]",0,48,1,state.customPadding);
+  if (l.controls.includes("customMargin")) c += slider("customMargin","Arbitrary Margin [px]",0,48,1,state.customMargin);
+  
+  if (l.kind === "capstone") {
+    c += `<div class="capstone-controls">Page shell · Grid or Flexbox</div>`;
+    c += select("capstoneViewport","Preview viewport",[["desktop","Desktop"],["mobile","Mobile · 390px"]],state.capstoneViewport);
+    c += select("capstoneShell","Outer layout",[["grid","CSS Grid"],["flex","Flexbox"]],state.capstoneShell);
+    c += select("capstoneCols","Grid columns · when shell = Grid",[["2","2 columns"],["3","3 columns"],["4","4 columns"]],String(state.capstoneCols));
+    c += slider("capstoneOuterPadding","Dashboard outer padding",0,32,4,state.capstoneOuterPadding);
+    c += `<div class="capstone-controls">Shell spacing · gap vs space-y</div>`;
+    c += select("capstoneGapMethod","Outer spacing method",[["gap","gap-* (recommended)"],["space-y","space-y-* (margins)"]],state.capstoneGapMethod);
+    c += slider("capstoneGap","Outer spacing",0,40,4,state.capstoneGap);
+    c += `<div class="capstone-controls">Sidebar · Flexbox navigation</div>`;
+    c += select("capstoneNavMethod","Navigation spacing",[["gap","gap-*"],["space-y","space-y-*"]],state.capstoneNavMethod);
+    c += slider("capstoneNavSpacing","Navigation spacing size",0,32,4,state.capstoneNavSpacing);
+    c += `<div class="capstone-controls">Header · Flexbox alignment</div>`;
+    c += select("capstoneHeaderAlign","Header justify",[["justify-start","Start"],["justify-center","Center"],["justify-between","Between"],["justify-end","End"]],state.capstoneHeaderAlign);
+    c += slider("capstoneHeaderGap","Header gap",0,32,4,state.capstoneHeaderGap);
+    c += `<div class="capstone-controls">Metric cards · Grid or wrapping Flexbox</div>`;
+    c += select("capstoneCardsLayout","Card layout",[["grid","Grid"],["flex","Flexbox + wrap"]],state.capstoneCardsLayout);
+    c += select("capstoneCardCols","Card columns / width",[["1","1 wide"],["2","2 columns"],["3","3 columns"]],String(state.capstoneCardCols));
+    c += select("capstoneCardGapMethod","Card spacing method",[["gap","gap-* (recommended)"],["space-x","space-x-* (row margins)"],["space-y","space-y-* (column margins)"]],state.capstoneCardGapMethod);
+    c += slider("capstoneCardGap","Space between cards",0,40,4,state.capstoneCardGap);
+    c += select("capstonePaddingAxis","Card padding direction",[["p","All sides · p-*"],["px","Horizontal · px-*"],["py","Vertical · py-*"],["pt","Top · pt-*"],["pb","Bottom · pb-*"]],state.capstonePaddingAxis);
+    c += select("capstonePaddingMode","Padding value type",[["scale","Standard spacing scale"],["arbitrary","Arbitrary pixel value"]],state.capstonePaddingMode);
+    c += slider("capstoneCardPadding","Card padding value",0,40,4,state.capstoneCardPadding);
+    c += slider("capstoneCardMargin","Margin outside each card",0,24,4,state.capstoneCardMargin);
+    c += slider("capstoneNegativeMargin","Negative top margin on LIVE badge",0,24,4,state.capstoneNegativeMargin);
+    c += select("capstoneCardCount","Number of metric cards",[["1","1 card"],["2","2 cards"],["3","3 cards"]],String(state.capstoneCardCount));
+  }
+
+  // Focused controls for the lesson currently being taught.
+  if (l.component === "flexcourse") {
+    if (l.part === "activate") {
+      c += select("flexDisplay","Parent display",[["block","block · not flex"],["flex","flex"],["inline-flex","inline-flex"]],state.flexDisplay);
+      c += select("flexDirection","Direction",[["flex-row","Row"],["flex-row-reverse","Row reverse"],["flex-col","Column"],["flex-col-reverse","Column reverse"]],state.flexDirection);
+    }
+    if (["justify","align","patterns"].includes(l.part)) c += select("flexDirection","Direction",[["flex-row","Row"],["flex-col","Column"]],state.flexDirection);
+    if (l.part === "justify" || l.part === "patterns") c += select("justify","Main-axis distribution",[["justify-start","Start"],["justify-center","Center"],["justify-end","End"],["justify-between","Between"],["justify-around","Around"],["justify-evenly","Evenly"]],state.justify);
+    if (l.part === "align") {
+      c += select("items","Parent cross-axis alignment",[["items-start","Start"],["items-center","Center"],["items-end","End"],["items-stretch","Stretch"],["items-baseline","Baseline"]],state.items);
+      c += select("selfAlign","One child's override",[["self-auto","Auto"],["self-start","Start"],["self-center","Center"],["self-end","End"],["self-stretch","Stretch"]],state.selfAlign);
+    }
+    if (l.part === "wrap") {
+      c += select("flexWrap","Wrapping",[["flex-nowrap","No wrap"],["flex-wrap","Wrap"],["flex-wrap-reverse","Wrap reverse"]],state.flexWrap);
+      c += select("flexAlignContent","Wrapped line distribution",[["content-start","Start"],["content-center","Center"],["content-end","End"],["content-between","Between"],["content-around","Around"],["content-evenly","Evenly"],["content-stretch","Stretch"]],state.flexAlignContent);
+      c += select("flexDirection","Direction",[["flex-row","Row"],["flex-col","Column"]],state.flexDirection);
+    }
+    if (l.part === "sizing") {
+      c += toggle("flexGrow","Allow first item to grow",state.flexGrow);
+      c += select("flexBasis","First item basis",[["basis-0","0"],["basis-1/4","25%"],["basis-1/3","33.333%"],["basis-1/2","50%"],["basis-auto","Auto"]],state.flexBasis);
+      c += slider("flexContainerWidth","Available container width",200,560,20,state.flexContainerWidth);
+      c += select("flexShrink","First item shrink",[["shrink","Can shrink"],["shrink-0","Cannot shrink"]],state.flexShrink);
+    }
+    if (l.part === "patterns") {
+      c += select("flexOrder","First item's order",[["order-0","Source order"],["order-first","First"],["order-1","1"],["order-2","2"],["order-3","3"],["order-last","Last"]],state.flexOrder);
+      c += select("selfAlign","First item's self alignment",[["self-auto","Auto"],["self-start","Start"],["self-center","Center"],["self-end","End"],["self-stretch","Stretch"]],state.selfAlign);
+    }
+    if (["justify","wrap"].includes(l.part)) c += slider("gap","Parent gap",0,32,4,state.gap);
+  }
+  if (l.component === "gridcourse") {
+    c += select("gridCols","Explicit columns",[["1","1"],["2","2"],["3","3"],["4","4"]],String(state.gridCols));
+    if (l.part === "gridbase") c += select("gridRows","Explicit rows",[["1","1"],["2","2"],["3","3"]],String(state.gridRows));
+    if (l.part === "gridtracks") c += select("gridAutoRows","Implicit row size",[["auto-rows-min","Min-content"],["auto-rows-max","Max-content"],["auto-rows-fr","Equal fraction"],["auto-rows-auto","Auto"]],state.gridAutoRows);
+    if (l.part === "gridspan") {
+      c += select("colSpan","First item column span",[["1","1 column"],["2","2 columns"],["3","3 columns"]],String(state.colSpan));
+      c += select("rowSpan","First item row span",[["1","1 row"],["2","2 rows"],["3","3 rows"]],String(state.rowSpan));
+    }
+    if (l.part === "gridflow") {
+      c += select("gridFlow","Auto-placement flow",[["grid-flow-row","Row"],["grid-flow-col","Column"]],state.gridFlow);
+      c += toggle("gridDense","Dense packing",state.gridDense);
+      c += select("gridPlacement","First item placement",[["auto","Automatic"],["col-start-1","Column 1"],["col-start-2","Column 2"],["col-start-3","Column 3"]],state.gridPlacement);
+    }
+    if (l.part === "gridresponsive") c += select("gridResponsive","Responsive behaviour",[["responsive","1 → 2 → 4 columns"],["two","1 → 2 columns"],["fixed","Fixed columns"]],state.gridResponsive);
+    if (l.part === "gridalign") {
+      c += select("gridPlaceItems","Align items inside cells",[["place-items-start","Start"],["place-items-center","Center"],["place-items-end","End"],["place-items-stretch","Stretch"]],state.gridPlaceItems);
+      c += select("gridPlaceContent","Align tracks inside container",[["place-content-start","Start"],["place-content-center","Center"],["place-content-end","End"],["place-content-between","Between"],["place-content-around","Around"],["place-content-evenly","Evenly"]],state.gridPlaceContent);
+    }
+    c += slider("gap","Grid gap",0,32,4,state.gap);
+  }
+  $("controls").innerHTML = c;
+
+  $("controls").querySelectorAll("input,select").forEach(el=>{
+    el.addEventListener("input",()=>{
+      let v = el.type === "range" ? Number(el.value) : el.value;
+      if (["scale", "gridCols", "gridRows", "colSpan", "rowSpan"].includes(el.id)) v = Number(v);
+      state[el.id] = v;
+      const valLabel = document.getElementById(el.id + "Value");
+      if (valLabel) valLabel.textContent = el.id === "negative" ? v + "px" : v + (el.type==="range"?"px":"");
+      updateAll();
+    });
+  });
+
+  $("controls").querySelectorAll("[data-toggle]").forEach(btn=>{
+    btn.onclick = ()=>{
+      state[btn.dataset.toggle] = btn.dataset.v === "true";
+      const seg = btn.parentElement;
+      seg.querySelectorAll("button").forEach(x=>x.classList.toggle("selected", x.dataset.v === String(state[btn.dataset.toggle])));
+      updateAll();
+    };
+  });
+}
+
+/* ---------- Update Diagram & Preview ---------- */
+function updateAll(skipEditor = false) {
+  const html = generateHTML();
+  
+  if (!skipEditor) {
+    $("codeEditor").value = html;
+  }
+  
+  $("previewStage").innerHTML = html;
+  
+  const p = getPadPixels();
+  const m = getMarginPixels();
+  const vis = v => v === "auto" ? 24 : Math.abs(v);
+  
+  let mTop = vis(m.t), mRight = vis(m.r), mBottom = vis(m.b), mLeft = vis(m.l);
+  if (lessons[current].kind === "negative") mTop = 0;
+  
+  $("marginBox").style.padding = `${mTop}px ${mRight}px ${mBottom}px ${mLeft}px`;
+  $("borderBox").style.padding = `${p.t}px ${p.r}px ${p.b}px ${p.l}px`;
+  
+  $("marginLabel").textContent = `margin · ${getMarginClass()}`;
+  $("borderLabel").textContent = `padding · ${getPadClass()}`;
+  
+  const content = $("contentBox");
+  if (lessons[current].kind === "sizing") {
+    content.style.minHeight = state.minHeight + "px";
+    content.textContent = `Content · min-h-[${state.minHeight}px]`;
+  } else if (lessons[current].kind === "group") {
+    content.style.minHeight = "56px";
+    content.textContent = `Content · Items`;
+  } else if (lessons[current].kind === "capstone") {
+    content.style.minHeight = "56px";
+    content.textContent = `Content · Grid + Flex`;
+  } else {
+    content.style.minHeight = "56px";
+    content.textContent = `Content · ${p.t}/${p.r}/${p.b}/${p.l}px`;
+  }
+}
+
+/* ---------- Parse Live Editor ---------- */
+function parseEditor() {
+  const html = $("codeEditor").value;
+  const tokens = [...html.matchAll(/class\s*=\s*["']([^"']*)["']/g)]
+    .flatMap(m => m[1].split(/\s+/)).filter(Boolean);
+    
+  for (const t of tokens) {
+    let m;
+    if ((m = t.match(/^p-(\d+)$/))) { state.padding=+m[1]*4; state.scale=+m[1]; }
+    else if ((m = t.match(/^px-(\d+)$/))) { state.direction="px"; state.padding=+m[1]*4; }
+    else if ((m = t.match(/^py-(\d+)$/))) { state.direction="py"; state.padding=+m[1]*4; }
+    else if ((m = t.match(/^p-\[(\d+)px\]$/))) { state.customPadding = +m[1]; }
+    else if ((m = t.match(/^m-(\d+)$/))) { state.margin=+m[1]*4; state.centering=false; }
+    else if (t === "mx-auto") { state.centering = true; }
+    else if ((m = t.match(/^-mt-(\d+)$/))) { state.negative = -(+m[1]*4); }
+    else if ((m = t.match(/^mt-\[(\d+)px\]$/))) { state.customMargin = +m[1]; }
+    else if (["w-full","w-1/2","w-64"].includes(t)) state.width = t;
+    else if (["max-w-sm","max-w-md","max-w-lg"].includes(t)) state.maxWidth = t;
+    else if ((m = t.match(/^min-h-\[(\d+)px\]$/))) { state.minHeight = +m[1]; }
+    else if (["flex-row","flex-col"].includes(t)) { state.flexDirection = t; state.groupDir = t; }
+    else if (["flex-wrap","flex-nowrap"].includes(t)) state.flexWrap = t;
+    else if (["justify-start","justify-center","justify-between"].includes(t)) state.justify = t;
+    else if (["items-start","items-center","items-end","items-stretch"].includes(t)) state.items = t;
+    else if (t === "flex-1") state.flexGrow = true;
+    else if ((m = t.match(/^gap-(\d+)$/))) state.gap=+m[1]*4;
+    else if ((m = t.match(/^space-x-(\d+)$/))) { state.groupMethod="space-x"; state.groupSpacing=+m[1]*4; }
+    else if ((m = t.match(/^space-y-(\d+)$/))) { state.groupMethod="space-y"; state.groupSpacing=+m[1]*4; }
+    else if ((m = t.match(/^grid-cols-(\d+)$/))) state.gridCols=+m[1];
+    else if ((m = t.match(/^col-span-(\d+)$/))) state.colSpan=+m[1];
+  }
+}
+
+/* ---------- Navigation & Init ---------- */
+function renderNav(){
+  $("lessonNav").innerHTML = lessons.map((l,i)=>
+    `<button class="${i===current?'active':''}" data-i="${i}"><span class="num">${String(i+1).padStart(2,"0")}</span><span>${l.title}</span></button>`
+  ).join("");
+  document.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{current=+b.dataset.i; renderLesson();});
+}
+
+function renderLesson(){
+  const l = lessons[current];
+  $("badge").textContent = l.badge;
+  $("lessonTitle").textContent = l.title;
+  $("lessonTheory").innerHTML = l.theory;
+  $("takeaway").textContent = l.takeaway;
+  
+  document.querySelector(".work-grid").classList.toggle("layout-lesson", ["flexcourse","gridcourse"].includes(l.component));
+  renderNav();
+  renderControls();
+  updateAll();
+  
+  $("nextLesson").textContent = current === lessons.length - 1 ? "Finish Module ✓" : "Next Lesson →";
+  $("nextLesson").disabled = current === lessons.length - 1;
+}
+
+$("codeEditor").addEventListener("input", () => {
+  $("previewStage").innerHTML = $("codeEditor").value;
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(() => {
+    parseEditor();
+    const p = getPadPixels();
+    const m = getMarginPixels();
+    const vis = v => v === "auto" ? 24 : Math.abs(v);
+    $("marginBox").style.padding = `${vis(m.t)}px ${vis(m.r)}px ${vis(m.b)}px ${vis(m.l)}px`;
+    $("borderBox").style.padding = `${p.t}px ${p.r}px ${p.b}px ${p.l}px`;
+    $("marginLabel").textContent = `margin · ${getMarginClass()}`;
+    $("borderLabel").textContent = `padding · ${getPadClass()}`;
+  }, 300);
+});
+
+$("resetCode").onclick = () => updateAll();
+$("nextLesson").onclick = () => { if (current < lessons.length - 1){ current++; renderLesson(); } };
+
+renderLesson();
+</script>
+</body>
+</html>
