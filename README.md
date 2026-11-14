@@ -58,4 +58,7 @@ The repository contains standalone HTML files for individual lessons and practic
 
 The project is intended to be hosted using GitHub Pages.
 
+## WARNING 
+Some pages may not work as expected you can use various AI agents to understand the lessons and as well Tailwind Playground to practice your skills. Also do not forget to always visit the official tailwind documentation. 
+
 
